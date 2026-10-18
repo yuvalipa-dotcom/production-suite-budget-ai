@@ -1,0 +1,2044 @@
+{
+  "contract": "frozen_split",
+  "counts": {
+    "demo": 40,
+    "productions": 400,
+    "test": 80,
+    "train": 280,
+    "train_folds": {
+      "0": 56,
+      "1": 56,
+      "2": 56,
+      "3": 56,
+      "4": 56
+    }
+  },
+  "description": "Frozen production-level train/test/demo groups and grouped CV folds (train only). Every snapshot inherits its production's group and fold. Not a dataset version.",
+  "n_folds": 5,
+  "non_train_cv_fold": -1,
+  "productions": [
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0001",
+      "split": "test"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0002",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0003",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0004",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0005",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0006",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0007",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0008",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0009",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0010",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0011",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0012",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0013",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0014",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0015",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0016",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0017",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0018",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0019",
+      "split": "test"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0020",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0021",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0022",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0023",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0024",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0025",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0026",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0027",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0028",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0029",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0030",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0031",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0032",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0033",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0034",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0035",
+      "split": "test"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0036",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0037",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0038",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0039",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0040",
+      "split": "test"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0041",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0042",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0043",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0044",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0045",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0046",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0047",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0048",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0049",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0050",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0051",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0052",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0053",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0054",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0055",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0056",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0057",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0058",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0059",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0060",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0061",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0062",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0063",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0064",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0065",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0066",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0067",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0068",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0069",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0070",
+      "split": "test"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0071",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0072",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0073",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0074",
+      "split": "test"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0075",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0076",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0077",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0078",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0079",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0080",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0081",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0082",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0083",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0084",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0085",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0086",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0087",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0088",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0089",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0090",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0091",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0092",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0093",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0094",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0095",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0096",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0097",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0098",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0099",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0100",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0101",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0102",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0103",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0104",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0105",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0106",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0107",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0108",
+      "split": "test"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0109",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0110",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0111",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0112",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0113",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0114",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0115",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0116",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0117",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0118",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0119",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0120",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0121",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0122",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0123",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0124",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0125",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0126",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0127",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0128",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0129",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0130",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0131",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0132",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0133",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0134",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0135",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0136",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0137",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0138",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0139",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0140",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0141",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0142",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0143",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0144",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0145",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0146",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0147",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0148",
+      "split": "test"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0149",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0150",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0151",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0152",
+      "split": "test"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0153",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0154",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0155",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0156",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0157",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0158",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0159",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0160",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0161",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0162",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0163",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0164",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0165",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0166",
+      "split": "test"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0167",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0168",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0169",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0170",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0171",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0172",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0173",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0174",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0175",
+      "split": "test"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0176",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0177",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0178",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0179",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0180",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0181",
+      "split": "test"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0182",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0183",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0184",
+      "split": "test"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0185",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0186",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0187",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0188",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0189",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0190",
+      "split": "test"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0191",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0192",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0193",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0194",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0195",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0196",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0197",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0198",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0199",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0200",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0201",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0202",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0203",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0204",
+      "split": "test"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0205",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0206",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0207",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0208",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0209",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0210",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0211",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0212",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0213",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0214",
+      "split": "test"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0215",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0216",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0217",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0218",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0219",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0220",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0221",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0222",
+      "split": "test"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0223",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0224",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0225",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0226",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0227",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0228",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0229",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0230",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0231",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0232",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0233",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0234",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0235",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0236",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0237",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0238",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0239",
+      "split": "test"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0240",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0241",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0242",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0243",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0244",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0245",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0246",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0247",
+      "split": "test"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0248",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0249",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0250",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0251",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0252",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0253",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0254",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0255",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0256",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0257",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0258",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0259",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0260",
+      "split": "test"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0261",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0262",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0263",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0264",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0265",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0266",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0267",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0268",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0269",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0270",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0271",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0272",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0273",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0274",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0275",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0276",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0277",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0278",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0279",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0280",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0281",
+      "split": "test"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0282",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0283",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0284",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0285",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0286",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0287",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0288",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0289",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0290",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0291",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0292",
+      "split": "test"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0293",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0294",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0295",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0296",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0297",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0298",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0299",
+      "split": "test"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0300",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0301",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0302",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0303",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0304",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0305",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0306",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0307",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0308",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0309",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0310",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0311",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0312",
+      "split": "test"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0313",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0314",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0315",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0316",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0317",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0318",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0319",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0320",
+      "split": "test"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0321",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0322",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0323",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0324",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0325",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0326",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0327",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0328",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0329",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0330",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0331",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0332",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0333",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0334",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0335",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0336",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0337",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0338",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0339",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0340",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0341",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0342",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0343",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0344",
+      "split": "test"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0345",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0346",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0347",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0348",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0349",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0350",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0351",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0352",
+      "split": "test"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0353",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0354",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0355",
+      "split": "test"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0356",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0357",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0358",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0359",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0360",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0361",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0362",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0363",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0364",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0365",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0366",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0367",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0368",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0369",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0370",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0371",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0372",
+      "split": "test"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0373",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0374",
+      "split": "test"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0375",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0376",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0377",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0378",
+      "split": "test"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0379",
+      "split": "test"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0380",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0381",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0382",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0383",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0384",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0385",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0386",
+      "split": "train"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0387",
+      "split": "train"
+    },
+    {
+      "cv_fold": 2,
+      "production_id": "SYN-0388",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0389",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0390",
+      "split": "demo"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0391",
+      "split": "demo"
+    },
+    {
+      "cv_fold": 4,
+      "production_id": "SYN-0392",
+      "split": "train"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0393",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0394",
+      "split": "test"
+    },
+    {
+      "cv_fold": 0,
+      "production_id": "SYN-0395",
+      "split": "train"
+    },
+    {
+      "cv_fold": -1,
+      "production_id": "SYN-0396",
+      "split": "test"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0397",
+      "split": "train"
+    },
+    {
+      "cv_fold": 1,
+      "production_id": "SYN-0398",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0399",
+      "split": "train"
+    },
+    {
+      "cv_fold": 3,
+      "production_id": "SYN-0400",
+      "split": "train"
+    }
+  ],
+  "provenance": {
+    "cross_check": "identical to a fresh run of generator/split.py (assign_split, assign_folds)",
+    "fold_random_stream": [
+      42,
+      2
+    ],
+    "seed": 42,
+    "source_files_sha256": {
+      "data/synthetic/v1/productions.csv": "98669f336c4e3f61e649a102f31f2d091ec64a3c29c652990f2c823ff7e3d454",
+      "data/synthetic/v2/productions.csv": "98669f336c4e3f61e649a102f31f2d091ec64a3c29c652990f2c823ff7e3d454"
+    },
+    "split_random_stream": [
+      42,
+      1
+    ],
+    "split_ratios": {
+      "demo": 0.1,
+      "test": 0.2,
+      "train": 0.7
+    }
+  },
+  "synthetic": true,
+  "version": "1.0.0"
+}
