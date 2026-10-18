@@ -1,0 +1,1 @@
+"""Deterministic, offline source and handoff quality gate."""

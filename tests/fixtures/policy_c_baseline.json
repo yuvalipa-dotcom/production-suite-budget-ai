@@ -1,0 +1,316 @@
+{
+  "algorithm": "sha256(canonical JSON of all 1600 Policy C decisions, labels, and reconstructed features)",
+  "digest": "3859b6fe3ac3c5cf24980fdc3979a6a9ff2f63cf3f5f01622255da3008817fcb",
+  "ineligible": [
+    {
+      "production_id": "SYN-0011",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0011",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0011",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0022",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0022",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0023",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0023",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0023",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0025",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0025",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0025",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0032",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0097",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0108",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0108",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0108",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0110",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0110",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0125",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0125",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0125",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0133",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0133",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0133",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0153",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0153",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0154",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0154",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0154",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0182",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0186",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0188",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0188",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0242",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0242",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0242",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0250",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0250",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0282",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0282",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0283",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0283",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0283",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0301",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0315",
+      "reason": "manual_cost_undated",
+      "stage": "S0"
+    },
+    {
+      "production_id": "SYN-0315",
+      "reason": "manual_cost_undated",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0315",
+      "reason": "manual_cost_undated",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0315",
+      "reason": "manual_cost_undated",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0325",
+      "reason": "manual_cost_undated",
+      "stage": "S0"
+    },
+    {
+      "production_id": "SYN-0325",
+      "reason": "manual_cost_undated",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0325",
+      "reason": "manual_cost_undated",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0325",
+      "reason": "manual_cost_undated",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0341",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0341",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0341",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0348",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0348",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0348",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0367",
+      "reason": "manual_cost_undated",
+      "stage": "S0"
+    },
+    {
+      "production_id": "SYN-0367",
+      "reason": "manual_cost_undated",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0367",
+      "reason": "manual_cost_undated",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0367",
+      "reason": "manual_cost_undated",
+      "stage": "S3"
+    }
+  ]
+}
