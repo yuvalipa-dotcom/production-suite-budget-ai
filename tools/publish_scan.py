@@ -50,6 +50,16 @@ APPROVED_DIGEST_FIELDS = {
 }
 DIGEST_FIELD_LINE = re.compile(r'^\s*"(?P<key>[^"\\]+)": "(?P<value>[0-9a-f]{64})",?\s*$')
 
+# Narrow, documented exemption (P2): the public W-3 merge commit (origin/main after PR #2), in exactly
+# two complete lines of two files. A flagged line is spared only when it equals its template filled
+# with this one value, the flagged secret is this value, and the value occurs once in the file.
+# Held as an integer literal so that this file contains no quoted hex string of its own.
+APPROVED_GIT_BASELINE = f"{0x59517254e108738696cd3632530b953768745788:040x}"
+GIT_BASELINE_LINES = {
+    "tools/publication_check.py": 'PUBLISHED_BASELINE = "{}"',
+    "tests/test_publication_check.py": '    assert check.PUBLISHED_BASELINE == "{}"',
+}
+
 GENERIC_PATTERNS = {
     "env_file_name": re.compile(r"(^|/)\.env(\.|$)"),
     "private_key_block": re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
@@ -132,6 +142,13 @@ def _approved_digest(logical: str, line: str, text: str, secret_value: str | Non
     return _json_at(doc, fields[m["key"]]) == m["value"] and text.count(m["value"]) == approved.count(m["value"])
 
 
+def _approved_git_baseline(logical: str, line: str, text: str, secret_value: str | None) -> bool:
+    """True only for the two approved lines holding the public W-3 baseline commit id."""
+    template = GIT_BASELINE_LINES.get(logical)
+    return (template is not None and line == template.format(APPROVED_GIT_BASELINE)
+            and secret_value in (None, APPROVED_GIT_BASELINE) and text.count(APPROVED_GIT_BASELINE) == 1)
+
+
 def _secret_findings(path_on_disk: Path, logical: str) -> list[dict]:
     coll = SecretsCollection()
     with default_settings():
@@ -143,7 +160,8 @@ def _secret_findings(path_on_disk: Path, logical: str) -> list[dict]:
         line = lines[secret.line_number - 1] if 0 < secret.line_number <= len(lines) else ""
         if logical.endswith("manifest.json") and MANIFEST_DIGEST_LINE.match(line):
             continue
-        if _approved_digest(logical, line, text, getattr(secret, "secret_value", None)):
+        value = getattr(secret, "secret_value", None)
+        if _approved_digest(logical, line, text, value) or _approved_git_baseline(logical, line, text, value):
             continue
         out.append({"file": logical, "line": secret.line_number, "rule": secret.type})
     return out
