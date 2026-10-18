@@ -1,6 +1,7 @@
-"""Raw export: defects, leakage safety, ground-truth isolation and clean reproduction (B1-B8)."""
+"""Raw export: defects, leakage safety, ground-truth isolation and record-level reproduction (B1-B8, Policy C)."""
 
 import copy
+import re
 import subprocess
 from datetime import datetime
 
@@ -10,8 +11,7 @@ from generator import config as C
 from generator.cli import RAW_FILES, generate, write_raw
 from generator.raw import PLAN, RAW_COLUMNS, inject
 from tests.conftest import ACTIVE_DATA, REPO
-from tests.raw_repair import DATES, KEYS, repair_table
-from tests.reconstruct import FEATURE_RULES, LABELS, as_csv_text, features_at, index
+from tests.raw_repair import DATES, KEYS, apply_policy_c
 
 TARGET_LIKE = {"final_cost_pre_vat", "budget_gap_ils", "is_overrun", "is_material_overrun",
                "final_company_profit_pre_vat", "final_fee_contract_pre_vat", "split", "cv_fold"}
@@ -38,6 +38,17 @@ def test_raw_files_and_dictionary_do_not_reference_clean_data_or_ground_truth():
     for name, text in texts.items():
         for token in FORBIDDEN_REFERENCES:
             assert token not in text, (name, token)
+
+
+def test_cleaning_policy_reveals_no_records_counts_or_ground_truth(defect_log):
+    """The public cleaning policy is Crew-1-facing: no ground-truth reference, no record ids, no counts."""
+    text = (REPO / "docs" / "raw_cleaning_policy.md").read_text(encoding="utf-8")
+    low = text.lower()
+    for token in FORBIDDEN_REFERENCES:
+        if token != "clean":                                 # the policy is, by name, about cleaning
+            assert token not in low, token
+    assert "syn-" not in low
+    assert set(re.findall(r"\d{2,}", text)) <= {"18"}, "only the documented VAT rate may appear as a number"
 
 
 def test_raw_is_labelled_synthetic(raw_text):
@@ -101,37 +112,28 @@ def test_defect_rates_follow_the_declared_rates(defect_log, generated):
         {t: len(generated[t]) for t in nonrec["table"].unique()})).max() <= 2 * nonrec_declared
 
 
-def test_clean_reproduction_from_raw(raw_text, defect_log, generated):
-    """B8: recoverable records reproduce the clean data exactly; the rest are excluded as documented."""
-    repaired, excluded = {}, {}
+def test_clean_reproduction_from_raw(raw_text, defect_log):
+    """B8 under Policy C: every record is reproduced exactly, except that a non-recoverable field stays
+    empty (never filled) and invalid payment rows are excluded. The full per-snapshot comparison
+    (eligibility, features and labels for all 1,600 snapshots) is in tests/test_policy_c.py."""
+    result = apply_policy_c(raw_text)
+    nonrec = defect_log[defect_log["recoverable"] == "False"]
     for name in RAW_FILES:
-        rep, exc = repair_table(name, raw_text[name])
-        expected_exc = set(defect_log.loc[(defect_log["table"] == name) & (defect_log["recoverable"] == "False"),
-                                          "record_id"])
-        assert exc == expected_exc, name                     # exactly the documented exclusions, nothing more
-        clean = _clean_text(name)[list(raw_text[name].columns)]
-        clean["_k"] = clean[KEYS[name]].agg("#".join, axis=1)
-        clean = clean[~clean["_k"].isin(exc)].sort_values("_k").drop(columns="_k").reset_index(drop=True)
-        assert rep.reset_index(drop=True).equals(clean), name
-        repaired[name], excluded[name] = rep, exc
-
-    # Snapshot features and labels rebuilt from the repaired raw ledgers, for every production
-    # not affected by an excluded cost record.
-    affected = {k.split("-")[0] + "-" + k.split("-")[1] for t in ("commitments", "manual_costs") for k in excluded[t]}
-    idx = index({n: repaired[n] for n in
-                 ("productions", "budget_revisions", "category_plans", "commitments", "manual_costs")})
-    clean_snaps = pd.read_csv(ACTIVE_DATA / "snapshots.csv", dtype=str, keep_default_na=False)
-    schedule = {(r["production_id"], r["stage"]): r["as_of_date"] for r in repaired["snapshot_schedule"].to_dict("records")}
-    reproduced = 0
-    for r in clean_snaps.to_dict("records"):
-        if r["production_id"] in affected:
-            continue
-        f = features_at(idx, r["production_id"], r["stage"], schedule[(r["production_id"], r["stage"])])
-        for col in list(FEATURE_RULES) + list(LABELS):
-            assert as_csv_text(f[col]) == r[col], (r["production_id"], r["stage"], col)
-        reproduced += 1
-    assert reproduced == 4 * (400 - len(affected))
-    assert 0 < len(affected) < 40
+        cleaned = result.tables[name].copy()
+        clean = _clean_text(name)[list(raw_text[name].columns)].copy()
+        for df in (cleaned, clean):
+            df["_k"] = df[KEYS[name]].agg("#".join, axis=1)
+        cleaned, clean = cleaned.set_index("_k").sort_index(), clean.set_index("_k").sort_index()
+        bad = nonrec[nonrec["table"] == name]
+        if name == "payments":
+            assert result.excluded_payments == set(bad["record_id"])
+            clean = clean.drop(index=sorted(bad["record_id"]))
+        else:
+            assert set(cleaned.index) == set(clean.index), name          # no record dropped
+            for d in bad.itertuples():                                    # missing stays missing
+                assert cleaned.loc[d.record_id, d.column] == "", (name, d.record_id)
+                clean.loc[d.record_id, d.column] = ""
+        assert cleaned.equals(clean), name
 
 
 def test_ground_truth_is_regenerable_and_git_ignored(generated, tmp_path):
