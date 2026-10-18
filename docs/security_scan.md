@@ -1,32 +1,43 @@
 # Pre-publication security scan: summary
 
-**Date:** 2026-10-18
-**Outcome:** **0 findings** (secret scan: 0 · content scan: 0)
+**Date:** 2026-10-18 (re-run after the Policy C changes)
+**Outcome:** **0 findings.** Secret scan 0 · content scan 0 · commit-message scan 0 · commercial identity-term check: **passed**.
+No excluded paths, submodules, large-file pointers, files over 5 MB or binary files.
 
 ## Tools
 
 | Tool | Version | Purpose |
 |---|---|---|
 | `detect-secrets` | 1.5.0 | secret detection with all default plugins (high-entropy strings, keyword, cloud and VCS token formats, private keys) |
-| `tools/publish_scan.py` | in this repository | content scan: environment files, key and token shapes, database URLs, local absolute paths, code imported from a product codebase, plus a private denylist that is kept outside the repository |
+| `tools/publish_scan.py` | in this repository | content scan: environment files, key and token shapes, database URLs, local absolute paths, code imported from a product codebase, plus a private term list kept outside the repository |
+| `tools/publication_check.py` | in this repository | publication dry run: refs, full-history, working-tree and commit-message scans, excluded paths, object and ignore-rule checks |
+| git | 2.55.0 | history and ref enumeration |
 
 Runtime: Python 3.13.15.
 
 ## Scope
 
-- **Every file of every commit** reachable from every local branch (`main` and the P1 branch), including the commit that adds this document.
-- The current working tree (all tracked files).
+The check ran in a fresh, disposable clone with its remote removed.
+
+- **Publication refs:** exactly the three branches `main`, `p1-synthetic-generator` and `p1-remediation`. No tags, stashes, notes or other refs.
+- **History:** every file of every commit reachable from those branches. That is 28 commits, including the commit that updates this summary.
+- **Commit messages:** every message, in full, including trailers. It was scanned with the same secret rules as files (each detect-secrets plugin's per-line rule) and with the content and private-term rules, except for the one check listed under *Coverage gap*.
+- **Working trees:** each of the three branches checked out and scanned file by file.
+- **Commercial identity terms:** a check against the identity terms of the commercial product was run over the same scope, and **passed**.
 
 ## Documented exclusion
 
-The dataset manifest lists the SHA-256 digests of the data files. These are high-entropy hexadecimal strings by design, not secrets. Only lines with exactly that shape inside `manifest.json` are excluded. A test proves that the same digest anywhere else is still flagged.
+The dataset manifests list the SHA-256 digests of the data files. These are high-entropy hexadecimal strings by design, not secrets. Only lines with exactly that shape inside `manifest.json` are excluded. A test proves that the same digest anywhere else is still flagged.
 
-## Proof that the scan works
+## Proof that the checks work
 
-`tests/test_publish_scan.py` checks both directions:
-- planted token shapes, database URLs, local paths, environment-file names and denylisted terms **are** detected;
-- healthy synthetic content passes.
+- `tests/test_publish_scan.py` checks both directions: planted token shapes, database URLs, local paths, environment-file names and private terms (including pattern rules with allow-lists) **are** detected, and healthy synthetic content passes. Planted values are built at runtime, so the test file contains no secret-shaped literal.
+- The dry-run checker was also shown to flag an unexpected ref and excluded paths.
 
-Planted values are built at runtime, so the test file itself contains no secret-shaped literal.
+## Coverage gap (stated, not bypassed)
+
+One commit-message pattern check, for references to environment-file names, was **not executed**. A safety hook in the development environment blocked the command that contained the pattern, and the block was **not bypassed** with another tool or wording.
+
+Commit messages were still scanned for secrets, private terms, absolute local paths, internal file names and e-mail addresses. Separately, environment *files* are excluded and checked by path in every commit tree and working tree.
 
 Raw scanner output is kept locally only and is not part of this repository.

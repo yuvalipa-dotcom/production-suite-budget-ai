@@ -15,3 +15,18 @@ scan_output/
 # Local output caches
 out/
 tmp/
+
+# Private process notes and generated ground truth: never committed
+private/
+ground_truth/
+
+# Data dumps (the versioned synthetic dataset under data/synthetic/ is committed on purpose)
+*.dump
+*.sql
+*.sql.gz
+*.bak
+dumps/
+
+# Other common virtual-environment folder names
+venv/
+env/

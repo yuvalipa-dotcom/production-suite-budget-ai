@@ -28,6 +28,23 @@
 - The test result is reported, and never used to change the choice.
 - **demo is not touched** by selection or evaluation.
 
+## Naive reference rule (added in P1-R, a reference point only)
+
+> **"Already over the budget in effect now ⇒ will overrun"**: predict an overrun when `current_position_ils > 0` (recorded commitments plus the fee if included, against the approved budget in effect at the snapshot).
+
+The rule involves no fitting. It is computed on **train only**, per stage. It is a reference point and **not** a selection gate: the pre-registered procedure above (training data only, production-grouped cross-validation, Brier score first) is unchanged.
+
+<!-- BEGIN GENERATED: naive-baseline -->
+| Stage | Rows | Prevalence | Precision | Recall | Accuracy |
+|---|---|---|---|---|---|
+| S0 | 280 | 47.9% | n/a (no positive predictions) | 0.0% | 52.1% |
+| S1 | 280 | 46.4% | n/a (no positive predictions) | 0.0% | 53.6% |
+| S2 | 280 | 41.8% | 88.9% | 6.8% | 60.7% |
+| S3 | 280 | 40.0% | 97.2% | 61.6% | 83.9% |
+<!-- END GENERATED: naive-baseline -->
+
+Later evaluation reports **probability quality and calibration** (Brier score, log loss, reliability curves) as well as **discrimination** (ROC-AUC, PR-AUC), per stage.
+
 ## Product preference (stated separately from the rule)
 
 For future product integration a simple calibrated logistic model is preferred, because it exports to plain JSON. If gradient boosting wins the rule, that is reported honestly. Shipping a different model in the product would be a separate, explicit owner decision, documented with the measured difference.
