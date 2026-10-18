@@ -33,4 +33,10 @@ The dataset manifests list the SHA-256 digests of the data files. These are high
 - `tests/test_publish_scan.py` checks both directions: planted token shapes, database URLs, local paths, environment-file names and private terms (including pattern rules with allow-lists) **are** detected, and healthy synthetic content passes. Planted values are built at runtime, so the test file contains no secret-shaped literal.
 - The dry-run checker was also shown to flag an unexpected ref and excluded paths.
 
+## Coverage gap (stated, not bypassed)
+
+One commit-message pattern check, for references to environment-file names, was **not executed**. A safety hook in the development environment blocked the command that contained the pattern, and the block was **not bypassed** with another tool or wording.
+
+Commit messages were still scanned for secrets, private terms, absolute local paths, internal file names and e-mail addresses. Separately, environment *files* are excluded and checked by path in every commit tree and working tree.
+
 Raw scanner output is kept locally only and is not part of this repository.

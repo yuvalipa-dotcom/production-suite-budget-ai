@@ -17,7 +17,7 @@ only original code, synthetic data and documentation.
 | Phase | Content | Status |
 |---|---|---|
 | **P1** | Synthetic data generator, tests, documentation | done (branch `p1-synthetic-generator`) |
-| **P1-R** | Remediation: target audit, dataset v2, raw export, reconciliation, reports | **branch `p1-remediation`** |
+| **P1-R / P1-R2** | Remediation: target audit, dataset v2, raw export, reconciliation, reports; Policy C cleaning and outcome-only contract | **branch `p1-remediation`** |
 | P2–P5 | Dataset contract and gate, two CrewAI crews, Flow, Streamlit | not started |
 
 See [`docs/roadmap.md`](docs/roadmap.md).
@@ -69,6 +69,8 @@ is_overrun     = budget_gap_ils > 0.5   (any positive excess; 0.5 is rounding to
 | [`docs/raw_data_dictionary.md`](docs/raw_data_dictionary.md) | the raw export: tables, fields, units, formats, keys |
 | [`docs/split_report.md`](docs/split_report.md) | event type × group, overrun rates with intervals |
 | [`docs/crew1_isolation.md`](docs/crew1_isolation.md) | required technical isolation of the future data-analyst crew |
+| [`docs/raw_cleaning_policy.md`](docs/raw_cleaning_policy.md) | public data-quality rules for the raw export (Policy C) |
+| [`docs/feature_availability.md`](docs/feature_availability.md) | feature vs outcome-only vs metadata roles; machine-readable in [`contracts/column_roles.json`](contracts/column_roles.json) |
 | [`docs/security_scan.md`](docs/security_scan.md) | pre-publication scan summary |
 
 ## Repository layout
@@ -78,9 +80,14 @@ generator/           seeded simulation, snapshots, split, schema, CLI
 data/synthetic/v1/   frozen first version (traceability)
 data/synthetic/v2/   active version: snapshots, ledgers, schema, manifest, and raw/ (provider-style export)
 tests/               determinism, counts, VAT, target, consistency, split, leakage, chronology
-tools/               pre-publication scan
+tools/               pre-publication scan, publication dry-run checker, generated report sections
+contracts/           machine-readable column-role contract
 docs/                documentation
 ```
+
+## AI assistance
+
+The code in this repository was developed with AI coding assistance (Claude Code), under the owner's direction and review. Commits carry a `Co-Authored-By` trailer that records this.
 
 ## Licence
 
