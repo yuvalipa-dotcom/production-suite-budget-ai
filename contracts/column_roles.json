@@ -1,0 +1,376 @@
+{
+  "contract": "column roles and availability",
+  "synthetic": true,
+  "version": 1,
+  "roles": {
+    "feature": "known at prediction time; may be used, directly or through a derived variable, to build snapshot features (subject to the as-of rule)",
+    "outcome-only": "known only after financial close; may be used only to construct targets; must never enter any snapshot feature, directly or through any derived variable",
+    "metadata": "identifiers, provenance, evaluation-protocol fields or columns not used by features or targets; never a model input"
+  },
+  "as_of_rule": "a record is available to a snapshot only if its date (selected_date, created_date, effective_date) is on or before the snapshot's as_of_date; cancellation counts only if cancelled_date is on or before as_of_date",
+  "tables": {
+    "productions": {
+      "production_id": {
+        "role": "metadata"
+      },
+      "batch_id": {
+        "role": "metadata"
+      },
+      "is_synthetic": {
+        "role": "metadata"
+      },
+      "archetype": {
+        "role": "feature"
+      },
+      "contract_date": {
+        "role": "feature"
+      },
+      "event_date": {
+        "role": "feature"
+      },
+      "financial_close_date": {
+        "role": "outcome-only",
+        "note": "known only after financial close; target construction only"
+      },
+      "budget_vat_mode": {
+        "role": "feature"
+      },
+      "initial_budget_entered": {
+        "role": "feature"
+      },
+      "final_budget_entered": {
+        "role": "outcome-only"
+      },
+      "fee_mode": {
+        "role": "feature"
+      },
+      "fee_value": {
+        "role": "feature"
+      },
+      "fee_vat_mode": {
+        "role": "feature"
+      },
+      "fee_included": {
+        "role": "feature"
+      },
+      "n_budget_revisions": {
+        "role": "outcome-only"
+      },
+      "final_cost_pre_vat": {
+        "role": "outcome-only"
+      },
+      "final_fee_contract_pre_vat": {
+        "role": "outcome-only"
+      },
+      "fee_concession_pre_vat": {
+        "role": "outcome-only",
+        "note": "granted at close; affects company profit only, never the overrun label"
+      },
+      "final_company_profit_pre_vat": {
+        "role": "outcome-only"
+      },
+      "split": {
+        "role": "metadata"
+      },
+      "cv_fold": {
+        "role": "metadata"
+      }
+    },
+    "budget_revisions": {
+      "production_id": {
+        "role": "metadata"
+      },
+      "batch_id": {
+        "role": "metadata"
+      },
+      "is_synthetic": {
+        "role": "metadata"
+      },
+      "revision_no": {
+        "role": "feature"
+      },
+      "effective_date": {
+        "role": "feature"
+      },
+      "approved_entered_amount": {
+        "role": "feature"
+      },
+      "vat_mode": {
+        "role": "feature"
+      },
+      "approved_pre_vat_amount": {
+        "role": "feature"
+      },
+      "guest_count": {
+        "role": "feature"
+      }
+    },
+    "category_plans": {
+      "production_id": {
+        "role": "metadata"
+      },
+      "batch_id": {
+        "role": "metadata"
+      },
+      "is_synthetic": {
+        "role": "metadata"
+      },
+      "category": {
+        "role": "feature"
+      },
+      "planned_entered": {
+        "role": "feature"
+      },
+      "vat_mode": {
+        "role": "feature"
+      },
+      "effective_date": {
+        "role": "feature"
+      }
+    },
+    "commitments": {
+      "commitment_id": {
+        "role": "metadata"
+      },
+      "production_id": {
+        "role": "metadata"
+      },
+      "batch_id": {
+        "role": "metadata"
+      },
+      "is_synthetic": {
+        "role": "metadata"
+      },
+      "category": {
+        "role": "feature"
+      },
+      "vat_mode": {
+        "role": "feature"
+      },
+      "payment_responsibility": {
+        "role": "feature"
+      },
+      "original_entered": {
+        "role": "feature"
+      },
+      "original_pre_vat": {
+        "role": "feature",
+        "note": "accepted quote (committed), not a verified final cost"
+      },
+      "selected_date": {
+        "role": "feature"
+      },
+      "cancelled_date": {
+        "role": "feature"
+      },
+      "replaces_commitment_id": {
+        "role": "metadata"
+      },
+      "final_pre_vat": {
+        "role": "outcome-only",
+        "note": "verified final supplier cost; known only at financial close; target construction only"
+      }
+    },
+    "manual_costs": {
+      "manual_cost_id": {
+        "role": "metadata"
+      },
+      "production_id": {
+        "role": "metadata"
+      },
+      "batch_id": {
+        "role": "metadata"
+      },
+      "is_synthetic": {
+        "role": "metadata"
+      },
+      "category": {
+        "role": "feature"
+      },
+      "kind": {
+        "role": "feature"
+      },
+      "vat_mode": {
+        "role": "feature"
+      },
+      "entered": {
+        "role": "feature"
+      },
+      "pre_vat": {
+        "role": "feature",
+        "note": "a feature source only for costs with created_date on or before the snapshot; every manual cost also enters the target"
+      },
+      "created_date": {
+        "role": "feature"
+      }
+    },
+    "payments": {
+      "payment_id": {
+        "role": "metadata"
+      },
+      "production_id": {
+        "role": "metadata"
+      },
+      "commitment_id": {
+        "role": "metadata"
+      },
+      "batch_id": {
+        "role": "metadata"
+      },
+      "is_synthetic": {
+        "role": "metadata"
+      },
+      "direction": {
+        "role": "metadata"
+      },
+      "amount_gross": {
+        "role": "metadata"
+      },
+      "paid_date": {
+        "role": "metadata"
+      }
+    },
+    "snapshot_schedule": {
+      "production_id": {
+        "role": "metadata"
+      },
+      "batch_id": {
+        "role": "metadata"
+      },
+      "is_synthetic": {
+        "role": "metadata"
+      },
+      "stage": {
+        "role": "feature"
+      },
+      "as_of_date": {
+        "role": "feature"
+      }
+    },
+    "snapshots": {
+      "production_id": {
+        "role": "metadata"
+      },
+      "batch_id": {
+        "role": "metadata"
+      },
+      "is_synthetic": {
+        "role": "metadata"
+      },
+      "stage": {
+        "role": "feature"
+      },
+      "as_of_date": {
+        "role": "metadata"
+      },
+      "event_date": {
+        "role": "metadata"
+      },
+      "archetype": {
+        "role": "feature"
+      },
+      "event_month": {
+        "role": "feature"
+      },
+      "lead_time_days": {
+        "role": "feature"
+      },
+      "days_since_contract": {
+        "role": "feature"
+      },
+      "days_to_event": {
+        "role": "feature"
+      },
+      "guest_count": {
+        "role": "feature"
+      },
+      "budget_vat_mode": {
+        "role": "feature"
+      },
+      "budget_pre_vat": {
+        "role": "feature"
+      },
+      "budget_revisions_to_date": {
+        "role": "feature"
+      },
+      "fee_included": {
+        "role": "feature"
+      },
+      "fee_mode": {
+        "role": "feature"
+      },
+      "fee_contract_pre_vat": {
+        "role": "feature"
+      },
+      "planned_total_pre_vat": {
+        "role": "feature"
+      },
+      "n_categories_planned": {
+        "role": "feature"
+      },
+      "n_categories_committed": {
+        "role": "feature"
+      },
+      "n_categories_pending": {
+        "role": "feature"
+      },
+      "n_commitments_active": {
+        "role": "feature"
+      },
+      "n_manual_costs": {
+        "role": "feature"
+      },
+      "manual_costs_pre_vat": {
+        "role": "feature"
+      },
+      "committed_pre_vat": {
+        "role": "feature"
+      },
+      "n_categories_over_plan": {
+        "role": "feature"
+      },
+      "over_plan_pre_vat": {
+        "role": "feature"
+      },
+      "n_substitutions_to_date": {
+        "role": "feature"
+      },
+      "no_vat_share": {
+        "role": "feature"
+      },
+      "client_direct_share": {
+        "role": "feature"
+      },
+      "current_position_ils": {
+        "role": "feature"
+      },
+      "committed_ratio": {
+        "role": "feature"
+      },
+      "cost_per_guest_pre_vat": {
+        "role": "feature"
+      },
+      "final_cost_pre_vat": {
+        "role": "outcome-only"
+      },
+      "budget_gap_ils": {
+        "role": "outcome-only"
+      },
+      "is_overrun": {
+        "role": "outcome-only"
+      },
+      "is_material_overrun": {
+        "role": "outcome-only"
+      },
+      "split": {
+        "role": "metadata"
+      },
+      "cv_fold": {
+        "role": "metadata"
+      }
+    }
+  },
+  "notes": {
+    "payments.*": "cash flow; feeds neither the target nor any feature"
+  }
+}

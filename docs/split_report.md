@@ -42,3 +42,44 @@ Observed test − train difference (row level): **+15.0 percentage points**, 95%
 - The groups were assigned by a seeded random permutation of production ids, independently of outcomes (`docs/split_protocol.md`).
 - This page makes **no claim** about the cause of the difference, or about how it will affect model probabilities.
 - The split was **not** re-drawn, stratified or rebalanced because of it.
+
+## Is the split independent of the outcomes? (code inspection)
+
+**Finding: independent by construction.**
+
+- **Groups:** `generator/split.py` (`assign_split`) sorts the production ids and permutes them with `numpy.random.default_rng([seed, 1])`. The first 280 ids are train, the next 80 test, the last 40 demo.
+- **Folds:** use a separate stream, `default_rng([seed, 2])`, on the train ids only.
+- **Inputs to the split:** none of the data. The split uses only the list of ids and the seed: no event type, date, amount or label.
+- **Where the ids come from:** a deterministic counter (`generator/simulate.py`, `simulate_all`), not a random draw.
+- **Order:** every outcome-determining draw happens in `simulate_all`, with its own stream `default_rng(seed)` and per-production child generators, **before** the split is assigned (`generator/cli.py`, `generate`). No generator object is shared between outcome generation and splitting.
+
+## Descriptive diagnostics (not used for any decision)
+
+The numbers below describe how the frozen split compares with other random splits of the same sizes, and how balanced it is at S0.
+
+- **They were not used to select, re-draw, stratify, rebalance or tune anything.** The split, the folds and the production ids remain frozen.
+- An extreme percentile here is **not** evidence of outcome-dependent splitting: the code inspection above is the evidence. A percentile describes where this particular random draw fell.
+
+<!-- BEGIN GENERATED: split-independence -->
+### Alternative random splits (1000 draws, seed 20261019, same 280/80/40 sizes)
+
+| Test − train overrun difference | Observed | Mean | 2.5th pct | 97.5th pct | Observed percentile |
+|---|---|---|---|---|---|
+| row level | +15.0 pp | +0.1 | -12.1 | +11.4 | 99.2 |
+| production level, S0 | +17.1 pp | +0.1 | -12.7 | +12.9 | 99.8 |
+| production level, S1 | +16.1 pp | +0.1 | -12.7 | +12.7 | 99.1 |
+| production level, S2 | +13.2 pp | +0.1 | -12.1 | +12.0 | 98.5 |
+| production level, S3 | +13.7 pp | +0.0 | -12.7 | +11.8 | 98.8 |
+
+### S0 covariate balance, test vs train (standardised mean difference)
+
+| Variable | Train mean | Test mean | SMD |
+|---|---|---|---|
+| budget_pre_vat | 252,561.622 | 265,732.415 | +0.093 |
+| guest_count | 344.050 | 374.950 | +0.147 |
+| lead_time_days | 206.332 | 196.662 | -0.110 |
+| event_month | 6.843 | 6.775 | -0.020 |
+| fee_mode = percent | 0.661 | 0.562 | -0.202 |
+| fee_included | 0.504 | 0.575 | +0.143 |
+| eventual number of budget revisions | 0.357 | 0.412 | +0.084 |
+<!-- END GENERATED: split-independence -->

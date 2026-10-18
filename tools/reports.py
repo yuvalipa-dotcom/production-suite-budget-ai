@@ -103,6 +103,57 @@ def split_report() -> str:
     return "\n".join(lines)
 
 
+PERMUTATION_SEED = 20261019
+PERMUTATIONS = 1000
+
+
+def split_independence() -> str:
+    """Descriptive diagnostics of the frozen split. Not used for any selection or tuning."""
+    snaps, prods = load()
+    ids = np.array(sorted(prods["production_id"]))
+    lab = snaps.pivot(index="production_id", columns="stage", values="is_overrun").loc[ids].astype(float)
+    grp = prods.set_index("production_id").loc[ids, "split"].to_numpy()
+
+    def diffs(test, train):
+        return [lab[test].to_numpy().mean() - lab[train].to_numpy().mean()] + \
+               [lab[test][s].mean() - lab[train][s].mean() for s in STAGES]
+
+    observed = diffs(grp == "test", grp == "train")
+    rng = np.random.default_rng(PERMUTATION_SEED)
+    sims = []
+    for _ in range(PERMUTATIONS):
+        perm = rng.permutation(len(ids))
+        g = np.empty(len(ids), dtype=object)
+        g[perm[:280]], g[perm[280:360]], g[perm[360:]] = "train", "test", "demo"
+        sims.append(diffs(g == "test", g == "train"))
+    sims = np.array(sims)
+    lines = [f"### Alternative random splits ({PERMUTATIONS} draws, seed {PERMUTATION_SEED}, same 280/80/40 sizes)", "",
+             "| Test − train overrun difference | Observed | Mean | 2.5th pct | 97.5th pct | Observed percentile |",
+             "|---|---|---|---|---|---|"]
+    for i, name in enumerate(["row level"] + [f"production level, {s}" for s in STAGES]):
+        col = sims[:, i]
+        pctl = 100 * ((col < observed[i]).mean() + 0.5 * (col == observed[i]).mean())
+        lines.append(f"| {name} | {100 * observed[i]:+.1f} pp | {100 * col.mean():+.1f} | "
+                     f"{np.percentile(col, 2.5) * 100:+.1f} | {np.percentile(col, 97.5) * 100:+.1f} | {pctl:.1f} |")
+    s0 = snaps[snaps["stage"] == "S0"].set_index("production_id")
+    rev = pd.read_csv(DATA / "budget_revisions.csv")
+    cov = pd.DataFrame({
+        "budget_pre_vat": s0["budget_pre_vat"], "guest_count": s0["guest_count"],
+        "lead_time_days": s0["lead_time_days"], "event_month": s0["event_month"],
+        "fee_mode = percent": (s0["fee_mode"] == "percent").astype(float),
+        "fee_included": s0["fee_included"].astype(float),
+        "eventual number of budget revisions": rev.groupby("production_id").size() - 1,
+    })
+    cov["split"] = prods.set_index("production_id")["split"]
+    lines += ["", "### S0 covariate balance, test vs train (standardised mean difference)", "",
+              "| Variable | Train mean | Test mean | SMD |", "|---|---|---|---|"]
+    for c in cov.columns[:-1]:
+        a, b = cov.loc[cov["split"] == "test", c], cov.loc[cov["split"] == "train", c]
+        smd = (a.mean() - b.mean()) / np.sqrt((a.var(ddof=1) + b.var(ddof=1)) / 2)
+        lines.append(f"| {c} | {b.mean():,.3f} | {a.mean():,.3f} | {smd:+.3f} |")
+    return "\n".join(lines)
+
+
 def naive_baseline() -> str:
     snaps, _ = load()
     train = snaps[snaps["split"] == "train"]
@@ -148,7 +199,7 @@ def target_audit_numbers() -> str:
 
 
 SECTIONS = {
-    "docs/split_report.md": {"split-report": split_report},
+    "docs/split_report.md": {"split-report": split_report, "split-independence": split_independence},
     "docs/model_selection_rule.md": {"naive-baseline": naive_baseline},
     "docs/target_audit.md": {"target-audit": target_audit_numbers},
 }

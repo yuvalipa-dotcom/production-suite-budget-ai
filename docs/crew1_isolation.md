@@ -3,7 +3,7 @@
 > **Design specification only.** Nothing here is implemented in P1-R: no CrewAI,
 > no agents, no tools, no sandbox. **ALL DATA IS SYNTHETIC.**
 
-The future data-analyst crew (Crew 1) must ingest, clean and validate the **raw export** using only `raw/` and `docs/raw_data_dictionary.md`. It must not be able to reach:
+The future data-analyst crew (Crew 1) must ingest, clean and validate the **raw export** using only `raw/`, `docs/raw_data_dictionary.md` and `docs/raw_cleaning_policy.md`. It must not be able to reach:
 - the curated evaluation dataset (the v2 snapshot and ledger tables);
 - the defect catalogue;
 - the defect log;
@@ -15,7 +15,7 @@ An instruction in a prompt is **not** a control. The isolation below is technica
 
 1. **Fresh staged workspace outside the repository.**
    - Before every run, the orchestrator creates a new empty directory outside the repository tree (a new temporary directory per run).
-   - It copies in only a copy of `raw/` and a copy of `docs/raw_data_dictionary.md`.
+   - It copies in only a copy of `raw/`, `docs/raw_data_dictionary.md` and `docs/raw_cleaning_policy.md`.
    - Crew 1's process starts with that workspace as its working directory.
    - The repository is never mounted, linked or reachable from it.
 2. **No generic capabilities.**
