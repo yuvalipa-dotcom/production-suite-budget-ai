@@ -1,0 +1,30 @@
+{
+  "batch_id": "syn-v1-seed42",
+  "counts": {
+    "commitments": 3740,
+    "manual_costs": 1218,
+    "payments": 5284,
+    "productions": 400,
+    "snapshot_rows": 1600,
+    "snapshots_per_production": 4
+  },
+  "dataset": "production-suite-budget-ai synthetic snapshots",
+  "files_sha256": {
+    "commitments.csv": "192834011499bc8cdbc3c8bc6a0a6c9b34445e5c74fb9faab982c71a1acdf5d0",
+    "manual_costs.csv": "8037192ea7d2f55b5d1ee50edb2a76ac0a72f4822a61751d72efc5c9a3c3aa79",
+    "payments.csv": "9a0ec03c3e9047b2eba18bff45b95636c048d3158e671e507afcaf7725b00d32",
+    "productions.csv": "98669f336c4e3f61e649a102f31f2d091ec64a3c29c652990f2c823ff7e3d454",
+    "schema.json": "940a7a54be411296f026d3fa2584f2c1b36a09dcf7815d3e1b3587e2ed9e9c1a",
+    "snapshots.csv": "0b044ba85570b95360aac0ece7c292c6335836b2d3bd9c524fb4e549b6983e2a"
+  },
+  "generator_version": "1.0.0",
+  "notice": "ALL DATA IS SYNTHETIC. No real customer, vendor or event data.",
+  "seed": 42,
+  "split_productions": {
+    "demo": 40,
+    "test": 80,
+    "train": 280
+  },
+  "synthetic": true,
+  "vat_rate": 0.18
+}
