@@ -76,3 +76,20 @@ v2 also adds the raw export (`raw/`) with its own manifest.
 - the snapshot table and every v1 file, which are byte-identical in v2 (tested).
 
 **Active dataset version: v2.**
+
+## Target from raw data: what is available, and when (P1-R2)
+
+Three kinds of information are distinguished:
+1. **The simulated final cost.** This is the generator's verified final supplier cost per commitment, plus every manual cost: the ground truth behind the target.
+2. **Records available as of a snapshot.** These are the raw rows dated on or before `as_of_date`: accepted quotes (`selected_date`), cancellations (`cancelled_date`), manual costs (`created_date`), budget revisions and category plans (`effective_date`). Only these may feed snapshot features.
+3. **Verified outcome records, available after the event.** These are `commitments.final_pre_vat` and `productions.financial_close_date`. They may be used to construct training labels, and never features. The roles are listed in [`feature_availability.md`](feature_availability.md).
+
+The raw export contains enough post-event evidence (category 3) to rebuild every label without ground truth. Under Policy C ([`raw_cleaning_policy.md`](raw_cleaning_policy.md)), **all 1,600 labels and signed gaps rebuilt from raw equal the ground truth**, and no cost record is dropped from the target. This is tested in `tests/test_policy_c.py`.
+
+The earlier reference cleaning (Policy A) excluded whole cost records that had a missing field, and so removed their amounts from the final cost. It has been **replaced**. The earlier record-level comparison skipped the affected productions. It now covers all 1,600 snapshots: each one is either eligible with identical features and labels, or ineligible with a stated reason.
+
+## Dataset-design limitations
+
+- **(a) The final cost sits in the same row as the commitment.** `final_pre_vat` is a column of the commitment record, with no separate, dated outcome record. Its temporal separation from prediction-time data therefore relies on the **contract** (outcome-only role, known at financial close), not on the table structure.
+- **(b) No independent evidence of finality.** The raw export has no invoices or other supporting documents. `final_pre_vat` equals the true final cost only because the generator writes it that way. Real data would need separate evidence before a value could be called verified.
+- **(c) Manual costs carry no verification flag.** Every manual cost is treated as final by definition. A real ledger may contain provisional entries that cannot be told apart.
