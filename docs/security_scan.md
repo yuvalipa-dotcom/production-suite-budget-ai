@@ -44,6 +44,8 @@ A flagged line is spared only when all of the following hold:
 
 Tests in `tests/test_publish_scan.py` prove that the same digest in another field or file is still flagged. They also prove that a value that is not lowercase hex-64 is not exempted, and that other secrets in those files, including on the same line, are still detected.
 
+**P2 publication candidate.** The dry-run checker (`tools/publication_check.py`) expects exactly four branches: the three W-3 branches plus `p2-quality-gate`. It applies the same history, working-tree, commit-message, path and object checks to each, and it still rejects any other ref. It also requires `p2-quality-gate` to descend from the published W-3 baseline, `origin/main` = `5951725`. Tests are in `tests/test_publication_check.py`.
+
 ## Proof that the checks work
 
 - `tests/test_publish_scan.py` checks both directions: planted token shapes, database URLs, local paths, environment-file names and private terms (including pattern rules with allow-lists) **are** detected, and healthy synthetic content passes. Planted values are built at runtime, so the test file contains no secret-shaped literal.
