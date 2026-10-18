@@ -62,3 +62,14 @@ def test_secret_scan_flags_a_token_and_spares_only_manifest_digests(tmp_path):
     elsewhere = tmp_path / "other.json"
     elsewhere.write_text('{\n  "api_secret": "' + DIGEST + '"\n}\n', encoding="utf-8")
     assert scan._secret_findings(elsewhere, "other.json"), "the same digest outside the manifest must be flagged"
+
+
+def test_private_patterns_with_allow_list():
+    deny = scan.Denylist([r"re:\bzork\b", r"re:zork[-_]", r"allow:unzork|zorkish", "plainword"])
+    assert len(deny) == 3
+    assert "private_pattern[0]" in rules(scan._content_findings("a.md", "met Zork today", deny))
+    assert "private_pattern[1]" in rules(scan._content_findings("a.md", "zork-team", deny))
+    assert scan._content_findings("a.md", "unzork_x is ok", deny) == []      # allow-listed line
+    assert scan._content_findings("a.md", "zorkless word", deny) == []          # word boundary respected
+    # allow never suppresses a literal entry
+    assert "private_denylist[0]" in rules(scan._content_findings("a.md", "unzork plainword", deny))
