@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crew 1 EDA report</title>
+<style>
+:root { --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --rule: #e4e3df; --note: #f3f2ee; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --rule: #3a3936; --note: #262624; }
+}
+:root[data-theme="dark"] { --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --rule: #3a3936; --note: #262624; }
+body { background: var(--surface); color: var(--ink); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+       margin: 0 auto; max-width: 920px; padding: 24px 16px 64px; }
+h1 { font-size: 1.6rem; margin: 0 0 4px; }
+h2 { font-size: 1.15rem; margin: 40px 0 8px; padding-top: 12px; border-top: 1px solid var(--rule); }
+.banner { background: var(--note); border-left: 3px solid var(--ink-2); padding: 10px 14px; color: var(--ink-2); }
+.narrative p { margin: 8px 0; }
+table.computed { border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; display: block; overflow-x: auto; }
+table.computed th, table.computed td { border-bottom: 1px solid var(--rule); padding: 4px 10px; text-align: right; white-space: nowrap; }
+table.computed th:first-child, table.computed td:first-child { text-align: left; }
+p.computed { color: var(--ink-2); font-size: 0.9rem; }
+figure { margin: 16px 0; }
+figure img { max-width: 100%; height: auto; border: 1px solid var(--rule); }
+figcaption { color: var(--ink-2); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<h1>Exploratory data analysis: eligible synthetic snapshots</h1>
+<p class="banner">ALL DATA IS SYNTHETIC. Descriptive analysis of the Policy C eligible snapshots in the Crew 1
+handoff. Tables and charts are computed by deterministic tools from stats.json; the interpretation paragraphs
+are written by the Exploratory Data Analyst agent and are checked against the computed statistics. Nothing here
+is a model result or evidence of real-world accuracy.</p>
+$sections
+</body>
+</html>
