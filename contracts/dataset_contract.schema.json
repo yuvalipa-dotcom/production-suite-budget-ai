@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Production Suite Budget AI handoff dataset contract",
+  "type": "object",
+  "required": ["dataset", "version", "raw_manifest_sha256", "primary_key", "row_count", "exclusion_counts", "columns", "split_policy", "outcome_only_exclusions"],
+  "properties": {
+    "dataset": {"type": "string"}, "version": {"type": "string"},
+    "raw_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "primary_key": {"const": ["production_id", "stage"]}, "row_count": {"type": "integer", "minimum": 0},
+    "exclusion_counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+    "columns": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["name", "dtype", "role", "unit", "nullable"], "properties": {"name": {"type": "string"}, "dtype": {"type": "string"}, "role": {"enum": ["id", "feature", "target", "metadata"]}, "unit": {"type": "string"}, "nullable": {"type": "boolean"}, "allowed": {}, "min": {"type": "number"}, "max": {"type": "number"}}}},
+    "split_policy": {"type": "string"}, "outcome_only_exclusions": {"type": "array", "items": {"type": "string"}}
+  }, "additionalProperties": false
+}

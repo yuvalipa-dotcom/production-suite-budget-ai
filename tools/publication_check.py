@@ -22,8 +22,12 @@ _spec = importlib.util.spec_from_file_location("publish_scan", HERE / "publish_s
 scan = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(scan)
 
-PUBLICATION_BRANCHES = ("main", "p1-synthetic-generator", "p1-remediation")
+# The W-3 branches plus the explicitly approved P2 candidate. An exact list: no other branch is accepted.
+PUBLICATION_BRANCHES = ("main", "p1-synthetic-generator", "p1-remediation", "p2-quality-gate")
 EXPECTED_REFS = {f"refs/heads/{b}" for b in PUBLICATION_BRANCHES}
+# origin/main after the W-3 publication (the PR #2 merge). The P2 candidate must build on it.
+PUBLISHED_BASELINE = "59517254e108738696cd3632530b953768745788"
+BASELINE_DESCENDANTS = ("p2-quality-gate",)
 FORBIDDEN_PATH = re.compile(
     r"(^|/)(private|scan_output|ground_truth|\.venv|venv)(/|$)"
     r"|(^|/)\.env(\.[^/]*)?$"
@@ -61,6 +65,14 @@ def refs_report(clone: Path) -> dict:
         "notes": git(clone, "notes", "list", check=False).strip(),
         "head": git(clone, "symbolic-ref", "HEAD").strip(),
     }
+
+
+def baseline_report(clone: Path, baseline: str = PUBLISHED_BASELINE,
+                    branches: tuple[str, ...] = BASELINE_DESCENDANTS) -> dict:
+    """Each listed branch must contain the published baseline commit."""
+    res = {b: subprocess.run(["git", "-C", str(clone), "merge-base", "--is-ancestor", baseline,
+                              f"refs/heads/{b}"], capture_output=True).returncode == 0 for b in branches}
+    return {"baseline": baseline, "descends": res, "all_descend": all(res.values())}
 
 
 def tree_checks(clone: Path) -> dict:
@@ -163,12 +175,14 @@ def main() -> int:
         raise SystemExit("--out must be outside the clone")
     deny = scan._denylist(args.denylist)
     refs = refs_report(args.clone)
+    baseline = baseline_report(args.clone)
     history, n_commits, n_pairs = scan.scan_history(args.clone, deny)
     trees = tree_checks(args.clone)
     worktrees = worktree_checks(args.clone, deny)
     messages = message_checks(args.clone, deny)
     report = {
         "refs": refs,
+        "baseline": baseline,
         "history_scan": {"commits": n_commits, "distinct_blob_path_pairs": n_pairs,
                          "secret_findings": [f for r in history for f in r["secret_findings"]],
                          "content_findings": [f for r in history for f in r["content_findings"]]},
@@ -182,7 +196,7 @@ def main() -> int:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, indent=2, default=list), encoding="utf-8")
     ok = (not refs["remotes"] and not refs["unexpected_refs"] and not refs["missing_refs"]
-          and not refs["stash"] and not refs["notes"]
+          and not refs["stash"] and not refs["notes"] and baseline["all_descend"]
           and not report["history_scan"]["secret_findings"] and not report["history_scan"]["content_findings"]
           and not trees["forbidden_paths"] and not trees["submodules"] and not trees["lfs_pointers"]
           and not trees["files_over_5mb"]
@@ -192,6 +206,7 @@ def main() -> int:
           and report["ignore"]["all_ignored"] and report["ignore"]["readme_states_dataset_committed"])
     summary = {
         "remotes": refs["remotes"], "refs": refs["refs"], "unexpected_refs": refs["unexpected_refs"],
+        "missing_refs": refs["missing_refs"], "baseline_descends": baseline["descends"],
         "commits_scanned": n_commits, "distinct_blob_path_pairs": n_pairs,
         "history_secret_findings": len(report["history_scan"]["secret_findings"]),
         "history_content_findings": len(report["history_scan"]["content_findings"]),

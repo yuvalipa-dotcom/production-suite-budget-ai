@@ -22,6 +22,10 @@ only original code, synthetic data and documentation.
 
 See [`docs/roadmap.md`](docs/roadmap.md).
 
+## P2 deterministic quality gate
+
+The local, offline gate validates raw source files and a Crew-1 handoff (`clean_data.csv` + `dataset_contract.json`) before any downstream flow consumes it. Every expected value is rebuilt from the raw export under Policy C; groups and folds come from the frozen reference [`contracts/frozen_split.json`](contracts/frozen_split.json). Run `python -m gate.run --stage source --raw data/synthetic/v2/raw --out <output-dir>`; the handoff stage also requires `--data` and `--contract`. See [`docs/quality_gate.md`](docs/quality_gate.md).
+
 ## Quick start (Python 3.13)
 
 ```

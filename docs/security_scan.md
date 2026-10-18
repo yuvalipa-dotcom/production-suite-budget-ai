@@ -29,6 +29,37 @@ The check ran in a fresh, disposable clone with its remote removed.
 
 The dataset manifests list the SHA-256 digests of the data files. These are high-entropy hexadecimal strings by design, not secrets. Only lines with exactly that shape inside `manifest.json` are excluded. A test proves that the same digest anywhere else is still flagged.
 
+**P2 addition.** Two further legitimate SHA-256 digest structures are exempted, after an owner-approved review of five false-positive findings:
+
+- `digest` in `tests/fixtures/policy_c_baseline.json`;
+- the `data/synthetic/v1/productions.csv` and `data/synthetic/v2/productions.csv` keys under `provenance.source_files_sha256` in `contracts/frozen_split.json`.
+
+A flagged line is spared only when all of the following hold:
+
+- the file path is exact;
+- the whole line is that one key with a lowercase hex-64 value;
+- the parsed JSON holds the value at exactly that location;
+- the value occurs nowhere else in the file;
+- the flagged secret is that value.
+
+Tests in `tests/test_publish_scan.py` prove that the same digest in another field or file is still flagged. They also prove that a value that is not lowercase hex-64 is not exempted, and that other secrets in those files, including on the same line, are still detected.
+
+**P2 publication candidate.** The dry-run checker (`tools/publication_check.py`) expects exactly four branches: the three W-3 branches plus `p2-quality-gate`. It applies the same history, working-tree, commit-message, path and object checks to each, and it still rejects any other ref. It also requires `p2-quality-gate` to descend from the published W-3 baseline, `origin/main` = `5951725`. Tests are in `tests/test_publication_check.py`.
+
+**P2 baseline commit id.** The checker records that baseline's full 40-character commit id, a public Git object name, not a secret. With owner approval, the id is exempted in exactly two complete lines:
+
+- the `PUBLISHED_BASELINE` assignment in `tools/publication_check.py`;
+- its assertion in `tests/test_publication_check.py`.
+
+A flagged line is spared only when all of the following hold:
+
+- the file path is exact;
+- the line equals its template filled with the one approved value;
+- the flagged secret is that value;
+- the value occurs once in the file.
+
+The scanner holds the approved value as an integer literal, so its own source contains no quoted hex string. The tests build every commit id at runtime. Tests prove that the approved value is the checker's baseline and the repository's `origin/main`. They also prove that modified values, other paths, other lines, a repeated value and additional secrets are all still detected.
+
 ## Proof that the checks work
 
 - `tests/test_publish_scan.py` checks both directions: planted token shapes, database URLs, local paths, environment-file names and private terms (including pattern rules with allow-lists) **are** detected, and healthy synthetic content passes. Planted values are built at runtime, so the test file contains no secret-shaped literal.

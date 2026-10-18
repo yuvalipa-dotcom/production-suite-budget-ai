@@ -54,3 +54,27 @@ def raw_text(generated):
 @pytest.fixture(scope="session")
 def defect_log(generated):
     return _read(generated["gt_dir"] / "defect_log.csv", as_text=True)
+
+
+@pytest.fixture(scope="session")
+def expected_ineligible(defect_log, generated):
+    """Expected ineligible snapshots, derived from ground truth + clean ledger dates (independent of the cleaner)."""
+    from tests.raw_repair import COST_TABLES, STAGES
+
+    snaps = generated["snapshots"]
+    asof = {(r.production_id, r.stage): r.as_of_date for r in snaps.itertuples()}
+    com = generated["commitments"].set_index("commitment_id")
+    out: dict[tuple[str, str], set[str]] = {}
+    nonrec = defect_log[(defect_log["recoverable"] == "False") & defect_log["table"].isin(COST_TABLES)]
+    for d in nonrec.itertuples():
+        pid = "-".join(d.record_id.split("-")[:2])
+        if d.table == "commitments":
+            c = com.loc[d.record_id]
+            for s in STAGES:
+                a = asof[(pid, s)]
+                if c.selected_date <= a and (c.cancelled_date == "" or c.cancelled_date > a):
+                    out.setdefault((pid, s), set()).add(f"commitment_{d.column}_missing")
+        elif d.column == "created_date":
+            for s in STAGES:
+                out.setdefault((pid, s), set()).add("manual_cost_undated")
+    return {k: "+".join(sorted(v)) for k, v in out.items()}
