@@ -1,4 +1,4 @@
-# Synthetic data generation (v1)
+# Synthetic data generation (active version: v2)
 
 > **ALL DATA IS SYNTHETIC.** Every record is produced by the seeded simulation
 > described here. No real customer, vendor or event data is used or contained.
@@ -7,8 +7,15 @@
 ## Reproduce
 
 ```
-python -m generator.cli --seed 42 --out data/synthetic/v1
+python -m generator.cli --version v2 --out data/synthetic/v2      # active version (+ raw export)
+python -m generator.cli --version v1 --out data/synthetic/v1      # frozen, byte-identical, for traceability
 ```
+
+**Versions:**
+- **v1:** the original export.
+- **v2:** adds the approved-budget revision ledger and the category-plan ledger, so that every snapshot feature and label can be rebuilt from dated records. The reason is in [`target_audit.md`](target_audit.md).
+- Every v1 file is byte-identical inside v2.
+- v2 also contains `raw/`, a provider-style export with realistic data-quality problems, described in [`raw_data_dictionary.md`](raw_data_dictionary.md).
 
 The output is byte-identical for a given seed: sorted rows, fixed numeric format
 (2 decimals), LF line endings, and no timestamps or machine-specific values. A
@@ -25,7 +32,7 @@ test regenerates the dataset and compares it, file by file, with the committed c
 | VAT rate | 0.18 |
 | Currency / basis | ILS, pre-VAT |
 
-## Output files (`data/synthetic/v1/`)
+## Output files (`data/synthetic/v2/`)
 
 | File | Grain | Purpose |
 |---|---|---|
@@ -34,6 +41,9 @@ test regenerates the dataset and compares it, file by file, with the committed c
 | `commitments.csv` | one row per supplier commitment | accepted quote and verified final cost, as two separate amounts |
 | `manual_costs.csv` | one row per manual cost | unexpected expenses and cancellation fees |
 | `payments.csv` | one row per company payment | cash flow only, **never a cost** |
+| `budget_revisions.csv` | one row per approved budget (revision 0 = original) | effective-dated budget and guest-count history (v2) |
+| `category_plans.csv` | one row per (production, category) | planned cost as typed, with VAT mode (v2) |
+| `raw/` | provider-style tables + own manifest | input for the future data-analyst crew (v2) |
 | `schema.json` | — | machine-readable role of every snapshot column |
 | `manifest.json` | — | seed, counts, split sizes, sha256 of every file |
 
@@ -122,7 +132,7 @@ is_overrun         = budget_gap_ils > 0.5
 
 Rates per split group are listed in `split_protocol.md`.
 
-A naive rule ("currently over budget ⇒ overrun") is close to chance early on (S0 48%, S1 51%) and strong only near the event (S3 84%). Prediction is therefore not trivial, and it is hardest exactly when it is most useful.
+A naive rule ("already over the budget in effect now ⇒ will overrun") never fires at S0 and S1, where nothing is over budget yet. It becomes informative only near the event. Per-stage figures on train are in [`model_selection_rule.md`](model_selection_rule.md).
 
 ## Known limitations
 

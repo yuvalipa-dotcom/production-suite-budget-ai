@@ -38,4 +38,4 @@ All snapshots of a production are always in the same fold, so a model is never v
 | test | 59.1% |
 | demo | 46.2% |
 
-The test group happens to have a higher rate than train. This is sampling variation over 80 productions. It is reported, not corrected, because re-drawing the split until it looks balanced would be a form of selection.
+The test group has a higher observed rate than train. Its uncertainty interval is in [`split_report.md`](split_report.md). The difference is reported, not corrected: re-drawing the split until it looks balanced would be a form of selection. The groups, the folds and the production ids are frozen.
