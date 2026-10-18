@@ -106,6 +106,31 @@ def worktree_checks(clone: Path, deny) -> list[dict]:
     return out
 
 
+def message_checks(clone: Path, deny) -> dict:
+    """Scan every reachable commit message in memory with the same rules as the file scans.
+
+    Secret rules: each detect-secrets plugin's ``analyze_line`` (the per-line rules of file scanning).
+    Content rules: the generic patterns and the private term list. Identities are not recorded here.
+    Not covered: references to environment-file names in messages (see docs/security_scan.md).
+    """
+    from detect_secrets.settings import default_settings, get_plugins
+    commits = git(clone, "rev-list", "--branches").split()
+    secret, content, lines = [], [], 0
+    with default_settings():
+        plugins = list(get_plugins())
+        for sha in commits:
+            msg = git(clone, "cat-file", "commit", sha).partition("\n\n")[2]
+            for n, ln in enumerate(msg.splitlines(), 1):
+                lines += 1
+                for p in plugins:
+                    for s in p.analyze_line(filename="COMMIT_MSG.txt", line=ln, line_number=n):
+                        secret.append({"commit": sha[:12], "line": n, "rule": s.type})
+                for f in scan._content_findings("COMMIT_MSG", ln, deny):
+                    content.append({"commit": sha[:12], "line": n, "rule": f["rule"]})
+    return {"commits": len(commits), "lines": lines, "secret_findings": secret,
+            "content_findings": content}
+
+
 def objects_report(repo: Path) -> dict:
     fsck = git(repo, "fsck", "--unreachable", "--dangling", "--no-reflogs", "--no-progress", check=False)
     lines = [ln for ln in fsck.splitlines() if ln.strip()]
@@ -141,6 +166,7 @@ def main() -> int:
     history, n_commits, n_pairs = scan.scan_history(args.clone, deny)
     trees = tree_checks(args.clone)
     worktrees = worktree_checks(args.clone, deny)
+    messages = message_checks(args.clone, deny)
     report = {
         "refs": refs,
         "history_scan": {"commits": n_commits, "distinct_blob_path_pairs": n_pairs,
@@ -148,6 +174,7 @@ def main() -> int:
                          "content_findings": [f for r in history for f in r["content_findings"]]},
         "tree_checks": trees,
         "worktrees": [{k: v for k, v in w.items()} for w in worktrees],
+        "messages": messages,
         "objects": {"clone": objects_report(args.clone), "academic": objects_report(args.origin_repo)},
         "ignore": ignore_report(args.clone),
         "private_denylist_entries": len(deny),
@@ -161,6 +188,7 @@ def main() -> int:
           and not trees["files_over_5mb"]
           and all(not w["secret_findings"] and not w["content_findings"] and not w["forbidden_paths"]
                   and w["status_clean"] for w in worktrees)
+          and not messages["secret_findings"] and not messages["content_findings"]
           and report["ignore"]["all_ignored"] and report["ignore"]["readme_states_dataset_committed"])
     summary = {
         "remotes": refs["remotes"], "refs": refs["refs"], "unexpected_refs": refs["unexpected_refs"],
@@ -173,6 +201,9 @@ def main() -> int:
         "forbidden_paths_in_history": trees["forbidden_paths"], "submodules": trees["submodules"],
         "lfs_pointers": trees["lfs_pointers"], "files_over_5mb": trees["files_over_5mb"],
         "binary_files": trees["binary_files"],
+        "message_scan": {"commits": messages["commits"], "lines": messages["lines"],
+                         "secret_findings": len(messages["secret_findings"]),
+                         "content_findings": len(messages["content_findings"])},
         "objects": report["objects"], "ignore_all": report["ignore"]["all_ignored"],
         "readme_statement": report["ignore"]["readme_states_dataset_committed"],
         "PASS": ok,
