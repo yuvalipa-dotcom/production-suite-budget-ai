@@ -1,0 +1,266 @@
+{
+  "columns": {
+    "archetype": {
+      "allowed": [
+        "wedding",
+        "bar_bat_mitzvah",
+        "corporate",
+        "conference"
+      ],
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "string"
+    },
+    "as_of_date": {
+      "available_at": "as_of",
+      "role": "metadata",
+      "type": "date"
+    },
+    "batch_id": {
+      "available_at": "as_of",
+      "role": "metadata",
+      "type": "string"
+    },
+    "budget_gap_ils": {
+      "available_at": "financial_close",
+      "note": "final_cost + (fee_contract if fee_included) - budget, signed",
+      "role": "target",
+      "type": "number",
+      "unit": "ILS pre-VAT"
+    },
+    "budget_pre_vat": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "number",
+      "unit": "ILS pre-VAT"
+    },
+    "budget_revisions_to_date": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer"
+    },
+    "budget_vat_mode": {
+      "allowed": [
+        "includes_vat",
+        "excludes_vat",
+        "no_vat"
+      ],
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "string"
+    },
+    "client_direct_share": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "number",
+      "unit": "ratio"
+    },
+    "committed_pre_vat": {
+      "available_at": "as_of",
+      "note": "accepted quotes + recorded manual costs; NOT a verified final cost",
+      "role": "feature",
+      "type": "number",
+      "unit": "ILS pre-VAT"
+    },
+    "committed_ratio": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "number",
+      "unit": "ratio"
+    },
+    "cost_per_guest_pre_vat": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "number",
+      "unit": "ILS pre-VAT"
+    },
+    "current_position_ils": {
+      "available_at": "as_of",
+      "note": "committed + fee if included - budget (deterministic actual-overrun level)",
+      "role": "feature",
+      "type": "number",
+      "unit": "ILS pre-VAT"
+    },
+    "cv_fold": {
+      "available_at": "as_of",
+      "note": "0..4 for train productions, -1 for test and demo",
+      "role": "metadata",
+      "type": "integer"
+    },
+    "days_since_contract": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer",
+      "unit": "days"
+    },
+    "days_to_event": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer",
+      "unit": "days"
+    },
+    "event_date": {
+      "available_at": "as_of",
+      "role": "metadata",
+      "type": "date"
+    },
+    "event_month": {
+      "available_at": "as_of",
+      "max": 12,
+      "min": 1,
+      "role": "feature",
+      "type": "integer"
+    },
+    "fee_contract_pre_vat": {
+      "available_at": "as_of",
+      "note": "contractual fee as known at as_of; manager-only in the product",
+      "role": "feature",
+      "type": "number",
+      "unit": "ILS pre-VAT"
+    },
+    "fee_included": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "boolean"
+    },
+    "fee_mode": {
+      "allowed": [
+        "percent",
+        "amount"
+      ],
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "string"
+    },
+    "final_cost_pre_vat": {
+      "available_at": "financial_close",
+      "note": "simulated verified final supplier costs + all manual costs",
+      "role": "target",
+      "type": "number",
+      "unit": "ILS pre-VAT"
+    },
+    "guest_count": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer",
+      "unit": "people"
+    },
+    "is_material_overrun": {
+      "available_at": "financial_close",
+      "note": "budget_gap_ils > 2% of budget; a WARNING level, not the overrun definition",
+      "role": "target",
+      "type": "boolean"
+    },
+    "is_overrun": {
+      "available_at": "financial_close",
+      "note": "budget_gap_ils > 0.5 (rounding tolerance only)",
+      "role": "target",
+      "type": "boolean"
+    },
+    "is_synthetic": {
+      "available_at": "as_of",
+      "role": "metadata",
+      "type": "boolean"
+    },
+    "lead_time_days": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer",
+      "unit": "days"
+    },
+    "manual_costs_pre_vat": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "number",
+      "unit": "ILS pre-VAT"
+    },
+    "n_categories_committed": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer"
+    },
+    "n_categories_over_plan": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer"
+    },
+    "n_categories_pending": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer"
+    },
+    "n_categories_planned": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer"
+    },
+    "n_commitments_active": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer"
+    },
+    "n_manual_costs": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer"
+    },
+    "n_substitutions_to_date": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "integer"
+    },
+    "no_vat_share": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "number",
+      "unit": "ratio"
+    },
+    "over_plan_pre_vat": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "number",
+      "unit": "ILS pre-VAT"
+    },
+    "planned_total_pre_vat": {
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "number",
+      "unit": "ILS pre-VAT"
+    },
+    "production_id": {
+      "available_at": "as_of",
+      "role": "metadata",
+      "type": "string"
+    },
+    "split": {
+      "allowed": [
+        "train",
+        "test",
+        "demo"
+      ],
+      "available_at": "as_of",
+      "role": "metadata",
+      "type": "string"
+    },
+    "stage": {
+      "allowed": [
+        "S0",
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "available_at": "as_of",
+      "role": "feature",
+      "type": "string"
+    }
+  },
+  "currency": "ILS",
+  "primary_key": [
+    "production_id",
+    "stage"
+  ],
+  "row_grain": "one row per (production_id, stage)",
+  "synthetic": true,
+  "table": "snapshots",
+  "vat_basis": "pre_vat"
+}
