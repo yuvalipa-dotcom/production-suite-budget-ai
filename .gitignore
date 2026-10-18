@@ -1,0 +1,17 @@
+# Local Python environment
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Environment and secrets: never committed
+.env
+.env*
+
+# Security scanner raw output: never committed
+scan_output/
+.secrets.baseline
+
+# Local output caches
+out/
+tmp/
