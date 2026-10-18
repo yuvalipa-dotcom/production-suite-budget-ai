@@ -1,7 +1,7 @@
 # Pre-publication security scan: summary
 
-**Date:** 2026-10-18
-**Outcome:** **0 findings.** Secret scan 0 · content scan 0 · commercial identity-term check: **passed**.
+**Date:** 2026-10-18 (re-run after the Policy C changes)
+**Outcome:** **0 findings.** Secret scan 0 · content scan 0 · commit-message scan 0 · commercial identity-term check: **passed**.
 No excluded paths, submodules, large-file pointers, files over 5 MB or binary files.
 
 ## Tools
@@ -10,7 +10,7 @@ No excluded paths, submodules, large-file pointers, files over 5 MB or binary fi
 |---|---|---|
 | `detect-secrets` | 1.5.0 | secret detection with all default plugins (high-entropy strings, keyword, cloud and VCS token formats, private keys) |
 | `tools/publish_scan.py` | in this repository | content scan: environment files, key and token shapes, database URLs, local absolute paths, code imported from a product codebase, plus a private term list kept outside the repository |
-| `tools/publication_check.py` | in this repository | publication dry run: refs, full-history and working-tree scans, excluded paths, object and ignore-rule checks |
+| `tools/publication_check.py` | in this repository | publication dry run: refs, full-history, working-tree and commit-message scans, excluded paths, object and ignore-rule checks |
 | git | 2.55.0 | history and ref enumeration |
 
 Runtime: Python 3.13.15.
@@ -20,7 +20,8 @@ Runtime: Python 3.13.15.
 The check ran in a fresh, disposable clone with its remote removed.
 
 - **Publication refs:** exactly the three branches `main`, `p1-synthetic-generator` and `p1-remediation`. No tags, stashes, notes or other refs.
-- **History:** every file of every commit reachable from those branches. That is 21 commits, including the commit that adds this summary.
+- **History:** every file of every commit reachable from those branches. That is 28 commits, including the commit that updates this summary.
+- **Commit messages:** every message, in full, including trailers. It was scanned with the same secret rules as files (each detect-secrets plugin's per-line rule) and with the content and private-term rules, except for the one check listed under *Coverage gap*.
 - **Working trees:** each of the three branches checked out and scanned file by file.
 - **Commercial identity terms:** a check against the identity terms of the commercial product was run over the same scope, and **passed**.
 
