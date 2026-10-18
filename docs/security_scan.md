@@ -29,6 +29,21 @@ The check ran in a fresh, disposable clone with its remote removed.
 
 The dataset manifests list the SHA-256 digests of the data files. These are high-entropy hexadecimal strings by design, not secrets. Only lines with exactly that shape inside `manifest.json` are excluded. A test proves that the same digest anywhere else is still flagged.
 
+**P2 addition.** Two further legitimate SHA-256 digest structures are exempted, after an owner-approved review of five false-positive findings:
+
+- `digest` in `tests/fixtures/policy_c_baseline.json`;
+- the `data/synthetic/v1/productions.csv` and `data/synthetic/v2/productions.csv` keys under `provenance.source_files_sha256` in `contracts/frozen_split.json`.
+
+A flagged line is spared only when all of the following hold:
+
+- the file path is exact;
+- the whole line is that one key with a lowercase hex-64 value;
+- the parsed JSON holds the value at exactly that location;
+- the value occurs nowhere else in the file;
+- the flagged secret is that value.
+
+Tests in `tests/test_publish_scan.py` prove that the same digest in another field or file is still flagged. They also prove that a value that is not lowercase hex-64 is not exempted, and that other secrets in those files, including on the same line, are still detected.
+
 ## Proof that the checks work
 
 - `tests/test_publish_scan.py` checks both directions: planted token shapes, database URLs, local paths, environment-file names and private terms (including pattern rules with allow-lists) **are** detected, and healthy synthetic content passes. Planted values are built at runtime, so the test file contains no secret-shaped literal.

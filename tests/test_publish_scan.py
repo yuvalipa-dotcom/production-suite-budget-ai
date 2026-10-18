@@ -64,6 +64,87 @@ def test_secret_scan_flags_a_token_and_spares_only_manifest_digests(tmp_path):
     assert scan._secret_findings(elsewhere, "other.json"), "the same digest outside the manifest must be flagged"
 
 
+# ---------- P2: the two approved digest structures, and nothing else ----------
+
+BASELINE = "tests/fixtures/policy_c_baseline.json"
+FROZEN = "contracts/frozen_split.json"
+V1, V2 = "data/synthetic/v1/productions.csv", "data/synthetic/v2/productions.csv"
+DIGEST2 = hashlib.sha256(b"planted-2").hexdigest()
+
+
+def _baseline(digest=DIGEST, extra=""):
+    return '{\n  "algorithm": "sha256",\n  "digest": "' + digest + '",\n' + extra + '  "ineligible": []\n}\n'
+
+
+def _frozen(v1=DIGEST, v2=DIGEST2, extra=""):
+    return ('{\n  "provenance": {\n    "seed": 42,\n    "source_files_sha256": {\n'
+            f'      "{V1}": "{v1}",\n      "{V2}": "{v2}"\n    }}\n  }},\n{extra}  "version": "1.0.0"\n}}\n')
+
+
+def _flagged(tmp_path, logical, text):
+    disk = tmp_path / "f.json"
+    disk.write_text(text, encoding="utf-8")
+    return scan._secret_findings(disk, logical)
+
+
+def _lines(findings):
+    return sorted(f["line"] for f in findings)
+
+
+def test_approved_digest_structures_are_exempted(tmp_path):
+    assert _flagged(tmp_path, "x.json", _baseline()), "the detector must flag the digest without the exemption"
+    assert _flagged(tmp_path, BASELINE, _baseline()) == []
+    assert _flagged(tmp_path, FROZEN, _frozen()) == []
+    assert _flagged(tmp_path, FROZEN, _frozen(v1=DIGEST, v2=DIGEST)) == []      # v1 and v2 files may be identical
+
+
+def test_committed_files_are_exempted():
+    for logical in (BASELINE, FROZEN):
+        assert scan._secret_findings(REPO / logical, logical) == [], logical
+
+
+def test_same_digest_in_another_field_or_file_is_detected(tmp_path):
+    # another field in the approved file. detect-secrets reports a repeated value once, at its first line;
+    # that line is the approved field, but the value is no longer unique to it, so it is not spared.
+    assert _lines(_flagged(tmp_path, BASELINE, _baseline(extra=f'  "other": "{DIGEST}",\n'))) == [3]
+    before = '{\n  "other": "' + DIGEST + '",\n' + _baseline()[2:]
+    assert _lines(_flagged(tmp_path, BASELINE, before)) == [2]
+    assert _flagged(tmp_path, FROZEN, _frozen(extra=f'  "checksum": "{DIGEST}",\n'))
+    # the approved key at an unapproved JSON location
+    nested = '  "nested": {\n    "digest": "' + DIGEST2 + '"\n  },\n'
+    assert _lines(_flagged(tmp_path, BASELINE, _baseline(extra=nested))) == [5]
+    moved = f'  "{V1}": "{DIGEST2}",\n'
+    assert _lines(_flagged(tmp_path, FROZEN, _frozen(v1=DIGEST, v2=DIGEST, extra=moved))) == [9]
+    # the approved structure in another file
+    assert _flagged(tmp_path, "tests/fixtures/other.json", _baseline())
+    assert _flagged(tmp_path, "contracts/other.json", _frozen())
+    assert _flagged(tmp_path, "docs/" + BASELINE, _baseline())
+
+
+def test_values_not_lowercase_hex64_are_not_exempted(tmp_path):
+    for bad in (DIGEST.upper(), DIGEST[:63], DIGEST + "a"):
+        assert _flagged(tmp_path, BASELINE, _baseline(digest=bad)), bad
+        assert _flagged(tmp_path, FROZEN, _frozen(v1=bad)), bad
+    for bad in (DIGEST.upper(), DIGEST[:63], DIGEST + "0", "g" + DIGEST[1:]):
+        line = f'  "digest": "{bad}",'
+        assert not scan._approved_digest(BASELINE, line, _baseline(digest=bad), None), bad
+
+
+def test_unrelated_secret_rules_remain_effective_in_approved_files(tmp_path):
+    token = f'  "token": "{FAKE_GH}",\n'
+    assert _flagged(tmp_path, BASELINE, _baseline(extra=token))
+    assert _flagged(tmp_path, FROZEN, _frozen(extra=token))
+    # another secret on the same line as an approved digest is never spared
+    same_line = '{\n  "digest": "' + DIGEST + '", "token": "' + FAKE_GH + '"\n}\n'
+    assert _flagged(tmp_path, BASELINE, same_line)
+    # a high-entropy hex value that is not the line's approved value is never spared
+    assert not scan._approved_digest(BASELINE, f'  "digest": "{DIGEST}",', _baseline(), DIGEST2)
+
+
+def test_manifest_exemption_is_unchanged():
+    assert scan.MANIFEST_DIGEST_LINE.pattern == r'^\s*"[a-z_]+\.(csv|json)": "[0-9a-f]{64}",?\s*$'
+
+
 def test_private_patterns_with_allow_list():
     deny = scan.Denylist([r"re:\bzork\b", r"re:zork[-_]", r"allow:unzork|zorkish", "plainword"])
     assert len(deny) == 3
