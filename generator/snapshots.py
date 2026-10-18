@@ -108,7 +108,26 @@ def snapshot_row(p: Production, stage: str, day: int) -> dict:
 
 def build_tables(productions: list[Production]) -> dict[str, pd.DataFrame]:
     snap_rows, prod_rows, comm_rows, man_rows, pay_rows = [], [], [], [], []
+    rev_rows, plan_rows = [], []
     for p in productions:
+        # v2 ledger: the original approved budget (revision 0) and every later approved revision.
+        history = [(0, p.initial_budget_entered, p.initial_guest_count)] + \
+                  [(r.day, r.budget_entered, r.guest_count) for r in p.revisions]
+        for revision_no, (day, entered, guests) in enumerate(history):
+            rev_rows.append({
+                "production_id": p.production_id, "batch_id": C.BATCH_ID, "is_synthetic": True,
+                "revision_no": revision_no, "effective_date": _date(p, day),
+                "approved_entered_amount": entered, "vat_mode": p.budget_vat_mode,
+                "approved_pre_vat_amount": pre_vat(entered, p.budget_vat_mode, C.VAT_RATE),
+                "guest_count": guests,
+            })
+        # v2 ledger: category plans as typed, with their VAT mode (fixed at contract in v1/v2).
+        for category, entered in p.category_plans_entered.items():
+            plan_rows.append({
+                "production_id": p.production_id, "batch_id": C.BATCH_ID, "is_synthetic": True,
+                "category": category, "planned_entered": entered, "vat_mode": p.category_plan_vat_mode,
+                "effective_date": _date(p, 0),
+            })
         for stage, day in stage_days(p).items():
             snap_rows.append(snapshot_row(p, stage, day))
         final_fee = p.fee_pre_vat_at(p.close_day)
@@ -167,4 +186,8 @@ def build_tables(productions: list[Production]) -> dict[str, pd.DataFrame]:
         "commitments": pd.DataFrame(comm_rows).sort_values("commitment_id").reset_index(drop=True),
         "manual_costs": pd.DataFrame(man_rows).sort_values("manual_cost_id").reset_index(drop=True),
         "payments": pd.DataFrame(pay_rows).sort_values("payment_id").reset_index(drop=True),
+        "budget_revisions": pd.DataFrame(rev_rows).sort_values(["production_id", "revision_no"])
+                              .reset_index(drop=True),
+        "category_plans": pd.DataFrame(plan_rows).sort_values(["production_id", "category"])
+                            .reset_index(drop=True),
     }
