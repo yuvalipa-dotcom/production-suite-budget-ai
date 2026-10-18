@@ -26,3 +26,7 @@ ground_truth/
 *.sql.gz
 *.bak
 dumps/
+
+# Other common virtual-environment folder names
+venv/
+env/
