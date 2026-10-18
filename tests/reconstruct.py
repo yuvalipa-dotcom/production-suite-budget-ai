@@ -54,7 +54,8 @@ def index(tables: dict) -> dict:
     return idx
 
 
-def features_at(idx: dict, pid: str, stage: str, as_of: str) -> dict:
+def _terms(idx: dict, pid: str, as_of: str) -> dict:
+    """Budget in effect and contractual fee known at ``as_of`` (prediction-time records only)."""
     prod = idx["productions"][pid]
     revs = [r for r in idx["budget_revisions"][pid] if r["effective_date"] <= as_of]
     current = max(revs, key=lambda r: int(r["revision_no"]))
@@ -64,6 +65,15 @@ def features_at(idx: dict, pid: str, stage: str, as_of: str) -> dict:
         else float(prod["fee_value"])
     fee_pre = vat_pre(round(fee_typed + 0.0, 2), prod["fee_vat_mode"])
     fee_in = fee_pre if _true(prod["fee_included"]) else 0.0
+    return {"prod": prod, "revs": revs, "current": current, "budget_pre": budget_pre,
+            "fee_pre": fee_pre, "fee_in": fee_in}
+
+
+def snapshot_features(idx: dict, pid: str, stage: str, as_of: str) -> dict:
+    """Features only. Must work on an index built WITHOUT any outcome-only column."""
+    t = _terms(idx, pid, as_of)
+    prod, revs, current = t["prod"], t["revs"], t["current"]
+    budget_pre, fee_pre, fee_in = t["budget_pre"], t["fee_pre"], t["fee_in"]
 
     plans = {r["category"]: vat_pre(float(r["planned_entered"]), r["vat_mode"])
              for r in idx["category_plans"][pid] if r["effective_date"] <= as_of}
@@ -119,17 +129,69 @@ def features_at(idx: dict, pid: str, stage: str, as_of: str) -> dict:
         "committed_ratio": (committed + fee_in) / budget_pre,
         "cost_per_guest_pre_vat": committed / guests if guests > 0 else 0.0,
     }
-    # Labels (approved definition A2): final verified costs + included contractual fee known at the
-    # snapshot, against the approved budget in effect at the snapshot.
-    final_cost = (sum(float(c["final_pre_vat"]) for c in idx["commitments"][pid]
-                      if c["cancelled_date"] in ("", None))
-                  + sum(float(m["pre_vat"]) for m in idx["manual_costs"][pid]))
-    gap = final_cost + fee_in - budget_pre
-    f["final_cost_pre_vat"] = final_cost
-    f["budget_gap_ils"] = gap
-    f["is_overrun"] = gap > OVERRUN_TOLERANCE
-    f["is_material_overrun"] = gap > WARNING_THRESHOLD * budget_pre
     return f
+
+
+def snapshot_labels(idx: dict, pid: str, as_of: str) -> dict:
+    """Labels (approved definition A2): verified final costs (outcome records) plus the included
+    contractual fee known at the snapshot, against the approved budget in effect at the snapshot."""
+    t = _terms(idx, pid, as_of)
+    final_cost = (sum((float(c["final_pre_vat"]) for c in idx["commitments"][pid]
+                       if c["cancelled_date"] in ("", None)), 0.0)
+                  + sum((float(m["pre_vat"]) for m in idx["manual_costs"][pid]), 0.0))
+    gap = final_cost + t["fee_in"] - t["budget_pre"]
+    return {"final_cost_pre_vat": final_cost, "budget_gap_ils": gap,
+            "is_overrun": gap > OVERRUN_TOLERANCE,
+            "is_material_overrun": gap > WARNING_THRESHOLD * t["budget_pre"]}
+
+
+def features_at(idx: dict, pid: str, stage: str, as_of: str) -> dict:
+    """Features and labels together (convenience)."""
+    return {**snapshot_features(idx, pid, stage, as_of), **snapshot_labels(idx, pid, as_of)}
+
+
+# Declared source columns (table.column) of every feature. Checked against the column-role
+# contract: no outcome-only column may appear here (P1-R2, R3.8c).
+_COMMIT_ACTIVE = {"commitments.selected_date", "commitments.cancelled_date", "commitments.original_pre_vat"}
+_MANUAL_SEEN = {"manual_costs.created_date", "manual_costs.pre_vat"}
+_REV = {"budget_revisions.effective_date", "budget_revisions.revision_no"}
+_TERMS = _REV | {"budget_revisions.approved_entered_amount", "productions.budget_vat_mode"}
+_FEE = _TERMS | {"productions.fee_mode", "productions.fee_value", "productions.fee_vat_mode",
+                 "productions.fee_included"}
+_PLANS = {"category_plans.category", "category_plans.planned_entered", "category_plans.vat_mode",
+          "category_plans.effective_date"}
+_CATS = _PLANS | _COMMIT_ACTIVE | _MANUAL_SEEN | {"commitments.category", "manual_costs.category"}
+FEATURE_SOURCES = {
+    "stage": {"snapshot_schedule.stage"},
+    "archetype": {"productions.archetype"},
+    "event_month": {"productions.event_date"},
+    "lead_time_days": {"productions.contract_date", "productions.event_date"},
+    "days_since_contract": {"productions.contract_date", "snapshot_schedule.as_of_date"},
+    "days_to_event": {"productions.event_date", "snapshot_schedule.as_of_date"},
+    "budget_vat_mode": {"productions.budget_vat_mode"},
+    "fee_included": {"productions.fee_included"},
+    "fee_mode": {"productions.fee_mode"},
+    "guest_count": _REV | {"budget_revisions.guest_count"},
+    "budget_pre_vat": _TERMS,
+    "budget_revisions_to_date": _REV,
+    "fee_contract_pre_vat": _FEE,
+    "planned_total_pre_vat": _PLANS,
+    "n_categories_planned": _PLANS,
+    "n_categories_committed": _PLANS | _COMMIT_ACTIVE | {"commitments.category"},
+    "n_categories_pending": _PLANS | _COMMIT_ACTIVE | {"commitments.category"},
+    "n_commitments_active": _COMMIT_ACTIVE,
+    "n_manual_costs": _MANUAL_SEEN,
+    "manual_costs_pre_vat": _MANUAL_SEEN,
+    "committed_pre_vat": _COMMIT_ACTIVE | _MANUAL_SEEN,
+    "n_categories_over_plan": _CATS,
+    "over_plan_pre_vat": _CATS,
+    "n_substitutions_to_date": {"commitments.cancelled_date"},
+    "no_vat_share": _COMMIT_ACTIVE | _MANUAL_SEEN | {"commitments.vat_mode"},
+    "client_direct_share": _COMMIT_ACTIVE | _MANUAL_SEEN | {"commitments.payment_responsibility"},
+    "current_position_ils": _COMMIT_ACTIVE | _MANUAL_SEEN | _FEE,
+    "committed_ratio": _COMMIT_ACTIVE | _MANUAL_SEEN | _FEE,
+    "cost_per_guest_pre_vat": _COMMIT_ACTIVE | _MANUAL_SEEN | _REV | {"budget_revisions.guest_count"},
+}
 
 
 def as_csv_text(value) -> str:

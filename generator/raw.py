@@ -68,7 +68,7 @@ PLAN = {
         ("date_format", "selected_date", 0.02, True, "parse_date"),
         ("vat_inclusive_in_pre_vat", "original_pre_vat", 0.02, True, "recompute_pre_vat_from_entered"),
         ("exact_duplicate", "*", 0.005, True, "drop_duplicate"),
-        ("missing_value", "category", 0.004, False, "exclude_record"),
+        ("missing_value", "category", 0.004, False, "retain_for_target_mark_features_unavailable_while_active"),
     ],
     "manual_costs": [
         ("whitespace", "kind", 0.02, True, "strip_whitespace"),
@@ -77,7 +77,7 @@ PLAN = {
         ("vat_inclusive_in_pre_vat", "pre_vat", 0.02, True, "recompute_pre_vat_from_entered"),
         ("exact_duplicate", "*", 0.01, True, "drop_duplicate"),
         ("near_duplicate", "category", 0.005, True, "drop_duplicate"),
-        ("missing_value", "created_date", 0.005, False, "exclude_record"),
+        ("missing_value", "created_date", 0.005, False, "retain_for_target_mark_all_snapshots_ineligible"),
     ],
     "payments": [
         ("date_format", "paid_date", 0.02, True, "parse_date"),
