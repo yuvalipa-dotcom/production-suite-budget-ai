@@ -60,6 +60,15 @@ GIT_BASELINE_LINES = {
     "tests/test_publication_check.py": '    assert check.PUBLISHED_BASELINE == "{}"',
 }
 
+# Narrow, documented exemption (P3), on the same rules: the public P2 merge commit (origin/main after
+# PR #3), the P3 starting baseline, in exactly two complete lines of the same two files.
+APPROVED_P3_BASELINE = f"{0x7140231951b1d2b82b8e1edcd92a0a8be5da15b8:040x}"
+P3_BASELINE_LINES = {
+    "tools/publication_check.py": 'P3_BASELINE = "{}"',
+    "tests/test_publication_check.py": '    assert check.P3_BASELINE == "{}"',
+}
+APPROVED_COMMIT_IDS = ((APPROVED_GIT_BASELINE, GIT_BASELINE_LINES), (APPROVED_P3_BASELINE, P3_BASELINE_LINES))
+
 GENERIC_PATTERNS = {
     "env_file_name": re.compile(r"(^|/)\.env(\.|$)"),
     "private_key_block": re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
@@ -143,10 +152,13 @@ def _approved_digest(logical: str, line: str, text: str, secret_value: str | Non
 
 
 def _approved_git_baseline(logical: str, line: str, text: str, secret_value: str | None) -> bool:
-    """True only for the two approved lines holding the public W-3 baseline commit id."""
-    template = GIT_BASELINE_LINES.get(logical)
-    return (template is not None and line == template.format(APPROVED_GIT_BASELINE)
-            and secret_value in (None, APPROVED_GIT_BASELINE) and text.count(APPROVED_GIT_BASELINE) == 1)
+    """True only for an approved line holding its approved public commit id (see APPROVED_COMMIT_IDS)."""
+    for value, lines in APPROVED_COMMIT_IDS:
+        template = lines.get(logical)
+        if (template is not None and line == template.format(value)
+                and secret_value in (None, value) and text.count(value) == 1):
+            return True
+    return False
 
 
 def _secret_findings(path_on_disk: Path, logical: str) -> list[dict]:

@@ -156,16 +156,25 @@ def _checker_test_src(value=BASE, extra=""):
     return f'def test_x():\n    assert check.PUBLISHED_BASELINE == "{value}"\n{extra}'
 
 
-def test_git_baseline_is_the_public_origin_main_commit():
+def test_git_baselines_are_public_origin_main_commits():
+    """The W-3 baseline was origin/main before PR #3; the P3 baseline is the PR #3 merge, whose first parent
+    is the W-3 baseline. Both stay ancestors of origin/main (equality would break at every later merge)."""
     import subprocess
+
+    def git(*args):
+        return subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, text=True)
+
     pc_spec = importlib.util.spec_from_file_location("publication_check", REPO / "tools" / "publication_check.py")
     pc = importlib.util.module_from_spec(pc_spec)
     pc_spec.loader.exec_module(pc)
-    assert len(BASE) == 40 and set(BASE) <= set("0123456789abcdef") and BASE == pc.PUBLISHED_BASELINE
-    origin = subprocess.run(["git", "-C", str(REPO), "rev-parse", "--verify", "-q", "refs/remotes/origin/main"],
-                            capture_output=True, text=True).stdout.strip()
+    for value in (BASE, P3):
+        assert len(value) == 40 and set(value) <= set("0123456789abcdef")
+    assert BASE == pc.PUBLISHED_BASELINE and P3 == pc.P3_BASELINE and BASE != P3
+    origin = git("rev-parse", "--verify", "-q", "refs/remotes/origin/main").stdout.strip()
     if origin:                                    # absent in a remote-less dry-run clone
-        assert origin == BASE
+        assert git("rev-parse", "--verify", "-q", f"{P3}^1").stdout.strip() == BASE
+        for value in (BASE, P3):
+            assert git("merge-base", "--is-ancestor", value, origin).returncode == 0, value
 
 
 def test_git_baseline_lines_are_exempted(tmp_path):
@@ -203,6 +212,66 @@ def test_git_baseline_files_still_detect_additional_secrets(tmp_path):
     assert _flagged(tmp_path, CHECKER, _checker_src(extra=f'OTHER = "{OTHER_SHA}"\n'))
     assert _flagged(tmp_path, CHECKER, f'PUBLISHED_BASELINE = "{BASE}"; T = "{FAKE_GH}"\n')
     assert "github_token" in rules(scan._content_findings(CHECKER, _checker_src(extra=token), []))
+
+
+# ---------- P3: the public P2 merge commit (P3 starting baseline) in exactly two lines ----------
+
+P3 = scan.APPROVED_P3_BASELINE
+
+
+def _p3_checker_src(value=P3, extra=""):
+    return f'{_checker_src()}P3_BASELINE = "{value}"\n{extra}P3_BASELINE_DESCENDANTS = ("p3-crew1",)\n'
+
+
+def _p3_checker_test_src(value=P3, extra=""):
+    return f'{_checker_test_src()}    assert check.P3_BASELINE == "{value}"\n{extra}'
+
+
+def test_p3_baseline_exemption_is_exact():
+    assert scan.APPROVED_COMMIT_IDS == ((BASE, scan.GIT_BASELINE_LINES), (P3, scan.P3_BASELINE_LINES))
+    assert set(scan.P3_BASELINE_LINES) == {CHECKER, CHECKER_TEST}
+    assert scan.GIT_BASELINE_LINES == {CHECKER: 'PUBLISHED_BASELINE = "{}"',
+                                       CHECKER_TEST: '    assert check.PUBLISHED_BASELINE == "{}"'}
+
+
+def test_p3_baseline_lines_are_exempted(tmp_path):
+    assert _flagged(tmp_path, "tools/other.py", _p3_checker_src()), "the detector must flag it without the exemption"
+    assert _flagged(tmp_path, CHECKER, _p3_checker_src()) == []
+    assert _flagged(tmp_path, CHECKER_TEST, _p3_checker_test_src()) == []
+
+
+def test_p3_baseline_modified_values_are_detected(tmp_path):
+    for bad in (OTHER_SHA, P3.upper(), P3[:39], P3 + "0", P3[:-1] + ("0" if P3[-1] != "0" else "1"), BASE):
+        assert _flagged(tmp_path, CHECKER, _p3_checker_src(value=bad)), bad
+        assert _flagged(tmp_path, CHECKER_TEST, _p3_checker_test_src(value=bad)), bad
+
+
+def test_p3_baseline_unrelated_paths_lines_and_swaps_are_detected(tmp_path):
+    for logical in ("tools/publication_check_v2.py", "tests/test_other.py", "docs/" + CHECKER, "crew1/run.py"):
+        assert _flagged(tmp_path, logical, _p3_checker_src()), logical
+        assert _flagged(tmp_path, logical, _p3_checker_test_src()), logical
+    variants = [f'P3_BASELINE = "{P3}"  # note', f'  P3_BASELINE = "{P3}"', f"P3_BASELINE = '{P3}'",
+                f'OTHER_BASELINE = "{P3}"', f'PUBLISHED_BASELINE = "{P3}"']
+    for line in variants:
+        assert _flagged(tmp_path, CHECKER, f"import x\n{line}\n"), line
+    # each approved value is spared only in its own line: swapping the two values is detected
+    assert _flagged(tmp_path, CHECKER, f'import x\nP3_BASELINE = "{BASE}"\n')
+    assert _flagged(tmp_path, CHECKER_TEST, f'    assert check.P3_BASELINE == "{BASE}"\n')
+    assert _flagged(tmp_path, CHECKER_TEST, f'    assert check.PUBLISHED_BASELINE == "{P3}"\n')
+    # the approved line plus the same value anywhere else in the file: not spared
+    assert _flagged(tmp_path, CHECKER, _p3_checker_src(extra=f'MIRROR = "{P3}"\n'))
+    assert _flagged(tmp_path, CHECKER_TEST, _p3_checker_test_src(extra=f'    other = "{P3}"\n'))
+    assert not scan._approved_git_baseline(CHECKER, f'P3_BASELINE = "{P3}"', _p3_checker_src(), OTHER_SHA)
+    assert not scan._approved_git_baseline(CHECKER, f'P3_BASELINE = "{P3}"', _p3_checker_src(), BASE)
+
+
+def test_p3_baseline_files_still_detect_additional_secrets(tmp_path):
+    token = f'TOKEN = "{FAKE_GH}"\n'
+    assert _flagged(tmp_path, CHECKER, _p3_checker_src(extra=token))
+    assert _flagged(tmp_path, CHECKER_TEST, _p3_checker_test_src(extra="    " + token))
+    assert _flagged(tmp_path, CHECKER, _p3_checker_src(extra=f'OTHER = "{OTHER_SHA}"\n'))
+    assert _flagged(tmp_path, CHECKER, f'P3_BASELINE = "{P3}"; T = "{FAKE_GH}"\n')
+    assert "github_token" in rules(scan._content_findings(CHECKER, _p3_checker_src(extra=token), []))
 
 
 def test_manifest_exemption_is_unchanged():
