@@ -1,7 +1,8 @@
 """Post-run deterministic validators for a Crew-1 run (P3 instruction 2.7). ALL DATA IS SYNTHETIC.
 
 A run is PASS only if every validator passes. Quantitative claims in the narrative text are
-checked against ``stats.json`` and the contracts with their units (docs/crew1.md, "Validators").
+checked against ``stats.json`` and the contracts with their units (docs/crew1.md, "Validators");
+V6 and V7 also reject statements against the narrative facts (``crew1/tools/narrative_checks.py``).
 
 Claim rules, in order:
 1. Identifiers and metadata are masked first and never validated: production and record ids
@@ -38,6 +39,7 @@ from pathlib import Path
 from .tools import cleaning as C
 from .tools import contract as K
 from .tools import eda as E
+from .tools import narrative_checks as N
 from .tools.workspace import Sources
 
 REQUIRED_ARTIFACTS = ("clean_data.csv", "eda_report.html", "insights.md", "dataset_contract.json")
@@ -409,7 +411,13 @@ def v5_claims(out: Path, sources: Sources) -> dict:
     return _res("V5", "quantitative claims match stats.json or the contracts (value, unit, rounding)", bad)
 
 
-def v6_eda(out: Path) -> dict:
+def run_facts(out: Path) -> dict:
+    """Narrative facts from a run folder's own artifacts (run_validators passes a fresh recomputation instead)."""
+    return N.narrative_facts(_load_json(out / "cleaning_log.json"), _load_json(out / "dataset_contract.json"),
+                             _load_json(out / "stats.json"))
+
+
+def v6_eda(out: Path, facts: dict | None = None) -> dict:
     p = out / "eda_report.html"
     if not p.is_file():
         return _res("V6", "EDA report sections and charts", ["eda_report.html missing"])
@@ -419,7 +427,11 @@ def v6_eda(out: Path) -> dict:
     if charts < E.MIN_CHARTS:
         bad.append(f"{charts} embedded PNG charts, at least {E.MIN_CHARTS} required")
     bad += [f"forbidden claim in eda_report.html: {h}" for t in narrative.values() for h in forbidden_claims(t)]
-    return _res("V6", "EDA report has every required section and at least 4 embedded charts", bad)
+    facts = facts or run_facts(out)
+    bad += [f"unsupported statement in eda_report.html [{sid}]: {h}" for sid, t in narrative.items()
+            for h in N.blocking_problems(t, facts)]
+    return _res("V6", "EDA report has every required section, at least 4 embedded charts, no forbidden claim and "
+                      "no statement against the narrative facts", bad)
 
 
 def frozen_note_problems(section: str, stats: dict | None) -> list[str]:
@@ -438,7 +450,7 @@ def frozen_note_problems(section: str, stats: dict | None) -> list[str]:
     return bad
 
 
-def v7_insights(out: Path) -> dict:
+def v7_insights(out: Path, facts: dict | None = None) -> dict:
     p = out / "insights.md"
     if not p.is_file():
         return _res("V7", "insights.md sections and forbidden claims", ["insights.md missing"])
@@ -452,7 +464,9 @@ def v7_insights(out: Path) -> dict:
     if not re.search(r"policy\s*c", secs.get(_norm_heading("Data quality and Policy C exclusions"), ""), re.I):
         bad.append("Data quality section does not discuss Policy C")
     bad += [f"forbidden claim: {h}" for h in forbidden_claims(md)]
-    return _res("V7", "insights.md has every required section and no forbidden claim", bad)
+    bad += [f"unsupported statement in insights.md: {h}" for h in N.blocking_problems(md, facts or run_facts(out))]
+    return _res("V7", "insights.md has every required section, no forbidden claim and no statement against the "
+                      "narrative facts", bad)
 
 
 def v8_manifest(manifest: dict | None) -> dict:
@@ -501,10 +515,12 @@ def v9_trace(out: Path, secret: str | None) -> dict:
 
 
 def run_validators(out: Path, sources: Sources, manifest: dict | None, secret: str | None) -> list[dict]:
-    expected_csv, _, expected_contract = fresh_handoff(sources)
+    expected_csv, expected_log, expected_contract = fresh_handoff(sources)
     gate_res, _ = v4_gate(out, sources)
+    facts = N.narrative_facts(expected_log, expected_contract, _load_json(out / "stats.json"))   # independent
     return [v1_artifacts(out), v2_clean_data(out, expected_csv), v3_contract(out, expected_contract), gate_res,
-            v5_claims(out, sources), v6_eda(out), v7_insights(out), v8_manifest(manifest), v9_trace(out, secret)]
+            v5_claims(out, sources), v6_eda(out, facts), v7_insights(out, facts), v8_manifest(manifest),
+            v9_trace(out, secret)]
 
 
 def lint_narrative(text: str, stats: dict | None, contract: dict | None, frozen_counts: dict | None) -> dict:

@@ -42,6 +42,21 @@ explore_and_report:
     Do not invent explanations, causes, reasons or numerical relationships (for example, which
     productions a count of snapshots comes from) that a tool output does not state.
 
+    Authoritative definitions (P2 contract; copy them, never infer them): the signed gap is the
+    verified final cost plus the contractual fee when it is included in the budget, minus the
+    approved budget in effect at the snapshot (ILS, pre-VAT). A positive gap means over budget; a
+    negative gap means under budget. is_overrun means the signed gap exceeds 0.5 ILS;
+    is_material_overrun means the signed gap exceeds 2% of that budget. Payments and commitment
+    totals are not part of the signed gap or of either label.
+
+    Keep three kinds of statements apart. Facts: these definitions and the counts in the
+    narrative_facts that list_analyses returns, stated exactly (its population sentence gives the
+    production count of the eligible snapshots). Associations: differences between stages, groups,
+    revision buckets or fee terms, and correlations; never present them as causes, effects,
+    impacts or explanations, and never use words such as reflects, drives, reduces, influences or
+    due to for them. Hypotheses: questions for Crew 2. Credit each figure to the analysis that
+    computed it (narrative_facts.attribution).
+
     Rules for your text: copy every number exactly as the tools returned it, rounded to at most
     one decimal place, with its unit. Write rates as percentages (a fraction 0.4733 is 47.3%),
     differences between rates in percentage points (pp), and amounts in ILS. Describe
@@ -91,11 +106,27 @@ contract_and_insights:
     Do not invent explanations, causes, reasons or numerical relationships (for example, which
     productions a count of snapshots comes from) that a tool output does not state.
 
+    Authoritative definitions (P2 contract; copy them, never infer them): the signed gap is the
+    verified final cost plus the contractual fee when it is included in the budget, minus the
+    approved budget in effect at the snapshot (ILS, pre-VAT). A positive gap means over budget; a
+    negative gap means under budget. is_overrun means the signed gap exceeds 0.5 ILS;
+    is_material_overrun means the signed gap exceeds 2% of that budget. Payments and commitment
+    totals are not part of the signed gap or of either label.
+
+    Keep three kinds of statements apart. Facts: these definitions and the counts in the
+    narrative_facts that build_dataset_contract returns, stated exactly (its population sentence
+    gives the production count of the eligible snapshots). Associations: differences between
+    stages, groups, revision buckets or fee terms, and correlations; never present them as causes,
+    effects, impacts or explanations, and never use words such as reflects, drives, reduces,
+    influences or due to for them. Hypotheses: questions for Crew 2. Credit each figure to the
+    analysis that computed it (narrative_facts.attribution).
+
     Quantitative claims: every number in insights.md must come from stats.json (the run_analysis
     results quoted in the context), from dataset_contract.json (the build_dataset_contract output:
-    row count, exclusion counts and columns), or from the approved frozen-split counts. Write each
-    with its unit. Do not quote any other number, such as the defect, normalisation, duplicate or
-    production-eligibility counts from the cleaning narrative; describe those findings in words.
+    row count, exclusion counts and columns), from narrative_facts, or from the approved
+    frozen-split counts. Write each with its unit. Do not quote any other number, such as the
+    defect, normalisation or duplicate counts from the cleaning narrative; describe those findings
+    in words.
     Before you write any split count, verify it against the deterministic tool output: snapshot
     counts per split group are the train, test and demo n values of
     frozen_split_prevalence_difference in the context, also returned by write_insights as

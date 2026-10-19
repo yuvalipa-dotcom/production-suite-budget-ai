@@ -297,15 +297,24 @@ def _split(df, log) -> dict:
             "interval_includes_zero": bool(lo <= 0 <= hi)}
 
 
+def production_eligibility(log: dict) -> dict:
+    """Productions by Policy C eligibility of their snapshots (the narrative's production counts)."""
+    prods = Counter(x["production_id"] for x in log["ineligible_snapshots"])
+    scheduled, fully_excluded = log["raw_rows"]["productions"], sum(1 for v in prods.values() if v == len(STAGES))
+    return {"n_productions_scheduled": scheduled,
+            "n_productions_with_eligible_snapshots": scheduled - fully_excluded,
+            "n_productions_fully_eligible": scheduled - len(prods),
+            "n_productions_partially_eligible": len(prods) - fully_excluded,
+            "n_productions_affected": len(prods), "n_productions_fully_excluded": fully_excluded}
+
+
 def _exclusions(df, log) -> dict:
     by_stage = Counter(x["stage"] for x in log["ineligible_snapshots"])
-    prods = Counter(x["production_id"] for x in log["ineligible_snapshots"])
     return {"scheduled": log["snapshots"]["scheduled"], "eligible": log["snapshots"]["eligible"],
             "ineligible": log["snapshots"]["ineligible"],
             "exclusion_counts": log["exclusion_counts"],
             "ineligible_by_stage_counts": {s: by_stage.get(s, 0) for s in STAGES},
-            "n_productions_affected": len(prods),
-            "n_productions_fully_excluded": sum(1 for v in prods.values() if v == len(STAGES)),
+            **production_eligibility(log),
             "n_target_unreliable_productions": len(log["target_unreliable_productions"]),
             "n_invalid_payments_excluded": len(log["excluded_payments"]),
             "n_records_with_problems": len(log["issues"])}
@@ -470,7 +479,13 @@ def computed_tables(analysis_id: str, a: dict) -> str:
         rows = [["scheduled", a["scheduled"]], ["eligible", a["eligible"]], ["ineligible", a["ineligible"]]]
         rows += [[f"excluded: {r}", n] for r, n in a["exclusion_counts"].items()]
         rows += [[f"ineligible at {s}", n] for s, n in a["ineligible_by_stage_counts"].items()]
-        return _table(["snapshots", "count"], rows)
+        prods = [[label, a[key]] for key, label in (
+            ("n_productions_scheduled", "scheduled"),
+            ("n_productions_with_eligible_snapshots", "with eligible snapshots"),
+            ("n_productions_fully_eligible", "fully eligible"),
+            ("n_productions_partially_eligible", "partially eligible"),
+            ("n_productions_fully_excluded", "fully excluded")) if key in a]
+        return _table(["snapshots", "count"], rows) + (_table(["productions", "count"], prods) if prods else "")
     if analysis_id == "overrun_prevalence":
         return (_table(head, _prev_rows({"all": a["overall"], **a["by_group"]}))
                 + _table(head, _prev_rows(a["by_stage"])) + _table(head, _prev_rows(a["by_archetype"])))
