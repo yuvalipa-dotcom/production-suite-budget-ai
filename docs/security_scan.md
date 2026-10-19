@@ -76,3 +76,23 @@ One commit-message pattern check, for references to environment-file names, was 
 Commit messages were still scanned for secrets, private terms, absolute local paths, internal file names and e-mail addresses. Separately, environment *files* are excluded and checked by path in every commit tree and working tree.
 
 Raw scanner output is kept locally only and is not part of this repository.
+
+## P4 finding: pinned handoff digest (open, owner decision needed before publication)
+
+**Finding.** The scan flagged `Hex High Entropy String` in `crew2/ml/data.py` line 36 of the local P4 commit `b2146c5`. It was found both by the P3 read-only scan and by the P4 re-scan.
+
+**Disposition: an expected SHA-256 digest, not a secret.**
+- The value is the 64-character lowercase hex `EXPECTED_CLEAN_SHA256`.
+- It is the sha256 of the `clean_data.csv` text rebuilt in-process by the deterministic Policy C cleaning function.
+- This was verified by recomputation: the value equals that sha256 and the current pinned constant. A test also ties it to the independent reference handoff (`tests/test_crew2_data.py`).
+- It grants no access and identifies only public synthetic data.
+
+**Remediation so far.**
+- Commit `44a81d5` holds the same value as an integer literal, so the source contains no quoted hex string. This is the convention of `tools/publication_check.py`.
+- The value now occurs in no tracked file at `HEAD`.
+- It remains in the history of `b2146c5`. That commit is on the local branch `p4-crew2` only; it is not pushed and not on any remote.
+- No scanner exemption was added.
+
+**Before any publication, the owner chooses one of:**
+- (a) rewrite the unpublished local history so that no commit contains the quoted literal;
+- (b) approve an exemption for exactly that path, line and value, under the same four rules as the existing digest exemptions.
