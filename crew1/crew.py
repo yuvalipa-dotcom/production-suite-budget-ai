@@ -127,8 +127,11 @@ class Recorder:
 
 # ---------------------------------------------------------------- the crew
 
-def build_crew(ws: Workspace, sources: Sources, llm, recorder: Recorder | None = None):
-    """Agents and tasks from the YAML configuration; each agent gets only its own tools."""
+def build_crew(ws: Workspace, sources: Sources, model: str, recorder: Recorder | None = None):
+    """Agents and tasks from the YAML configuration; each agent gets only its own tools and its own LLM.
+
+    One LLM instance per agent: CrewAI sums each agent's ``llm.get_token_usage_summary()``, so a shared
+    instance is counted once per agent (p3-live-002 reported 3x its real usage)."""
     import warnings
 
     from crewai import Agent, Crew, Process, Task
@@ -144,7 +147,7 @@ def build_crew(ws: Workspace, sources: Sources, llm, recorder: Recorder | None =
         cfg = agents_cfg[key]
         agents[key] = Agent(
             role=cfg["role"].strip(), goal=cfg["goal"].strip(), backstory=cfg["backstory"].strip(),
-            tools=tools[key], llm=llm, allow_delegation=False, memory=False, knowledge_sources=None,
+            tools=tools[key], llm=make_llm(model), allow_delegation=False, memory=False, knowledge_sources=None,
             embedder=None, allow_code_execution=False, reasoning=False, planning=False, multimodal=False,
             inject_date=False, cache=False, max_retry_limit=1, respect_context_window=True,
             step_callback=step_cb, verbose=False, **AGENT_LIMITS[key])

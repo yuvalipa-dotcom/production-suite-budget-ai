@@ -44,8 +44,9 @@ explore_and_report:
   expected_output: >
     A short summary listing the analyses run, the charts rendered, and the key statistics with
     their units copied from run_analysis output, including the overall overrun prevalence, the
-    prevalence by stage, and the frozen split test minus train difference in pp with its 95%
-    bootstrap interval.
+    prevalence by stage, the frozen split test minus train difference in pp with its 95%
+    bootstrap interval, and the number of eligible snapshots in each frozen split group (train,
+    test, demo) exactly as returned by run_analysis for frozen_split_prevalence_difference.
 
 contract_and_insights:
   agent: contract_author
@@ -72,7 +73,16 @@ contract_and_insights:
        forbidden claims or frozen split note problems, correct the document and call
        write_insights again.
 
-    Use only numbers from the context or from your tools, with their units. Hypotheses are
+    Quantitative claims: every number in insights.md must come from stats.json (the run_analysis
+    results quoted in the context), from dataset_contract.json (the build_dataset_contract output:
+    row count, exclusion counts and columns), or from the approved frozen-split counts. Write each
+    with its unit. Do not quote any other number, such as the defect, normalisation, duplicate or
+    production-eligibility counts from the cleaning narrative; describe those findings in words.
+    Before you write any split count, verify it against the deterministic tool output: snapshot
+    counts per split group are the train, test and demo n values of
+    frozen_split_prevalence_difference in the context. Never estimate, round or derive a split
+    count, and leave it out if you cannot verify it. write_insights checks every number against
+    these sources: remove or correct each number it lists as unverified. Hypotheses are
     questions for the modelling crew to test, not predictions. Never write that anything will
     predict, never claim real-world accuracy, and never recommend re-splitting or rebalancing.
   expected_output: >

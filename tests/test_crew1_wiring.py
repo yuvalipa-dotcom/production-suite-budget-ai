@@ -28,7 +28,7 @@ def built():
     saved = os.environ.pop("ANTHROPIC_API_KEY", None)
     ws = stage_workspace()
     try:
-        crew, ctx = build_crew(ws, Sources.default(), make_llm(resolve_model({})), Recorder(ws.root))
+        crew, ctx = build_crew(ws, Sources.default(), resolve_model({}), Recorder(ws.root))
         yield crew, ws
     finally:
         ws.cleanup()
@@ -95,6 +95,37 @@ def test_the_wired_step_callback_records_crewai_steps(built):
     steps = recorder.events[before:]
     assert [(e["event"], e["kind"]) for e in steps] == [("agent_step", "AgentAction"), ("agent_step", "AgentFinish")]
     assert steps[0]["tool"] == "load_raw_table" and steps[1]["output"] == "done"
+
+
+def test_each_agent_has_its_own_llm_with_the_approved_settings(built):
+    """Regression (p3-live-002): one shared LLM made crew.usage_metrics count every request once per agent."""
+    crew, _ = built
+    llms = [a.llm for a in crew.agents]
+    assert len({id(x) for x in llms}) == 3
+    for x in llms:
+        assert type(x).__name__ == "AnthropicCompletion" and x.model == DEFAULT_MODEL
+        assert (x.temperature, x.max_tokens, x.timeout, x.max_retries) == (
+            LLM_SETTINGS["temperature"], LLM_SETTINGS["max_tokens"], LLM_SETTINGS["timeout"],
+            LLM_SETTINGS["max_retries"])
+
+
+def test_crew_usage_counts_each_request_once():
+    """Three simulated responses go through CrewAI's own usage tracking; the crew total counts each once."""
+    saved = os.environ.pop("ANTHROPIC_API_KEY", None)
+    ws = stage_workspace()
+    try:
+        crew, _ = build_crew(ws, Sources.default(), DEFAULT_MODEL, Recorder(ws.root))
+        a, b, _ = (agent.llm for agent in crew.agents)
+        for llm, usage in ((a, {"input_tokens": 100, "output_tokens": 10}),
+                           (b, {"input_tokens": 200, "output_tokens": 20}),
+                           (b, {"input_tokens": 300, "output_tokens": 30})):
+            llm._track_token_usage_internal(usage)
+        m = crew.calculate_usage_metrics()
+        assert (m.prompt_tokens, m.completion_tokens, m.total_tokens, m.successful_requests) == (600, 60, 660, 3)
+    finally:
+        ws.cleanup()
+        if saved is not None:
+            os.environ["ANTHROPIC_API_KEY"] = saved
 
 
 def test_telemetry_and_tracing_are_disabled():

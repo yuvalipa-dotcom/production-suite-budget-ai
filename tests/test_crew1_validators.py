@@ -96,6 +96,47 @@ def test_a_fabricated_quantitative_claim_fails(run_copy):
     assert res["status"] == "FAIL" and any("93.1%" in d for d in res["details"])
 
 
+def _flat(text: str) -> str:
+    return " ".join(text.split())
+
+
+def test_the_insights_prompt_limits_numbers_to_the_v5_sources():
+    """Prompt constraint (p3-live-002): the insights author was allowed 'numbers from the context', which V5 rejects."""
+    from crew1.crew import load_config
+    _, tasks = load_config()
+    desc = _flat(tasks["contract_and_insights"]["description"])
+    assert "numbers from the context or from your tools" not in desc
+    assert ("every number in insights.md must come from stats.json" in desc and "dataset_contract.json" in desc
+            and "approved frozen-split counts" in desc)
+    assert "Do not quote any other number" in desc and "cleaning narrative" in desc
+    assert "Before you write any split count, verify it against the deterministic tool output" in desc
+    assert "Never estimate, round or derive a split count" in desc
+    assert "remove or correct each number it lists as unverified" in desc
+    handover = _flat(tasks["explore_and_report"]["expected_output"])
+    assert "number of eligible snapshots in each frozen split group" in handover
+
+
+def test_split_and_cleaning_counts_are_checked_against_the_v5_sources(run_copy):
+    """The verification the prompt relies on: verified split counts pass; the p3-live-002 split counts
+    (train 1,100 / test 308 / demo 130) and a cleaning-narrative count are flagged by write_insights' checks
+    and fail V5."""
+    groups = _stats(run_copy)["analyses"]["frozen_split_prevalence_difference"]["groups"]
+    n = {g: groups[g]["n"] for g in ("train", "test", "demo")}
+    good = f"\nThe split holds {n['train']:,} train, {n['test']:,} test and {n['demo']:,} demo snapshots.\n"
+    _append(run_copy / "insights.md", good)
+    assert V.v5_claims(run_copy, SOURCES)["status"] == "PASS"
+    wrong = "\nTrain has 1,100 snapshots, test 308 and demo 130; 22 duplicate commitments were dropped.\n"
+    src = _sources(run_copy)
+    assert not any(V.claim_matches(c, src) for c in V.extract_claims(wrong))     # precondition: all unverifiable
+    _append(run_copy / "insights.md", wrong)
+    res = V.v5_claims(run_copy, SOURCES)
+    assert res["status"] == "FAIL" and len(res["details"]) == 4
+    frozen = json.loads((SOURCES.contracts_dir / "frozen_split.json").read_text(encoding="utf-8"))
+    contract = json.loads((run_copy / "dataset_contract.json").read_text(encoding="utf-8"))
+    lint = V.lint_narrative(wrong, _stats(run_copy), contract, frozen["counts"])
+    assert len(lint["unverified_quantitative_claims"]) == 4
+
+
 def test_a_fabricated_count_and_amount_fail(run_copy):
     _append(run_copy / "insights.md", "\nThe handoff has 1,537 rows and a median gap of 98,765 ILS.\n")
     res = V.v5_claims(run_copy, SOURCES)

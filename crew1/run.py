@@ -81,9 +81,9 @@ def estimate_cost(model: str, usage: dict) -> dict:
 
 def live_runner(ws: Workspace, sources: Sources, model: str, recorder: Recorder) -> dict:
     """Build and kick off the crew in the isolated process state. Makes the LLM calls."""
-    from .crew import build_crew, isolated_process_state, make_llm
+    from .crew import build_crew, isolated_process_state
 
-    crew, ctx = build_crew(ws, sources, make_llm(model), recorder)
+    crew, ctx = build_crew(ws, sources, model, recorder)
     with isolated_process_state(ws.root):
         crew.kickoff()
     m = crew.usage_metrics

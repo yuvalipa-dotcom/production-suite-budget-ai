@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import time
 
 import pandas as pd
 import pytest
@@ -60,6 +61,43 @@ def test_repeated_tool_calls_in_one_workspace_are_byte_identical(two_runs):
     ctx.build_dataset_contract({"stage": "Snapshot stage, S0 to S3."})
     for n in ("out.clean_data", "out.cleaning_log", "out.dataset_contract"):
         assert ws.read_output(n) == first[n], n
+
+
+def test_concurrent_run_analysis_calls_keep_stats_json_valid_and_complete(monkeypatch):
+    """Regression (p3-live-002): CrewAI ran five run_analysis calls of one turn in parallel threads; two
+    read-merge-write cycles of stats.json overlapped, leaving invalid JSON and one analysis lost."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    from crew1.crew import Recorder
+    from crew1.tools import build_tools
+
+    batch = ["policy_c_exclusions", "signed_gap_distribution", "budget_revision_effects",
+             "frozen_split_prevalence_difference", "fee_breakdown"]
+    ws = stage_workspace()
+    try:
+        ctx, recorder = ToolContext(ws, Sources.default()), Recorder(ws.root)
+        ctx.apply_policy_c()
+        tool = {t.name: t for ts in build_tools(ctx, recorder).values() for t in ts}["run_analysis"]
+        real_load = E.load_stats
+
+        def slow_load(w):                                      # widens the read-to-write window
+            stats = real_load(w)
+            time.sleep(0.2)
+            return stats
+
+        monkeypatch.setattr(E, "load_stats", slow_load)
+        with ThreadPoolExecutor(max_workers=len(batch)) as pool:      # as CrewAI executes one turn's calls
+            outputs = list(pool.map(lambda a: tool._run(analysis_id=a), batch))
+        monkeypatch.undo()
+        assert not [o for o in outputs if o.startswith("ERROR")]
+        stats = json.loads(ws.read_output("out.stats"))                # valid JSON, nothing trailing
+        assert sorted(stats["analyses"]) == sorted(batch)
+        for a in batch:
+            assert stats["analyses"][a] == json.loads(E.dumps({"x": E.compute_analysis(
+                a, E.load_clean(ws), ctx.log())}))["x"], a
+        assert [e["seq"] for e in recorder.events] == list(range(1, len(batch) + 1))
+    finally:
+        ws.cleanup()
 
 
 def test_tool_output_equals_the_validators_fresh_recomputation(two_runs):

@@ -5,6 +5,7 @@ names (never paths), and records its call in the run trace."""
 from __future__ import annotations
 
 import json
+import threading
 import time
 from typing import Any, Callable
 
@@ -65,27 +66,33 @@ class Crew1Tool(BaseTool):
 
     _fn: Callable[..., Any] = PrivateAttr()
     _recorder: Any = PrivateAttr(default=None)
+    _lock: Any = PrivateAttr(default_factory=threading.Lock)
 
-    def bind(self, fn, recorder) -> "Crew1Tool":
+    def bind(self, fn, recorder, lock=None) -> "Crew1Tool":
         self._fn, self._recorder = fn, recorder
+        if lock is not None:
+            self._lock = lock
         return self
 
     def _run(self, **kwargs) -> str:
-        start = time.monotonic()
-        try:
-            out = self._fn(**kwargs)
-            text = out if isinstance(out, str) else compact(out)
-            ok = True
-        except IsolationError as e:
-            text, ok = f"ERROR: rejected ({e.code}). Use a logical name from the tool description.", False
-        except (K.ContractError, KeyError, LookupError, ValueError) as e:
-            text, ok = f"ERROR: {type(e).__name__}: {e}", False
-        if len(text) > OUTPUT_LIMIT:
-            text = text[:OUTPUT_LIMIT] + " ...[truncated]"
-        if self._recorder is not None:
-            self._recorder.add("tool_call", tool=self.name, args=kwargs, ok=ok, output=text,
-                               seconds=round(time.monotonic() - start, 3))
-        return text
+        # CrewAI runs the tool calls of one model turn in parallel threads; the shared run lock makes them
+        # execute one at a time (stats.json is read, merged and rewritten; p3-live-002 lost a write).
+        with self._lock:
+            start = time.monotonic()
+            try:
+                out = self._fn(**kwargs)
+                text = out if isinstance(out, str) else compact(out)
+                ok = True
+            except IsolationError as e:
+                text, ok = f"ERROR: rejected ({e.code}). Use a logical name from the tool description.", False
+            except (K.ContractError, KeyError, LookupError, ValueError) as e:
+                text, ok = f"ERROR: {type(e).__name__}: {e}", False
+            if len(text) > OUTPUT_LIMIT:
+                text = text[:OUTPUT_LIMIT] + " ...[truncated]"
+            if self._recorder is not None:
+                self._recorder.add("tool_call", tool=self.name, args=kwargs, ok=ok, output=text,
+                                   seconds=round(time.monotonic() - start, 3))
+            return text
 
 
 class ToolContext:
@@ -96,6 +103,7 @@ class ToolContext:
         self.analyses_requested: list[str] = []
         self.charts_rendered: list[str] = []
         self._raw = None
+        self.lock = threading.Lock()                              # shared by every tool of this run
 
     def raw(self):
         if self._raw is None:
@@ -254,6 +262,6 @@ def build_tools(ctx: ToolContext, recorder=None) -> dict[str, list[BaseTool]]:
         for name in names:
             schema, description = SPECS[name]
             tool = Crew1Tool(name=name, description=description, args_schema=schema)
-            tools.append(tool.bind(getattr(ctx, name), recorder))
+            tools.append(tool.bind(getattr(ctx, name), recorder, ctx.lock))
         out[agent] = tools
     return out
