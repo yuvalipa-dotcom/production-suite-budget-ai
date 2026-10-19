@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field, PrivateAttr
 from . import cleaning as C
 from . import contract as K
 from . import eda as E
+from . import narrative_checks as N
 from .gate_tool import run_gate
 from .workspace import RAW_TABLES, IsolationError, Sources, Workspace
 
@@ -46,15 +47,36 @@ class ChartArgs(BaseModel):
     chart_id: str = Field(description="One chart id from list_analyses: " + ", ".join(E.CHARTS))
 
 
+# CrewAI 1.15.28 sends every native tool to Anthropic with strict: true, which closes every object
+# (additionalProperties: false). A dict-typed argument then admits only {} (p3-live-003: 22 empty
+# assemble_eda_report calls), so every argument below is a named field or a list of typed objects.
+_SECTION_TEXT = "Plain-text interpretation for the report section '{}'; blank lines separate paragraphs."
+
+
 class ReportArgs(BaseModel):
-    sections: dict[str, str] = Field(description="Interpretation text for every report section id: "
-                                     + ", ".join(E.SECTIONS) + ". Plain text; blank lines separate paragraphs.")
+    overview: str = Field(description=_SECTION_TEXT.format(E.SECTIONS["overview"][0]))
+    data_quality: str = Field(description=_SECTION_TEXT.format(E.SECTIONS["data_quality"][0]))
+    prevalence: str = Field(description=_SECTION_TEXT.format(E.SECTIONS["prevalence"][0]))
+    signed_gap: str = Field(description=_SECTION_TEXT.format(E.SECTIONS["signed_gap"][0]))
+    budget_revisions: str = Field(description=_SECTION_TEXT.format(E.SECTIONS["budget_revisions"][0]))
+    fee_terms: str = Field(description=_SECTION_TEXT.format(E.SECTIONS["fee_terms"][0]))
+    correlations: str = Field(description=_SECTION_TEXT.format(E.SECTIONS["correlations"][0]))
+    frozen_split: str = Field(description=_SECTION_TEXT.format(E.SECTIONS["frozen_split"][0]))
+    limitations: str = Field(description=_SECTION_TEXT.format(E.SECTIONS["limitations"][0]))
+
+
+assert tuple(ReportArgs.model_fields) == tuple(E.SECTIONS)
+
+
+class ColumnDescription(BaseModel):
+    column: str = Field(description="An exact column name of clean_data.csv.")
+    description: str = Field(description="One line of plain text describing the column.")
 
 
 class ContractArgs(BaseModel):
-    column_descriptions: dict[str, str] | None = Field(
-        default=None, description="Optional one-line plain-text description per column name. Free text only: "
-                                  "every structural field is built by the tool.")
+    column_descriptions: list[ColumnDescription] | None = Field(
+        default=None, description="Optional one-line plain-text descriptions, one entry per column. Free text "
+                                  "only: every structural field is built by the tool.")
 
 
 class InsightsArgs(BaseModel):
@@ -178,10 +200,8 @@ class ToolContext:
         self.charts_rendered.append(chart_id)
         return {"chart_id": chart_id, "rendered": True, "png_bytes": len(data), "title": E.CHARTS[chart_id][1]}
 
-    def assemble_eda_report(self, sections: dict):
+    def assemble_eda_report(self, **sections: str):
         from ..validators import eda_narrative, lint_narrative
-        if isinstance(sections, str):
-            sections = json.loads(sections)
         page = E.assemble_report(self.ws, sections)
         narrative, images = eda_narrative(page)
         stats = E.load_stats(self.ws)
@@ -189,16 +209,18 @@ class ToolContext:
         return {"written": "eda_report.html",
                 "sections_missing_or_short": [s for s in E.SECTIONS if len(narrative.get(s, "")) < 40],
                 "charts_embedded": len(images), "minimum_charts": E.MIN_CHARTS,
-                **lint_narrative(text, stats, self.contract(), self.frozen_counts())}
+                **lint_narrative(text, stats, self.contract(), self.frozen_counts()),
+                "context_problems": N.context_problems(text, stats, self.contract(), self.frozen_counts(),
+                                                       self.log())}
 
     # ------------------------------------------------------------ A3
-    def build_dataset_contract(self, column_descriptions: dict | None = None):
+    def build_dataset_contract(self, column_descriptions: list | None = None):
         if not self.ws.has_output("out.clean_data"):
             raise LookupError("clean_data.csv does not exist yet")
         sha = C.sha256_bytes(self.ws.read_bytes("raw.manifest"))
         log = self.log()
         contract = K.build_contract(self.ws.read_output("out.clean_data"), self.sources.contracts_dir, sha,
-                                    log["exclusion_counts"], column_descriptions)
+                                    log["exclusion_counts"], K.descriptions_from_entries(column_descriptions))
         K.write_contract(self.ws, contract)
         return {"written": "dataset_contract.json", "row_count": contract["row_count"],
                 "exclusion_counts": contract["exclusion_counts"], "columns": len(contract["columns"]),
@@ -221,10 +243,14 @@ class ToolContext:
         secs = markdown_sections(markdown)
         stats = E.load_stats(self.ws)
         return {"written": "insights.md",
+                "required_headings": [f"## {t}" for t in INSIGHT_SECTIONS],
                 "sections_missing_or_empty": [t for t in INSIGHT_SECTIONS if not secs.get(_norm_heading(t))],
                 "frozen_split_note_problems": frozen_note_problems(secs.get(_norm_heading("Frozen split note"), ""),
                                                                    stats),
-                **lint_narrative(markdown, stats, self.contract(), self.frozen_counts())}
+                "frozen_split_values": N.frozen_split_values(stats),
+                **lint_narrative(markdown, stats, self.contract(), self.frozen_counts()),
+                "context_problems": N.context_problems(markdown, stats, self.contract(), self.frozen_counts(),
+                                                       self.log())}
 
 
 SPECS = {
@@ -240,16 +266,19 @@ SPECS = {
     "run_analysis": (AnalysisArgs, "Run one approved analysis on clean_data.csv; results are added to stats.json "
                                    "and returned."),
     "render_chart": (ChartArgs, "Render one chart (PNG) from stats.json only. Its analysis must have been run."),
-    "assemble_eda_report": (ReportArgs, "Write eda_report.html: your interpretation text per section, with the "
-                                        "computed tables and rendered charts inserted by the tool. Returns checks "
-                                        "of your text (unverified numbers, forbidden claims, missing sections)."),
+    "assemble_eda_report": (ReportArgs, "Write eda_report.html: your interpretation text in each of the nine "
+                                        "section fields, with the computed tables and rendered charts inserted by "
+                                        "the tool. Returns checks of your text (unverified numbers, forbidden "
+                                        "claims, missing sections, statements the tool outputs do not support)."),
     "build_dataset_contract": (ContractArgs, "Build dataset_contract.json deterministically from the actual "
                                              "clean_data.csv and the committed contracts. You may add only "
                                              "one-line column descriptions."),
     "run_handoff_gate": (NoArgs, "Run the P2 handoff quality gate (read-only) on clean_data.csv and "
                                  "dataset_contract.json; writes gate_result.json and returns the check statuses."),
-    "write_insights": (InsightsArgs, "Write insights.md. Returns checks of your text (missing sections, "
-                                     "unverified numbers, forbidden claims, frozen split note requirements)."),
+    "write_insights": (InsightsArgs, "Write insights.md. Returns the required headings, the frozen split values "
+                                     "from stats.json, and checks of your text (missing sections, unverified "
+                                     "numbers, forbidden claims, frozen split note requirements, statements the "
+                                     "tool outputs do not support)."),
 }
 assert set(SPECS) == {t for ts in TOOLSETS.values() for t in ts}
 

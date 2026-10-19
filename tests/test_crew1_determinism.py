@@ -27,12 +27,12 @@ def _build(order):
     ws = stage_workspace()
     ctx = ToolContext(ws, Sources.default())
     ctx.apply_policy_c()
-    ctx.build_dataset_contract({"stage": "Snapshot stage, S0 to S3."})
+    ctx.build_dataset_contract([{"column": "stage", "description": "Snapshot stage, S0 to S3."}])
     for a in order:
         ctx.run_analysis(a)
     for c in E.CHARTS:
         ctx.render_chart(c)
-    ctx.assemble_eda_report(eda_sections(E.load_stats(ws)))
+    ctx.assemble_eda_report(**eda_sections(E.load_stats(ws)))
     names = ["out.clean_data", "out.cleaning_log", "out.dataset_contract", "out.stats", "out.eda_report",
              *(f"out.chart.{c}" for c in E.CHARTS)]
     files = {n: ws.read_output(n) for n in names}
@@ -58,7 +58,7 @@ def test_repeated_tool_calls_in_one_workspace_are_byte_identical(two_runs):
     (ws, first), _ = two_runs
     ctx = ToolContext(ws, Sources.default())
     ctx.apply_policy_c()
-    ctx.build_dataset_contract({"stage": "Snapshot stage, S0 to S3."})
+    ctx.build_dataset_contract([{"column": "stage", "description": "Snapshot stage, S0 to S3."}])
     for n in ("out.clean_data", "out.cleaning_log", "out.dataset_contract"):
         assert ws.read_output(n) == first[n], n
 

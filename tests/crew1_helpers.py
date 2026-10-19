@@ -129,9 +129,10 @@ def scripted_runner(corrupt=None, eda_text=None, insights_text=None):
         for cid in E.CHARTS:
             tools["render_chart"]._run(chart_id=cid)
         stats = E.load_stats(ws)
-        tools["assemble_eda_report"]._run(sections=(eda_text or eda_sections)(stats))
+        tools["assemble_eda_report"].run(**(eda_text or eda_sections)(stats))    # validated, as CrewAI calls it
         recorder.task(SimpleNamespace(name="explore_and_report", agent="Exploratory Data Analyst", raw="scripted"))
-        tools["build_dataset_contract"]._run(column_descriptions={"stage": "Snapshot stage, S0 to S3."})
+        tools["build_dataset_contract"].run(column_descriptions=[{"column": "stage",
+                                                             "description": "Snapshot stage, S0 to S3."}])
         if corrupt:
             corrupt(ws)
         tools["run_handoff_gate"]._run()

@@ -32,6 +32,23 @@ class ContractError(ValueError):
     pass
 
 
+def descriptions_from_entries(entries) -> dict[str, str] | None:
+    """The tool's typed list of {column, description} entries as a column -> text mapping."""
+    if entries is None:
+        return None
+    if not isinstance(entries, list):
+        raise ContractError("column_descriptions must be a list of {column, description} entries")
+    out: dict[str, str] = {}
+    for e in entries:
+        e = e.model_dump() if hasattr(e, "model_dump") else e
+        if not isinstance(e, dict) or set(e) != {"column", "description"}:
+            raise ContractError("each column description must have exactly the fields column and description")
+        if e["column"] in out:
+            raise ContractError(f"duplicate column in descriptions: {e['column']}")
+        out[e["column"]] = e["description"]
+    return out
+
+
 def validate_descriptions(descriptions, columns: list[str]) -> dict[str, str]:
     """Free-text descriptions only: known columns, plain single-line text of bounded length."""
     if descriptions in (None, ""):

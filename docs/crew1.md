@@ -15,8 +15,8 @@ It is a CrewAI crew of three agents running three sequential tasks. **Every data
 | Agent | Task | Tools (its own only) |
 |---|---|---|
 | A1 Data Ingestion & Cleaning Engineer | T1 `ingest_and_clean`: profile, detect, clean, and write the cleaning narrative | `load_raw_table(name)`, `detect_defects()`, `apply_policy_c()`, `eligibility_summary()` |
-| A2 Exploratory Data Analyst | T2 `explore_and_report` (context T1): run analyses, render charts, interpret, `eda_report.html` | `list_analyses()`, `run_analysis(analysis_id)`, `render_chart(chart_id)`, `assemble_eda_report(sections)` |
-| A3 Data Contract & Insights Author | T3 `contract_and_insights` (context T1, T2): contract, gate, `insights.md` | `build_dataset_contract(column_descriptions)`, `run_handoff_gate()`, `write_insights(markdown)` |
+| A2 Exploratory Data Analyst | T2 `explore_and_report` (context T1): run analyses, render charts, interpret, `eda_report.html` | `list_analyses()`, `run_analysis(analysis_id)`, `render_chart(chart_id)`, `assemble_eda_report(overview, data_quality, prevalence, signed_gap, budget_revisions, fee_terms, correlations, frozen_split, limitations)` |
+| A3 Data Contract & Insights Author | T3 `contract_and_insights` (context T1, T2): contract, gate, `insights.md` | `build_dataset_contract(column_descriptions: [{column, description}])`, `run_handoff_gate()`, `write_insights(markdown)` |
 
 **Layout:**
 
@@ -56,7 +56,9 @@ The `run_handoff_gate` tool (`crew1/tools/gate_tool.py`) calls `gate.run` unchan
 
 **No agent can write or edit a data value.** The cleaning tool writes `clean_data.csv`. The contract tool takes only descriptions, rejects unknown columns and non-plain text, and generates everything else.
 
-The two authoring tools, `assemble_eda_report` and `write_insights`, return the validator findings on the agent's text: missing sections, unverified numbers and forbidden claims. The agent can then correct the text. The post-run validators remain the authority.
+The two authoring tools, `assemble_eda_report` and `write_insights`, return the validator findings on the agent's text: missing sections, unverified numbers and forbidden claims. They also return `context_problems` (`crew1/tools/narrative_checks.py`): a production count attached to the eligible snapshots that is not theirs, frozen split figures attributed to the handoff gate instead of the bootstrap analysis, and exclusion reasons that the cleaning log does not record. `write_insights` also returns the required headings and the frozen split values from `stats.json` (`frozen_split_values`). The agent can then correct the text. The post-run validators remain the authority; `context_problems` is feedback only and is not a validator.
+
+Every tool argument is a named field or a list of typed objects, never a free-form mapping: CrewAI 1.15.28 sends the tools to Anthropic in strict mode, which closes every object, so a mapping argument could only be sent empty (p3-live-003). `tests/test_crew1_authoring.py` checks the converted schemas.
 
 **Note on Policy C assurance.** Crew 1 uses the same Policy C library that the gate uses for verification. The independent assurance of Policy C correctness comes from the P2 agreement tests against ground truth and committed data. The handoff gate protects against tampering, LLM error and corruption between the crews. The Crew 1 tests add one more independent cross-check: the tool-built handoff equals the reference built from the committed clean snapshots and the ground truth.
 
