@@ -106,9 +106,10 @@ These settings are applied in code before CrewAI is imported, by `crew1/__init__
 - Crew and agents have no memory, knowledge, embeddings, delegation, code execution, reasoning or planning, and caching is off.
 - Limits:
   - A1: `max_iter` 12, `max_execution_time` 600 s, `max_rpm` 20;
-  - A2: `max_iter` 25, `max_execution_time` 900 s, `max_rpm` 20;
-  - A3: `max_iter` 15, `max_execution_time` 600 s, `max_rpm` 20;
-  - crew: `max_rpm` 20.
+  - A2: `max_iter` 18, `max_execution_time` 900 s, `max_rpm` 20;
+  - A3: `max_iter` 10, `max_execution_time` 600 s, `max_rpm` 20;
+  - crew: `max_rpm` 20; agent `max_retry_limit` 0.
+  - In crewai 1.15.28 `max_iter` counts model requests (one per executor iteration, however many parallel tool calls it returns), not tool calls. When it is reached, CrewAI sends one more request without tools for a forced final answer and the task completes with that text. Per agent there are therefore at most `max_iter` + 1 successful requests; the SDK's 2 retries apply only to failed HTTP requests. The values fit a legitimate run with every tool call in its own turn (A1 11, A2 17, A3 8 requests) and stop the loops seen in p3-live-002 (13 `write_insights` calls) and p3-live-003 (22 `assemble_eda_report` calls). `tests/test_crew1_iteration_caps.py` measures this on a mocked kickoff. These are iteration bounds, not a spending cap.
 - LLM: temperature 0, `max_tokens` 8192, timeout 180 s, 2 retries.
 - **Model:** `CREW_MODEL`, default `claude-haiku-4-5-20251001`. This dated Haiku id is listed in the installed `crewai==1.15.28` (`crewai/llms/constants.py`, `ANTHROPIC_MODELS`) and routes to CrewAI's native Anthropic provider (`anthropic==0.73.0`); LiteLLM is not installed.
 - **Key:** the provider SDK reads `ANTHROPIC_API_KEY` from the environment. Crew 1 code only checks that it is present. Its value is never read into a log, and any occurrence in the trace is redacted.
