@@ -248,6 +248,21 @@ p3-live-004 passed V1–V9 although its narrative defined the signed gap through
 
 Column descriptions are optional: the meta-contract (`contracts/dataset_contract.schema.json`) does not require them, and V3 compares the contract without them. p3-live-004 has none (0 of 37). Its trace shows why: the author's first call described 38 columns, 35 of which do not exist (a guessed raw-table schema, among them `snapshot_id`, `total_payment_pre_vat` and `signed_gap_pre_vat`, the same commitment-and-payment reading of the gap that `N-DEFINITION` now rejects). The tool rejected the call naming only the first unknown column, and the agent retried with `column_descriptions: null`. No tool output lists the 37 contract columns (some feature names appear only inside earlier analysis results). This is a quality improvement, not a P3 gate. A bounded improvement for a future run: return the 37 column names with their roles in `build_dataset_contract`'s output and in its error message, and ask for descriptions of the primary key and the four targets only (6 columns), each checked against the definitions above.
 
+### Audit of p3-live-005 (the published run)
+
+p3-live-005 (`artifacts/crew1/p3-live-005/`, model `claude-haiku-4-5-20251001`, code at `5cca25f`) is PASS on V1–V9, both in its manifest and when re-run independently; the P2 source and handoff gates pass on its outputs. An independent read-only audit recomputed its figures from `clean_data.csv` and the cleaning log rather than from `stats.json`. All counts, rates, Wilson and bootstrap intervals, gap statistics and Policy C counts match. None of the p3-live-004 errors recurs: the gap is defined from the verified final cost, the sign is read correctly, the eligible snapshots are credited to 397 productions, associations are not presented as causes, and the frozen split figures are credited to `frozen_split_prevalence_difference`.
+
+The audit found four narrative inaccuracies that the validators do not catch. **The artifacts are published unchanged**, because editing them would break the digests in `run_manifest.json`. Read them with these corrections:
+
+| # | Where | Statement | Correction |
+|---|---|---|---|
+| 1 | `insights.md`, Hypotheses | "fee modes (fixed, percentage, variable)" | `fee_mode` has two values only, `percent` (1,000 snapshots) and `amount` (538). No "fixed" or "variable" mode exists. |
+| 2 | `eda_report.html`, `correlations` | "Other features show correlations with absolute values below 0.13" | This holds for the Spearman correlation with the signed gap (largest other: `current_position_ils`, 0.124). It does not hold for the point-biserial correlation with `is_overrun`, which the previous sentence reports: `manual_costs_pre_vat` is 0.176 and `n_manual_costs` 0.101 (train group). |
+| 3 | `eda_report.html`, `data_quality`; `insights.md`, Data quality | "22 had at least one ineligible snapshot" (EDA) and "25 had at least one ineligible snapshot" (insights) | Both use the same words for different counts. 25 productions have at least one ineligible snapshot: 22 partially eligible and 3 with no eligible snapshot. With the 375 fully eligible productions this gives 400. |
+| 4 | `insights.md`, Hypotheses | "the temporal spread of costs (recency and age measures)" | The dataset contract has no recency or age column. Its time columns are `as_of_date`, `event_month`, `lead_time_days`, `days_since_contract` and `days_to_event`. |
+
+`dataset_contract.json` has no column descriptions (0 of 37), as in p3-live-004 and for the same reason (above). This is a documented limitation, not a requirement.
+
 ## Relationship to the P2 handoff gate
 
 **The gate is unchanged.** Crew 1 calls it through `gate.run` (A3's `run_handoff_gate`, read-only), and V4 re-runs it independently on the copied artifacts.

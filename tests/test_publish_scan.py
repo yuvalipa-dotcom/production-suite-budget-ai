@@ -9,6 +9,8 @@ import hashlib
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 REPO = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("publish_scan", REPO / "tools" / "publish_scan.py")
 scan = importlib.util.module_from_spec(spec)
@@ -287,3 +289,103 @@ def test_private_patterns_with_allow_list():
     assert scan._content_findings("a.md", "zorkless word", deny) == []          # word boundary respected
     # allow never suppresses a literal entry
     assert "private_denylist[0]" in rules(scan._content_findings("a.md", "unzork plainword", deny))
+
+
+# ---------- P3: the provenance digests of the four p3-live-005 JSON artifacts, and nothing else ----------
+
+RUN = REPO / scan.P3_RUN
+RUN_FILES = tuple(scan.APPROVED_P3_RUN_DIGESTS)
+
+
+def _tree_secrets(files: dict) -> list:
+    return scan._scan_tree(files, scan.Denylist([]), "t")["secret_findings"]
+
+
+def _run_bytes(logical):
+    p = REPO / logical
+    if not p.is_file():
+        pytest.skip("the p3-live-005 artifacts are not in this checkout")
+    return p.read_bytes()
+
+
+def test_p3_run_exemption_is_exact():
+    assert scan.P3_RUN == "artifacts/crew1/p3-live-005" and scan.P3_RUN_DIGEST_TYPE == "Hex High Entropy String"
+    assert {k: len(v[1]) for k, v in scan.APPROVED_P3_RUN_DIGESTS.items()} == {
+        f"{scan.P3_RUN}/run_manifest.json": 17, f"{scan.P3_RUN}/gate_result.json": 6,
+        f"{scan.P3_RUN}/dataset_contract.json": 1, f"{scan.P3_RUN}/cleaning_log.json": 1}
+
+
+def test_p3_run_artifacts_are_exempted_and_their_blobs_match():
+    for logical in RUN_FILES:
+        data = _run_bytes(logical)
+        assert hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest() == scan.APPROVED_P3_RUN_DIGESTS[logical][0]
+        assert scan._secret_findings(RUN / Path(logical).name, logical), "the detector must flag it unexempted"
+        assert _tree_secrets({logical: data}) == [], logical
+
+
+def test_p3_run_approved_digests_are_the_digests_of_the_named_files():
+    """Independent verification: each approved value is the sha256 of a run artifact or a committed input."""
+    import json
+    import subprocess
+    sha = lambda b: hashlib.sha256(b).hexdigest()
+
+    def named(key):
+        if (RUN / key).is_file():
+            return (RUN / key).read_bytes()
+        path = "data/synthetic/v2/" + key if key.startswith("raw/") else key
+        res = subprocess.run(["git", "-C", str(REPO), "show", f"5cca25f:{path}"], capture_output=True)
+        if res.returncode != 0:
+            pytest.skip("the run's code commit is not in this clone")
+        return res.stdout
+
+    n = 0
+    for logical, (_, locations) in scan.APPROVED_P3_RUN_DIGESTS.items():
+        doc = json.loads(_run_bytes(logical))
+        for loc in locations:
+            key = "raw/manifest.json" if loc == ("raw_manifest_sha256",) else loc[-1]
+            assert scan._json_at(doc, loc) == sha(named(key)), (logical, loc)
+            n += 1
+    assert n == 25
+
+
+def test_p3_run_exemption_requires_the_unchanged_file_at_its_path():
+    logical = f"{scan.P3_RUN}/run_manifest.json"
+    data = _run_bytes(logical)
+    value = scan._json_at(__import__("json").loads(data), ("input_sha256", "raw/payments.csv"))
+    # a different digest in an approved slot (same shape, same length)
+    assert _tree_secrets({logical: data.replace(value.encode(), DIGEST.encode())})
+    # any other change to the file, even outside the digests
+    assert _tree_secrets({logical: data.replace(b'"status": "PASS"', b'"status": "PAS5"')})
+    # the same bytes at any other path: an earlier run, another name, another folder
+    for other in ("artifacts/crew1/p3-live-004/run_manifest.json", f"{scan.P3_RUN}/manifest_copy.json",
+                  "run_manifest.json", f"{scan.P3_RUN}/gate_result.json"):
+        assert _tree_secrets({other: data}), other
+
+
+def test_p3_run_files_still_detect_other_secrets():
+    for logical in RUN_FILES:
+        data = _run_bytes(logical)
+        planted = data.replace(b"{", ('{\n  "token": "' + FAKE_GH + '",').encode(), 1)
+        assert _tree_secrets({logical: planted}), logical
+        assert "github_token" in rules(scan._content_findings(logical, planted.decode("utf-8"), []))
+        hexed = data.replace(b"{", ('{\n  "api_secret": "' + DIGEST2 + '",').encode(), 1)
+        assert _tree_secrets({logical: hexed}), logical
+
+
+def test_p3_run_exemption_never_spares_another_finding_type_or_line():
+    logical = f"{scan.P3_RUN}/dataset_contract.json"
+    data = _run_bytes(logical)
+    line = next(i for i, ln in enumerate(data.decode("utf-8").splitlines(), 1) if "raw_manifest_sha256" in ln)
+    assert scan._approved_p3_run_digest(logical, data, {"rule": "Hex High Entropy String", "line": line})
+    for finding in ({"rule": "Secret Keyword", "line": line}, {"rule": "Base64 High Entropy String", "line": line},
+                    {"rule": "Hex High Entropy String", "line": 1}, {"rule": "Hex High Entropy String", "line": 0},
+                    {"rule": "Hex High Entropy String", "line": 10 ** 6}):
+        assert not scan._approved_p3_run_digest(logical, data, finding), finding
+
+
+def test_p3_run_exemption_ignores_synthetic_files_at_the_approved_paths():
+    """Without the exact approved bytes nothing is spared, whatever the structure."""
+    for logical in RUN_FILES:
+        fake = ('{\n  "raw_manifest_sha256": "' + DIGEST + '",\n  "input_sha256": {\n    "raw/manifest.json": "'
+                + DIGEST2 + '"\n  }\n}\n').encode()
+        assert _lines(_tree_secrets({logical: fake})) == [2, 4], logical
