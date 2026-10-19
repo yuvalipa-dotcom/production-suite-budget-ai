@@ -1,0 +1,818 @@
+{
+  "analyses": {
+    "budget_revision_effects": {
+      "by_revisions_to_date": {
+        "0": {
+          "hi": 0.543891,
+          "k": 683,
+          "lo": 0.490075,
+          "mean_gap_ils": 1965.309054,
+          "median_gap_share": 0.001382,
+          "n": 1321,
+          "rate": 0.517033
+        },
+        "1": {
+          "hi": 0.323405,
+          "k": 39,
+          "lo": 0.188612,
+          "mean_gap_ils": -19637.960513,
+          "median_gap_share": -0.06594,
+          "n": 156,
+          "rate": 0.25
+        },
+        "2+": {
+          "hi": 0.198446,
+          "k": 6,
+          "lo": 0.045865,
+          "mean_gap_ils": -39325.526885,
+          "median_gap_share": -0.10758,
+          "n": 61,
+          "rate": 0.098361
+        }
+      },
+      "population": "eligible snapshots (Policy C)"
+    },
+    "descriptive_statistics": {
+      "by_archetype": {
+        "bar_bat_mitzvah": {
+          "productions": 100,
+          "snapshots": 380
+        },
+        "conference": {
+          "productions": 97,
+          "snapshots": 381
+        },
+        "corporate": {
+          "productions": 100,
+          "snapshots": 390
+        },
+        "wedding": {
+          "productions": 100,
+          "snapshots": 387
+        }
+      },
+      "by_group": {
+        "demo": {
+          "productions": 39,
+          "snapshots": 148
+        },
+        "test": {
+          "productions": 80,
+          "snapshots": 306
+        },
+        "train": {
+          "productions": 278,
+          "snapshots": 1084
+        }
+      },
+      "by_stage": {
+        "S0": {
+          "productions": 397,
+          "snapshots": 397
+        },
+        "S1": {
+          "productions": 386,
+          "snapshots": 386
+        },
+        "S2": {
+          "productions": 380,
+          "snapshots": 380
+        },
+        "S3": {
+          "productions": 375,
+          "snapshots": 375
+        }
+      },
+      "by_stage_numeric": {
+        "S0": {
+          "budget_gap_ils": {
+            "mean_ils": 1894.180479,
+            "median_ils": 282.36
+          },
+          "committed_ratio": {
+            "mean_ratio": 0.227582,
+            "median_ratio": 0.13
+          },
+          "days_to_event": {
+            "mean_days": 204.63728,
+            "median_days": 199.0
+          },
+          "n_commitments_active": {
+            "mean_value": 0.445844,
+            "median_value": 0.0
+          }
+        },
+        "S1": {
+          "budget_gap_ils": {
+            "mean_ils": 394.420337,
+            "median_ils": -255.675
+          },
+          "committed_ratio": {
+            "mean_ratio": 0.58658,
+            "median_ratio": 0.58
+          },
+          "days_to_event": {
+            "mean_days": 133.272021,
+            "median_days": 130.0
+          },
+          "n_commitments_active": {
+            "mean_value": 3.189119,
+            "median_value": 3.0
+          }
+        },
+        "S2": {
+          "budget_gap_ils": {
+            "mean_ils": -3975.472842,
+            "median_ils": -2534.965
+          },
+          "committed_ratio": {
+            "mean_ratio": 0.791684,
+            "median_ratio": 0.8
+          },
+          "days_to_event": {
+            "mean_days": 71.789474,
+            "median_days": 69.5
+          },
+          "n_commitments_active": {
+            "mean_value": 6.289474,
+            "median_value": 6.0
+          }
+        },
+        "S3": {
+          "budget_gap_ils": {
+            "mean_ils": -6026.03184,
+            "median_ils": -3441.9
+          },
+          "committed_ratio": {
+            "mean_ratio": 0.954213,
+            "median_ratio": 0.95
+          },
+          "days_to_event": {
+            "mean_days": 14.0,
+            "median_days": 14.0
+          },
+          "n_commitments_active": {
+            "mean_value": 8.488,
+            "median_value": 8.0
+          }
+        }
+      },
+      "numeric_summary": {
+        "budget_gap_ils": {
+          "max_ils": 144560.05,
+          "mean_ils": -1863.592796,
+          "median_ils": -988.9,
+          "min_ils": -237944.72,
+          "std_ils": 29821.04324
+        },
+        "budget_pre_vat": {
+          "max_ils": 1291000.0,
+          "mean_ils": 260787.50736,
+          "median_ils": 230000.0,
+          "min_ils": 55084.75,
+          "std_ils": 137402.650942
+        },
+        "budget_revisions_to_date": {
+          "max_value": 2.0,
+          "mean_value": 0.180754,
+          "median_value": 0.0,
+          "min_value": 0.0,
+          "std_value": 0.477026
+        },
+        "committed_pre_vat": {
+          "max_ils": 1034577.14,
+          "mean_ils": 149288.758648,
+          "median_ils": 129933.47,
+          "min_ils": 0.0,
+          "std_ils": 118172.845256
+        },
+        "committed_ratio": {
+          "max_ratio": 1.36,
+          "mean_ratio": 0.634226,
+          "median_ratio": 0.69,
+          "min_ratio": 0.0,
+          "std_ratio": 0.309377
+        },
+        "final_cost_pre_vat": {
+          "max_ils": 1053055.28,
+          "mean_ils": 243884.129395,
+          "median_ils": 212570.87,
+          "min_ils": 50454.36,
+          "std_ils": 130754.463414
+        },
+        "guest_count": {
+          "max_value": 1795.0,
+          "mean_value": 354.927178,
+          "median_value": 310.0,
+          "min_value": 82.0,
+          "std_value": 202.708466
+        },
+        "lead_time_days": {
+          "max_days": 417.0,
+          "mean_days": 203.986996,
+          "median_days": 199.0,
+          "min_days": 45.0,
+          "std_days": 86.678197
+        }
+      },
+      "population": "eligible snapshots (Policy C)",
+      "productions": 397,
+      "snapshots": 1538
+    },
+    "feature_correlations": {
+      "features": [
+        {
+          "feature": "over_plan_pre_vat",
+          "pearson": 0.274787,
+          "spearman": 0.266408
+        },
+        {
+          "feature": "budget_revisions_to_date",
+          "pearson": -0.182812,
+          "spearman": -0.245641
+        },
+        {
+          "feature": "current_position_ils",
+          "pearson": 0.028948,
+          "spearman": 0.124306
+        },
+        {
+          "feature": "manual_costs_pre_vat",
+          "pearson": 0.175895,
+          "spearman": 0.109133
+        },
+        {
+          "feature": "n_categories_over_plan",
+          "pearson": 0.097444,
+          "spearman": 0.099512
+        },
+        {
+          "feature": "committed_ratio",
+          "pearson": 0.046334,
+          "spearman": 0.086161
+        },
+        {
+          "feature": "n_manual_costs",
+          "pearson": 0.100704,
+          "spearman": 0.085431
+        },
+        {
+          "feature": "days_since_contract",
+          "pearson": -0.061172,
+          "spearman": -0.085247
+        },
+        {
+          "feature": "fee_contract_pre_vat",
+          "pearson": 0.013275,
+          "spearman": -0.076357
+        },
+        {
+          "feature": "n_categories_pending",
+          "pearson": 0.044707,
+          "spearman": 0.075774
+        },
+        {
+          "feature": "n_categories_committed",
+          "pearson": -0.050774,
+          "spearman": -0.070047
+        },
+        {
+          "feature": "guest_count",
+          "pearson": 0.087763,
+          "spearman": 0.069592
+        },
+        {
+          "feature": "lead_time_days",
+          "pearson": -0.037601,
+          "spearman": -0.067671
+        },
+        {
+          "feature": "n_commitments_active",
+          "pearson": -0.047638,
+          "spearman": -0.062234
+        },
+        {
+          "feature": "n_substitutions_to_date",
+          "pearson": 0.052711,
+          "spearman": 0.060651
+        },
+        {
+          "feature": "event_month",
+          "pearson": 0.050366,
+          "spearman": 0.060038
+        },
+        {
+          "feature": "client_direct_share",
+          "pearson": -0.0049,
+          "spearman": -0.057239
+        },
+        {
+          "feature": "budget_pre_vat",
+          "pearson": 0.033968,
+          "spearman": -0.052115
+        },
+        {
+          "feature": "cost_per_guest_pre_vat",
+          "pearson": 0.00429,
+          "spearman": -0.049732
+        },
+        {
+          "feature": "no_vat_share",
+          "pearson": -0.018142,
+          "spearman": -0.046998
+        },
+        {
+          "feature": "days_to_event",
+          "pearson": 0.025027,
+          "spearman": 0.038249
+        },
+        {
+          "feature": "planned_total_pre_vat",
+          "pearson": 0.059581,
+          "spearman": -0.009671
+        },
+        {
+          "feature": "committed_pre_vat",
+          "pearson": 0.055624,
+          "spearman": -0.007093
+        },
+        {
+          "feature": "n_categories_planned",
+          "pearson": -0.018534,
+          "spearman": 0.004364
+        }
+      ],
+      "n": 1084,
+      "pearson_target": "is_overrun (point-biserial)",
+      "population": "eligible snapshots of the TRAIN group only",
+      "spearman_target": "budget_gap_ils"
+    },
+    "fee_breakdown": {
+      "by_fee_included": {
+        "False": {
+          "hi": 0.494324,
+          "k": 332,
+          "lo": 0.421981,
+          "mean_gap_ils": -3430.331628,
+          "n": 725,
+          "rate": 0.457931
+        },
+        "True": {
+          "hi": 0.521423,
+          "k": 396,
+          "lo": 0.452868,
+          "mean_gap_ils": -466.439471,
+          "n": 813,
+          "rate": 0.487085
+        }
+      },
+      "by_fee_mode": {
+        "amount": {
+          "hi": 0.567881,
+          "k": 283,
+          "lo": 0.483794,
+          "mean_gap_ils": -1585.506766,
+          "n": 538,
+          "rate": 0.526022
+        },
+        "percent": {
+          "hi": 0.475954,
+          "k": 445,
+          "lo": 0.414467,
+          "mean_gap_ils": -2013.20308,
+          "n": 1000,
+          "rate": 0.445
+        }
+      },
+      "population": "eligible snapshots (Policy C)"
+    },
+    "frozen_split_prevalence_difference": {
+      "bootstrap_reps": 2000,
+      "groups": {
+        "demo": {
+          "hi": 0.591906,
+          "k": 65,
+          "lo": 0.296552,
+          "n": 148,
+          "productions": 39,
+          "rate": 0.439189
+        },
+        "test": {
+          "hi": 0.694551,
+          "k": 181,
+          "lo": 0.483868,
+          "n": 306,
+          "productions": 80,
+          "rate": 0.591503
+        },
+        "train": {
+          "hi": 0.502328,
+          "k": 482,
+          "lo": 0.388784,
+          "n": 1084,
+          "productions": 278,
+          "rate": 0.444649
+        }
+      },
+      "interval_includes_zero": false,
+      "method": "production-level bootstrap, 95% percentile interval",
+      "population": "eligible snapshots (Policy C), row level; groups from contracts/frozen_split.json",
+      "seed": 42,
+      "test_minus_train_hi_pp": 26.220708,
+      "test_minus_train_lo_pp": 3.270041,
+      "test_minus_train_pp": 14.6854
+    },
+    "overrun_prevalence": {
+      "by_archetype": {
+        "bar_bat_mitzvah": {
+          "hi": 0.50816,
+          "k": 174,
+          "lo": 0.408472,
+          "n": 380,
+          "rate": 0.457895
+        },
+        "conference": {
+          "hi": 0.600365,
+          "k": 210,
+          "lo": 0.500975,
+          "n": 381,
+          "rate": 0.551181
+        },
+        "corporate": {
+          "hi": 0.541758,
+          "k": 192,
+          "lo": 0.443008,
+          "n": 390,
+          "rate": 0.492308
+        },
+        "wedding": {
+          "hi": 0.442247,
+          "k": 152,
+          "lo": 0.345391,
+          "n": 387,
+          "rate": 0.392765
+        }
+      },
+      "by_group": {
+        "demo": {
+          "hi": 0.519681,
+          "k": 65,
+          "lo": 0.361775,
+          "n": 148,
+          "rate": 0.439189
+        },
+        "test": {
+          "hi": 0.645114,
+          "k": 181,
+          "lo": 0.535624,
+          "n": 306,
+          "rate": 0.591503
+        },
+        "train": {
+          "hi": 0.474375,
+          "k": 482,
+          "lo": 0.415315,
+          "n": 1084,
+          "rate": 0.444649
+        }
+      },
+      "by_group_stage": {
+        "demo": {
+          "S0": {
+            "hi": 0.684331,
+            "k": 21,
+            "lo": 0.385694,
+            "n": 39,
+            "rate": 0.538462
+          },
+          "S1": {
+            "hi": 0.61616,
+            "k": 17,
+            "lo": 0.310386,
+            "n": 37,
+            "rate": 0.459459
+          },
+          "S2": {
+            "hi": 0.551355,
+            "k": 14,
+            "lo": 0.247849,
+            "n": 36,
+            "rate": 0.388889
+          },
+          "S3": {
+            "hi": 0.524249,
+            "k": 13,
+            "lo": 0.224756,
+            "n": 36,
+            "rate": 0.361111
+          }
+        },
+        "test": {
+          "S0": {
+            "hi": 0.745454,
+            "k": 52,
+            "lo": 0.5408,
+            "n": 80,
+            "rate": 0.65
+          },
+          "S1": {
+            "hi": 0.7233,
+            "k": 48,
+            "lo": 0.511728,
+            "n": 77,
+            "rate": 0.623377
+          },
+          "S2": {
+            "hi": 0.659193,
+            "k": 42,
+            "lo": 0.441005,
+            "n": 76,
+            "rate": 0.552632
+          },
+          "S3": {
+            "hi": 0.64408,
+            "k": 39,
+            "lo": 0.420989,
+            "n": 73,
+            "rate": 0.534247
+          }
+        },
+        "train": {
+          "S0": {
+            "hi": 0.533464,
+            "k": 132,
+            "lo": 0.416863,
+            "n": 278,
+            "rate": 0.47482
+          },
+          "S1": {
+            "hi": 0.52625,
+            "k": 127,
+            "lo": 0.408495,
+            "n": 272,
+            "rate": 0.466912
+          },
+          "S2": {
+            "hi": 0.485209,
+            "k": 114,
+            "lo": 0.367647,
+            "n": 268,
+            "rate": 0.425373
+          },
+          "S3": {
+            "hi": 0.469751,
+            "k": 109,
+            "lo": 0.352367,
+            "n": 266,
+            "rate": 0.409774
+          }
+        }
+      },
+      "by_stage": {
+        "S0": {
+          "hi": 0.565138,
+          "k": 205,
+          "lo": 0.467294,
+          "n": 397,
+          "rate": 0.516373
+        },
+        "S1": {
+          "hi": 0.547068,
+          "k": 192,
+          "lo": 0.447802,
+          "n": 386,
+          "rate": 0.497409
+        },
+        "S2": {
+          "hi": 0.49764,
+          "k": 170,
+          "lo": 0.39815,
+          "n": 380,
+          "rate": 0.447368
+        },
+        "S3": {
+          "hi": 0.479898,
+          "k": 161,
+          "lo": 0.380201,
+          "n": 375,
+          "rate": 0.429333
+        }
+      },
+      "material_by_stage": {
+        "S0": {
+          "hi": 0.439248,
+          "k": 155,
+          "lo": 0.343709,
+          "n": 397,
+          "rate": 0.390428
+        },
+        "S1": {
+          "hi": 0.424963,
+          "k": 145,
+          "lo": 0.328784,
+          "n": 386,
+          "rate": 0.375648
+        },
+        "S2": {
+          "hi": 0.385785,
+          "k": 128,
+          "lo": 0.291165,
+          "n": 380,
+          "rate": 0.336842
+        },
+        "S3": {
+          "hi": 0.371575,
+          "k": 121,
+          "lo": 0.277355,
+          "n": 375,
+          "rate": 0.322667
+        }
+      },
+      "overall": {
+        "hi": 0.49833,
+        "k": 728,
+        "lo": 0.448486,
+        "n": 1538,
+        "rate": 0.473342
+      },
+      "overall_material": {
+        "hi": 0.38123,
+        "k": 549,
+        "lo": 0.333397,
+        "n": 1538,
+        "rate": 0.356957
+      },
+      "population": "eligible snapshots (Policy C), row level"
+    },
+    "policy_c_exclusions": {
+      "eligible": 1538,
+      "exclusion_counts": {
+        "commitment_category_missing": 50,
+        "manual_cost_undated": 12
+      },
+      "ineligible": 62,
+      "ineligible_by_stage_counts": {
+        "S0": 3,
+        "S1": 14,
+        "S2": 20,
+        "S3": 25
+      },
+      "n_invalid_payments_excluded": 15,
+      "n_productions_affected": 25,
+      "n_productions_fully_eligible": 375,
+      "n_productions_fully_excluded": 3,
+      "n_productions_partially_eligible": 22,
+      "n_productions_scheduled": 400,
+      "n_productions_with_eligible_snapshots": 397,
+      "n_records_with_problems": 42,
+      "n_target_unreliable_productions": 0,
+      "scheduled": 1600
+    },
+    "signed_gap_distribution": {
+      "by_stage": {
+        "S0": {
+          "mean_ils": 1894.180479,
+          "p05_ils": -37822.696,
+          "p25_ils": -11760.59,
+          "p50_ils": 282.36,
+          "p75_ils": 13802.63,
+          "p95_ils": 45852.106,
+          "std_ils": 26045.295896
+        },
+        "S1": {
+          "mean_ils": 394.420337,
+          "p05_ils": -40493.38,
+          "p25_ils": -12939.8325,
+          "p50_ils": -255.675,
+          "p75_ils": 13021.865,
+          "p95_ils": 44803.9925,
+          "std_ils": 27476.103505
+        },
+        "S2": {
+          "mean_ils": -3975.472842,
+          "p05_ils": -50104.9375,
+          "p25_ils": -16035.375,
+          "p50_ils": -2534.965,
+          "p75_ils": 10503.4575,
+          "p95_ils": 38630.6895,
+          "std_ils": 31973.993498
+        },
+        "S3": {
+          "mean_ils": -6026.03184,
+          "p05_ils": -59914.907,
+          "p25_ils": -17538.0,
+          "p50_ils": -3441.9,
+          "p75_ils": 9313.195,
+          "p95_ils": 37820.243,
+          "std_ils": 32880.203266
+        }
+      },
+      "by_stage_as_budget": {
+        "S0": {
+          "mean_share": 0.007432,
+          "p05_share": -0.139321,
+          "p25_share": -0.056402,
+          "p50_share": 0.001039,
+          "p75_share": 0.063432,
+          "p95_share": 0.169142,
+          "std_share": 0.093942
+        },
+        "S1": {
+          "mean_share": 0.00242,
+          "p05_share": -0.145523,
+          "p25_share": -0.064371,
+          "p50_share": -0.00116,
+          "p75_share": 0.056734,
+          "p95_share": 0.167995,
+          "std_share": 0.096727
+        },
+        "S2": {
+          "mean_share": -0.009879,
+          "p05_share": -0.168304,
+          "p25_share": -0.075262,
+          "p50_share": -0.012373,
+          "p75_share": 0.044886,
+          "p95_share": 0.156788,
+          "std_share": 0.100733
+        },
+        "S3": {
+          "mean_share": -0.01546,
+          "p05_share": -0.1732,
+          "p25_share": -0.080431,
+          "p50_share": -0.016083,
+          "p75_share": 0.040963,
+          "p95_share": 0.149908,
+          "std_share": 0.102144
+        }
+      },
+      "gap": {
+        "mean_ils": -1863.592796,
+        "p05_ils": -46958.01,
+        "p25_ils": -14335.38,
+        "p50_ils": -988.9,
+        "p75_ils": 12302.895,
+        "p95_ils": 41310.107,
+        "std_ils": 29821.04324
+      },
+      "gap_as_budget": {
+        "mean_share": -0.003685,
+        "p05_share": -0.160165,
+        "p25_share": -0.067293,
+        "p50_share": -0.004542,
+        "p75_share": 0.0473,
+        "p95_share": 0.163481,
+        "std_share": 0.098706
+      },
+      "histogram": {
+        "bin_counts": [
+          2,
+          17,
+          73,
+          138,
+          266,
+          314,
+          353,
+          167,
+          110,
+          56,
+          21,
+          13,
+          2,
+          6
+        ],
+        "edges_share": [
+          -0.3,
+          -0.25,
+          -0.2,
+          -0.15,
+          -0.1,
+          -0.05,
+          0.0,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.4
+        ],
+        "note": "shares outside the first and last edge are counted in the end bins"
+      },
+      "population": "eligible snapshots (Policy C)"
+    }
+  },
+  "definitions": {
+    "bootstrap_reps": 2000,
+    "material_threshold_share": 0.02,
+    "n_archetypes": 4,
+    "n_groups": 3,
+    "n_stages": 4,
+    "overrun_tolerance_ils": 0.5,
+    "s1_lead_time_share": 0.35,
+    "s2_lead_time_share": 0.65,
+    "s3_before_event_days": 14,
+    "vat_rate": 0.18
+  },
+  "synthetic": true
+}
