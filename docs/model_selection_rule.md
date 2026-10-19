@@ -206,3 +206,18 @@ Selection is applied by deterministic code. No agent and no LLM can choose, over
 ### 11. Seed
 
 The seed is 42 everywhere: the inner partitions, `GB` and the bootstrap.
+
+## Addendum P4-1a: executability erratum (2026-10-19, before any training run)
+
+> This erratum is committed on its own, after Addendum P4-1 and before any P4 training code was committed or any model was fitted on the handoff. It changes no target, candidate, grid, metric or selection rule. It only makes three statements executable and exact.
+
+1. **Seed of the final refit.**
+   - `numpy.random.default_rng` rejects negative seed entropy, so the seed lists `[42, -1, …]` of §6 cannot run.
+   - The final refit on all of train uses the fold code **5** instead of −1: `K(train, 3, [42, 5, 1])` for tuning, and `[42, 5, 2, j]` for calibration.
+   - Folds 0–4 keep their own number.
+2. **The 0.5 threshold.** A snapshot is predicted positive when **p ≥ 0.5**.
+3. **Verified API of the pinned scikit-learn 1.9.1.**
+   - `CalibratedClassifierCV.fit(X, y, sample_weight=None, **fit_params)` has no `groups` argument. Groups could reach it only through metadata routing, which is disabled by default (`enable_metadata_routing=False`).
+   - `GridSearchCV` is likewise not used.
+   - The manual calibration and the explicit inner splits of §6 therefore stand as written.
+   - `LogisticRegression`'s `penalty` argument is deprecated in 1.9.1. L2 is its default (`l1_ratio=0.0`), and that default is used.
