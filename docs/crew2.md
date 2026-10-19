@@ -109,3 +109,14 @@ A run is **PASS** only if all ten pass.
 | W8 | every card section, the synthetic and demo labels, the target disclosure, the copyright notice and both charts are present; there is no forbidden claim |
 | W9 | the manifest is complete; the trace holds no key, secret shape or absolute path |
 | W10 | the leakage report is clean, every CV and final-fit split/fit audit has zero violations, and all 9 pre-registered runs are present |
+
+## Known limitations (P4 closure)
+
+These are reported as measured. Nothing was retrained, retuned or re-selected after the single TEST evaluation, and the pre-registered rule is unchanged.
+
+- **Synthetic data.** Every number comes from a synthetic dataset. The results are **not evidence of real-world production performance**, and every prediction is an experimental / demo prediction.
+- **The grid boundary.** The selected logistic regression chose `C = 10`, the upper edge of the pre-registered grid (0.01, 0.1, 1.0, 10.0), in all 5 outer folds and in the final refit. The weakest regularisation in the grid was preferred, and a larger `C` was never evaluated. The grid was fixed before training and is not extended after seeing results.
+- **The prevalence shift.** The TEST overrun prevalence is 59.2% (181 of 306 eligible snapshots), against 44.5% on TRAIN (482 of 1,084). The split is frozen, and the difference is reported, not corrected ([`split_report.md`](split_report.md)).
+- **Calibration on TEST.** The expected calibration error on TEST is about 0.111 (10 bins). The model was calibrated on TRAIN, at TRAIN's prevalence, so its probabilities are not well calibrated at TEST's higher prevalence. No recalibration on TEST was done or is permitted.
+- **The target.** `is_overrun` is a 0.5 ILS rounding-tolerance label, not a commercially material overrun. The 2% material overrun is a secondary result only.
+- **Fixed fields.** Fields without a revision ledger are treated as fixed from the contract date (owner decision D4). In a real product they could change.

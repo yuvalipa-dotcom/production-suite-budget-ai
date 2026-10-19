@@ -19,12 +19,17 @@ def _git(*args) -> str:
     return subprocess.run(["git", *args], cwd=REPO, capture_output=True, text=True, check=True).stdout
 
 
+# The one owner-approved change under a frozen path (P4 security closure): the narrow scanner exemption
+# for the P4 clean-data digest in tools/publish_scan.py. Nothing else under a frozen path may change.
+APPROVED_CHANGES = {"tools/publish_scan.py"}
+
+
 def test_frozen_paths_and_p3_files_are_byte_identical_to_the_p3_base():
     try:
         _git("cat-file", "-e", P3_BASE)
     except (OSError, subprocess.CalledProcessError):
         pytest.skip("git history unavailable")
-    changed = _git("diff", "--name-only", P3_BASE, "--", *FROZEN).split()
+    changed = sorted(set(_git("diff", "--name-only", P3_BASE, "--", *FROZEN).split()) - APPROVED_CHANGES)
     untracked = _git("ls-files", "--others", "--exclude-standard", "--", *FROZEN).split()
     assert changed == [] and untracked == []
     p3_tests = [p for p in _git("ls-tree", "-r", "--name-only", P3_BASE, "tests").split()]

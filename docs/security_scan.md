@@ -77,22 +77,45 @@ Commit messages were still scanned for secrets, private terms, absolute local pa
 
 Raw scanner output is kept locally only and is not part of this repository.
 
-## P4 finding: pinned handoff digest (open, owner decision needed before publication)
+## P4 exemption: the pinned clean-data digest in one historical file version (owner-approved)
 
-**Finding.** The scan flagged `Hex High Entropy String` in `crew2/ml/data.py` line 36 of the local P4 commit `b2146c5`. It was found both by the P3 read-only scan and by the P4 re-scan.
+**Finding.** The scan flagged a `Hex High Entropy String` at `crew2/ml/data.py` line 36 in the local P4 commit `b2146c5`. Both the P3 read-only scan and the P4 scan found it. That line is `EXPECTED_CLEAN_SHA256 = "<64 hex characters>"`.
 
-**Disposition: an expected SHA-256 digest, not a secret.**
-- The value is the 64-character lowercase hex `EXPECTED_CLEAN_SHA256`.
-- It is the sha256 of the `clean_data.csv` text rebuilt in-process by the deterministic Policy C cleaning function.
-- This was verified by recomputation: the value equals that sha256 and the current pinned constant. A test also ties it to the independent reference handoff (`tests/test_crew2_data.py`).
-- It grants no access and identifies only public synthetic data.
+**Why it is not a secret.**
+- The value is the SHA-256 of the `clean_data.csv` text that the deterministic Policy C cleaning function (`crew1.tools.cleaning.build_clean_data`) rebuilds from the committed synthetic raw export.
+- It is a public fingerprint of public synthetic data. It grants no access and is not a credential, token or key.
+- The same digest is reproducible by anyone who runs the cleaning on the committed raw data.
 
-**Remediation so far.**
-- Commit `44a81d5` holds the same value as an integer literal, so the source contains no quoted hex string. This is the convention of `tools/publication_check.py`.
-- The value now occurs in no tracked file at `HEAD`.
-- It remains in the history of `b2146c5`. That commit is on the local branch `p4-crew2` only; it is not pushed and not on any remote.
-- No scanner exemption was added.
+**How it was verified independently.**
+- The clean data was rebuilt in-process and hashed. The result equals the flagged value.
+- `tests/test_crew2_data.py` ties that output to the independent reference handoff, built from the committed clean snapshots and the ground truth rather than from the cleaning code.
+- The value occurs once in the file.
+- Exactly one historical file version contains it as a quoted literal. That version is git blob `e0c7b3a…`, the file as it is in `b2146c5`.
+- From `44a81d5` onwards the file holds the digest as an integer literal. No tracked file at `HEAD` contains it as a quoted string.
 
-**Before any publication, the owner chooses one of:**
-- (a) rewrite the unpublished local history so that no commit contains the quoted literal;
-- (b) approve an exemption for exactly that path, line and value, under the same four rules as the existing digest exemptions.
+**Exact scope** (`tools/publish_scan.py`, `_approved_p4_clean_digest`). A flagged secret is spared only when **all** of these hold:
+1. the path is exactly `crew2/ml/data.py`;
+2. the finding type is exactly `Hex High Entropy String`;
+3. the whole line equals `EXPECTED_CLEAN_SHA256 = "<value>"` filled with the one approved value, and the flagged secret is that value;
+4. the value occurs once in the file;
+5. the whole file is byte-identical to the approved historical blob. Its git blob id must equal the approved id, so any other content, version or path is not spared.
+
+Both approved values are held in the scanner as integer literals, so the scanner contains no quoted hex string. No other rule, file or value is affected: there is no hex allow-listing and no scanner disabling. The earlier exemptions are unchanged.
+
+**Security implications.**
+- The only thing spared is one known, public digest in one immutable historical blob.
+- A real secret anywhere is still detected, including in that same file. Any edit to the file changes its blob id and voids the exemption.
+- Git history was **not** rewritten. Commit `b2146c5` and the pre-registration commits `dc830a8` and `aa16b98` are preserved.
+
+**Proof.** `tests/test_publish_scan_p4.py`:
+- The historical blob is spared at its path, and the detector does flag it without the exemption.
+- The same file at any other path is detected.
+- A different digest in the approved line is detected.
+- A one-byte edit, an appended line or a repeated value is detected.
+- **A deliberately planted, synthetic token and a different hex digest added to the approved file are both still detected** (owner step 6). The planted values are built at runtime; no real key is used.
+- The finding type, value, line and path are each required exactly.
+- The earlier exemptions are unchanged.
+
+**Scan result** (P4 closure, all local branches, every reachable commit including `b2146c5`, plus the tracked working tree): 52 commits, 233 distinct blob/path pairs, **0 secret findings, 0 content findings**.
+- The private denylist was not applied (0 entries). It is kept outside this worktree, and the P4 instruction limits work to this worktree.
+- That denylist scan must still be run before publication.
