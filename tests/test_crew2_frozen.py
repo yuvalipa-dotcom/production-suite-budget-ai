@@ -19,9 +19,10 @@ def _git(*args) -> str:
     return subprocess.run(["git", *args], cwd=REPO, capture_output=True, text=True, check=True).stdout
 
 
-# The one owner-approved change under a frozen path (P4 security closure): the narrow scanner exemption
-# for the P4 clean-data digest in tools/publish_scan.py. Nothing else under a frozen path may change.
-APPROVED_CHANGES = {"tools/publish_scan.py"}
+# Owner-approved changes under frozen paths, and nothing else: the narrow scanner exemption for the P4
+# clean-data digest (P4 security closure) and the p4-crew2 publication candidate (P4 readiness fixes).
+APPROVED_CHANGES = {"tools/publish_scan.py", "tools/publication_check.py"}
+APPROVED_P3_TEST_CHANGES = {"tests/test_publication_check.py"}
 
 
 def test_frozen_paths_and_p3_files_are_byte_identical_to_the_p3_base():
@@ -33,4 +34,4 @@ def test_frozen_paths_and_p3_files_are_byte_identical_to_the_p3_base():
     untracked = _git("ls-files", "--others", "--exclude-standard", "--", *FROZEN).split()
     assert changed == [] and untracked == []
     p3_tests = [p for p in _git("ls-tree", "-r", "--name-only", P3_BASE, "tests").split()]
-    assert _git("diff", "--name-only", P3_BASE, "--", *p3_tests).split() == []
+    assert sorted(set(_git("diff", "--name-only", P3_BASE, "--", *p3_tests).split()) - APPROVED_P3_TEST_CHANGES) == []

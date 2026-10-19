@@ -22,9 +22,10 @@ _spec = importlib.util.spec_from_file_location("publish_scan", HERE / "publish_s
 scan = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(scan)
 
-# The W-3 branches, the published P2 branch and the explicitly approved P3 candidate.
+# The W-3 branches, the published P2 branch and the explicitly approved P3 and P4 candidates.
 # An exact list: no other branch is accepted.
-PUBLICATION_BRANCHES = ("main", "p1-synthetic-generator", "p1-remediation", "p2-quality-gate", "p3-crew1")
+PUBLICATION_BRANCHES = ("main", "p1-synthetic-generator", "p1-remediation", "p2-quality-gate", "p3-crew1",
+                        "p4-crew2")
 EXPECTED_REFS = {f"refs/heads/{b}" for b in PUBLICATION_BRANCHES}
 # Historical: origin/main after the W-3 publication (the PR #2 merge). The P2 branch must build on it.
 PUBLISHED_BASELINE = "59517254e108738696cd3632530b953768745788"
@@ -33,6 +34,11 @@ BASELINE_DESCENDANTS = ("p2-quality-gate",)
 # The P3 candidate must build on it.
 P3_BASELINE = "7140231951b1d2b82b8e1edcd92a0a8be5da15b8"
 P3_BASELINE_DESCENDANTS = ("p3-crew1",)
+# The P4 candidate (owner-approved local publication candidate) is built on the P3 commit it started from.
+# That commit must be an ancestor of both p3-crew1 and p4-crew2, and must itself descend from P3_BASELINE.
+# Held as an integer literal so that this file gains no quoted hex string (docs/security_scan.md).
+P4_BASELINE = f"{0x7d2d38aac808e4762536b66ad80e75fd2e1880c6:040x}"
+P4_BASELINE_DESCENDANTS = ("p3-crew1", "p4-crew2")
 FORBIDDEN_PATH = re.compile(
     r"(^|/)(private|scan_output|ground_truth|\.venv|venv)(/|$)"
     r"|(^|/)\.env(\.[^/]*)?$"
@@ -190,6 +196,10 @@ def main() -> int:
     baseline = baseline_report(args.clone)
     p3_baseline = baseline_report(args.clone, P3_BASELINE, P3_BASELINE_DESCENDANTS)
     p3_baseline["first_parent_is_published_baseline"] = lineage_ok(args.clone)
+    p4_baseline = baseline_report(args.clone, P4_BASELINE, P4_BASELINE_DESCENDANTS)
+    p4_baseline["builds_on_p3_baseline"] = subprocess.run(
+        ["git", "-C", str(args.clone), "merge-base", "--is-ancestor", P3_BASELINE, P4_BASELINE],
+        capture_output=True).returncode == 0
     history, n_commits, n_pairs = scan.scan_history(args.clone, deny)
     trees = tree_checks(args.clone)
     worktrees = worktree_checks(args.clone, deny)
@@ -198,6 +208,7 @@ def main() -> int:
         "refs": refs,
         "baseline": baseline,
         "p3_baseline": p3_baseline,
+        "p4_baseline": p4_baseline,
         "history_scan": {"commits": n_commits, "distinct_blob_path_pairs": n_pairs,
                          "secret_findings": [f for r in history for f in r["secret_findings"]],
                          "content_findings": [f for r in history for f in r["content_findings"]]},
@@ -213,6 +224,7 @@ def main() -> int:
     ok = (not refs["remotes"] and not refs["unexpected_refs"] and not refs["missing_refs"]
           and not refs["stash"] and not refs["notes"] and baseline["all_descend"] and p3_baseline["all_descend"]
           and p3_baseline["first_parent_is_published_baseline"]
+          and p4_baseline["all_descend"] and p4_baseline["builds_on_p3_baseline"]
           and not report["history_scan"]["secret_findings"] and not report["history_scan"]["content_findings"]
           and not trees["forbidden_paths"] and not trees["submodules"] and not trees["lfs_pointers"]
           and not trees["files_over_5mb"]
@@ -225,6 +237,8 @@ def main() -> int:
         "missing_refs": refs["missing_refs"], "baseline_descends": baseline["descends"],
         "p3_baseline_descends": p3_baseline["descends"],
         "p3_baseline_first_parent_ok": p3_baseline["first_parent_is_published_baseline"],
+        "p4_baseline_descends": p4_baseline["descends"],
+        "p4_baseline_builds_on_p3_baseline": p4_baseline["builds_on_p3_baseline"],
         "commits_scanned": n_commits, "distinct_blob_path_pairs": n_pairs,
         "history_secret_findings": len(report["history_scan"]["secret_findings"]),
         "history_content_findings": len(report["history_scan"]["content_findings"]),

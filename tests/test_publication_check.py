@@ -34,7 +34,7 @@ def _repo(tmp_path: Path, branches) -> tuple[Path, str]:
 
 def test_branch_set_is_exact():
     assert check.PUBLICATION_BRANCHES == ("main", "p1-synthetic-generator", "p1-remediation", "p2-quality-gate",
-                                          "p3-crew1")
+                                          "p3-crew1", "p4-crew2")
     assert check.EXPECTED_REFS == {f"refs/heads/{b}" for b in check.PUBLICATION_BRANCHES}
     assert check.BASELINE_DESCENDANTS == ("p2-quality-gate",)
     assert check.PUBLISHED_BASELINE == "59517254e108738696cd3632530b953768745788"
@@ -50,20 +50,21 @@ def test_expected_p2_branch_is_accepted(tmp_path):
 
 def test_unexpected_branch_is_still_rejected(tmp_path):
     repo, base = _repo(tmp_path, check.PUBLICATION_BRANCHES)
-    for extra in ("p2-quality-gate-2", "p3-crew-1", "p3-crew1-2", "p3-crew2", "feature"):
+    for extra in ("p2-quality-gate-2", "p3-crew-1", "p3-crew1-2", "p3-crew2", "p4-crew2-2", "feature"):
         _git(repo, "branch", extra, base)
     assert check.refs_report(repo)["unexpected_refs"] == ["refs/heads/feature", "refs/heads/p2-quality-gate-2",
                                                           "refs/heads/p3-crew-1", "refs/heads/p3-crew1-2",
-                                                          "refs/heads/p3-crew2"]
+                                                          "refs/heads/p3-crew2", "refs/heads/p4-crew2-2"]
 
 
 def test_missing_p2_branch_is_reported(tmp_path):
     repo, _ = _repo(tmp_path, check.PUBLICATION_BRANCHES[:3])
-    assert check.refs_report(repo)["missing_refs"] == ["refs/heads/p2-quality-gate", "refs/heads/p3-crew1"]
+    assert check.refs_report(repo)["missing_refs"] == ["refs/heads/p2-quality-gate", "refs/heads/p3-crew1",
+                                                       "refs/heads/p4-crew2"]
 
 
 def test_missing_p3_branch_is_reported(tmp_path):
-    repo, _ = _repo(tmp_path, check.PUBLICATION_BRANCHES[:4])
+    repo, _ = _repo(tmp_path, check.PUBLICATION_BRANCHES[:4] + ("p4-crew2",))
     assert check.refs_report(repo)["missing_refs"] == ["refs/heads/p3-crew1"]
 
 

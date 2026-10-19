@@ -120,3 +120,7 @@ These are reported as measured. Nothing was retrained, retuned or re-selected af
 - **Calibration on TEST.** The expected calibration error on TEST is about 0.111 (10 bins). The model was calibrated on TRAIN, at TRAIN's prevalence, so its probabilities are not well calibrated at TEST's higher prevalence. No recalibration on TEST was done or is permitted.
 - **The target.** `is_overrun` is a 0.5 ILS rounding-tolerance label, not a commercially material overrun. The 2% material overrun is a secondary result only.
 - **Fixed fields.** Fields without a revision ledger are treated as fixed from the contract date (owner decision D4). In a real product they could change.
+- **Product fields.** Of the 27 primary features, 24 correspond to fields the product stores today or are derived from them.
+  - Three are only approximations there: `lead_time_days` and `days_since_contract` use the event creation date as a proxy for the contract date, and `n_substitutions_to_date` counts deleted quotes, which are not always substitutions.
+  - The model's behaviour on those inputs in a real installation is untested ([`product_field_mapping.md`](product_field_mapping.md)).
+- **Corrected model card.** [`p4_model_card.md`](p4_model_card.md) is assembled from the `p4-offline-002` metrics, with these corrections in its narrative. It passes W7 and W8, and no model or result changed.
