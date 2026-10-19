@@ -30,3 +30,6 @@ dumps/
 # Other common virtual-environment folder names
 venv/
 env/
+
+# P3 schema probe results (owner-run; tool definitions, criteria, usage; never committed)
+probe_output/

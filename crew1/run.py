@@ -23,7 +23,8 @@ from importlib import metadata
 from pathlib import Path
 
 from . import SAFETY_ENV
-from .crew import AGENT_LIMITS, CONFIG, CREW_MAX_RPM, LLM_SETTINGS, ConfigError, Recorder, resolve_model
+from .crew import AGENT_LIMITS, AGENT_MAX_RETRY_LIMIT, CONFIG, CREW_MAX_RPM, LLM_SETTINGS, ConfigError, \
+    Recorder, resolve_model
 from .tools.cleaning import dumps
 from .tools.workspace import RAW_TABLES, REPO, Sources, Workspace, stage_workspace
 
@@ -148,7 +149,8 @@ def main(argv=None, runner=None, mode: str = "live") -> int:
     manifest = {
         "run_id": out.name, "status": "RUNNING", "mode": mode, "synthetic": True,
         "model": {"id": model, "provider": "anthropic (native SDK through crewai)"},
-        "llm_settings": LLM_SETTINGS, "limits": {"agents": AGENT_LIMITS, "crew_max_rpm": CREW_MAX_RPM},
+        "llm_settings": LLM_SETTINGS, "limits": {"agents": AGENT_LIMITS, "crew_max_rpm": CREW_MAX_RPM,
+                                              "agent_max_retry_limit": AGENT_MAX_RETRY_LIMIT},
         "safety_env": SAFETY_ENV, "package_versions": package_versions(), "input_sha256": input_hashes(sources),
         "policy_c_counts": {"scheduled": fresh_log["snapshots"]["scheduled"],
                             "eligible": fresh_log["snapshots"]["eligible"],

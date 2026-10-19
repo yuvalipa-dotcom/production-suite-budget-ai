@@ -1,0 +1,197 @@
+{
+  "analyses_requested": [
+    "descriptive_statistics",
+    "overrun_prevalence",
+    "signed_gap_distribution",
+    "budget_revision_effects",
+    "feature_correlations",
+    "fee_breakdown",
+    "frozen_split_prevalence_difference",
+    "policy_c_exclusions"
+  ],
+  "artifacts_sha256": {
+    "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "cleaning_log.json": "93175292be7d61b4cd9edbd7ec02cb62979505b4f1713cc23822747ade42c71c",
+    "dataset_contract.json": "d8774b8dd55b835822e1f0f1179734be536b647b2f0111ec14f2ee59bc5f719c",
+    "eda_report.html": "027f99a5a49070e6cff084caa9518428d23e09083c0e3166f257c829f66b5ec6",
+    "gate_result.json": "69ec2f3abec1d953755e05e87567777b3f36512cc0a07f92636bc168564e1a48",
+    "insights.md": "266b12b2db6653eebb43a10bc8a8ab69d9186310dde63232b79556c6154f51b0",
+    "stats.json": "c1ec4a40be85b9aeca018ad6972ffb2b4d83cd59a2774c0072d5d275bdccdb5e",
+    "trace.jsonl": "3fae89c64fe01ebb19db317ec5614f4d776a1155e51bea906d124912e0102dbb"
+  },
+  "charts_rendered": [
+    "prevalence_by_stage",
+    "split_prevalence",
+    "gap_histogram",
+    "feature_correlations"
+  ],
+  "cost": {
+    "estimated_usd": 0.1926,
+    "input_cost_per_token": 1e-06,
+    "output_cost_per_token": 5e-06,
+    "source": "crewai bundled price catalogue (LiteLLM format)"
+  },
+  "error": null,
+  "input_sha256": {
+    "contracts/column_roles.json": "ece753463263717758a5cb110b570f71d326feb909ef2b07db4a33f936bcd552",
+    "contracts/dataset_contract.schema.json": "c2967ecfb2fdeaee8561b97f14826009a13ec9a6ffb6f31409969b555d0ef305",
+    "contracts/frozen_split.json": "064e1909b340a60c946084e0ebaf20fecd2acdce4fcb27930176c532e86158c1",
+    "crew1/config/agents.yaml": "6cdc8327ced61c3684809be8ffdebf9c363a093e7cbb6b12b2cd15a2d271205e",
+    "crew1/config/tasks.yaml": "aacd33554b88751caa587c4b82e9e9f3509c9841eaab4c5f826b7663ba5bf1bd",
+    "docs/raw_data_dictionary.md": "1bc2e42eaf1e11eadc112342496a47f89e587b955c589f48f0742b2ecb8d037a",
+    "raw/budget_revisions.csv": "e76b22645106c55bd1d67160cd5b9fa464d858daeda2c610f24ea1aec22ca0ae",
+    "raw/category_plans.csv": "50e5dc1ba62cece38af90fa1ffd9f31b004c3a2e076ee350d385106e2853af99",
+    "raw/commitments.csv": "3efef98a4d6c3cb0f5fbdf8368fbf6f8e771b5ae876cb576f45c6d0e416f6163",
+    "raw/manifest.json": "82724a3dcac035ae83795299a9850380c6993dcc2ea837b7e95aa9a11942cef7",
+    "raw/manual_costs.csv": "19fd7190f43513d6920fad2f26f91dd4f5ec61de55d8a7b00dbb9c17d1208a72",
+    "raw/payments.csv": "29004e61461e4148e167e9994185ada20bfe1be5abb262622da16f6bd76a2d30",
+    "raw/productions.csv": "b2fe632f95f0bd296ce82ef5fccc9932b3a26b94694fd4d4042b7518507d260b",
+    "raw/snapshot_schedule.csv": "e04b2bf280dd4df69c0c1412759ad722f76fa534c396e822feff0e36c898e284"
+  },
+  "limits": {
+    "agent_max_retry_limit": 0,
+    "agents": {
+      "contract_author": {
+        "max_execution_time": 600,
+        "max_iter": 10,
+        "max_rpm": 20
+      },
+      "exploratory_analyst": {
+        "max_execution_time": 900,
+        "max_iter": 18,
+        "max_rpm": 20
+      },
+      "ingestion_engineer": {
+        "max_execution_time": 600,
+        "max_iter": 12,
+        "max_rpm": 20
+      }
+    },
+    "crew_max_rpm": 20
+  },
+  "llm_settings": {
+    "max_retries": 2,
+    "max_tokens": 8192,
+    "temperature": 0.0,
+    "timeout": 180.0
+  },
+  "mode": "live",
+  "model": {
+    "id": "claude-haiku-4-5-20251001",
+    "provider": "anthropic (native SDK through crewai)"
+  },
+  "package_versions": {
+    "PyYAML": "6.0.3",
+    "anthropic": "0.73.0",
+    "crewai": "1.15.28",
+    "matplotlib": "3.11.2",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pydantic": "2.12.5",
+    "python": "3.13.15"
+  },
+  "policy_c_counts": {
+    "eligible": 1538,
+    "exclusion_counts": {
+      "commitment_category_missing": 50,
+      "manual_cost_undated": 12
+    },
+    "scheduled": 1600
+  },
+  "run_id": "p3-live-005",
+  "safety_env": {
+    "CREWAI_DISABLE_TELEMETRY": "true",
+    "CREWAI_DISABLE_TRACKING": "true",
+    "CREWAI_STORAGE_DIR": "psba-crew1",
+    "CREWAI_TRACING_ENABLED": "false",
+    "OTEL_SDK_DISABLED": "true"
+  },
+  "status": "PASS",
+  "synthetic": true,
+  "timings": {
+    "duration_seconds": 167.7,
+    "finished_at": "2026-10-19T13:38:46+00:00",
+    "started_at": "2026-10-19T13:35:58+00:00",
+    "tasks": [
+      {
+        "agent": "Data Ingestion & Cleaning Engineer",
+        "completed_at_s": 32.517,
+        "task": "ingest_and_clean"
+      },
+      {
+        "agent": "Exploratory Data Analyst",
+        "completed_at_s": 111.414,
+        "task": "explore_and_report"
+      },
+      {
+        "agent": "Data Contract & Insights Author",
+        "completed_at_s": 162.414,
+        "task": "contract_and_insights"
+      }
+    ]
+  },
+  "token_usage": {
+    "cached_prompt_tokens": 0,
+    "completion_tokens": 13444,
+    "prompt_tokens": 125419,
+    "successful_requests": 18,
+    "total_tokens": 138863
+  },
+  "tool_calls": 31,
+  "validators": [
+    {
+      "details": [],
+      "id": "V1",
+      "name": "required artifacts exist and are non-empty",
+      "status": "PASS"
+    },
+    {
+      "details": [],
+      "id": "V2",
+      "name": "clean_data.csv is byte-identical to a fresh Policy C recomputation",
+      "status": "PASS"
+    },
+    {
+      "details": [],
+      "id": "V3",
+      "name": "contract structure equals a fresh build (descriptions excepted)",
+      "status": "PASS"
+    },
+    {
+      "details": [],
+      "id": "V4",
+      "name": "P2 handoff gate PASS (re-run independently)",
+      "status": "PASS"
+    },
+    {
+      "details": [],
+      "id": "V5",
+      "name": "quantitative claims match stats.json or the contracts (value, unit, rounding)",
+      "status": "PASS"
+    },
+    {
+      "details": [],
+      "id": "V6",
+      "name": "EDA report has every required section, at least 4 embedded charts, no forbidden claim and no statement against the narrative facts",
+      "status": "PASS"
+    },
+    {
+      "details": [],
+      "id": "V7",
+      "name": "insights.md has every required section, no forbidden claim and no statement against the narrative facts",
+      "status": "PASS"
+    },
+    {
+      "details": [],
+      "id": "V8",
+      "name": "run_manifest.json is complete",
+      "status": "PASS"
+    },
+    {
+      "details": [],
+      "id": "V9",
+      "name": "trace.jsonl is redacted (no key, no absolute path)",
+      "status": "PASS"
+    }
+  ]
+}

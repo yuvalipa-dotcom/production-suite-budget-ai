@@ -56,7 +56,7 @@ The `run_handoff_gate` tool (`crew1/tools/gate_tool.py`) calls `gate.run` unchan
 
 **No agent can write or edit a data value.** The cleaning tool writes `clean_data.csv`. The contract tool takes only descriptions, rejects unknown columns and non-plain text, and generates everything else.
 
-The two authoring tools, `assemble_eda_report` and `write_insights`, return the validator findings on the agent's text: missing sections, unverified numbers and forbidden claims. They also return `context_problems` (`crew1/tools/narrative_checks.py`): a production count attached to the eligible snapshots that is not theirs, frozen split figures attributed to the handoff gate instead of the bootstrap analysis, and exclusion reasons that the cleaning log does not record. `write_insights` also returns the required headings and the frozen split values from `stats.json` (`frozen_split_values`). The agent can then correct the text. The post-run validators remain the authority; `context_problems` is feedback only and is not a validator.
+The two authoring tools, `assemble_eda_report` and `write_insights`, return the validator findings on the agent's text: missing sections, unverified numbers and forbidden claims. They also return `context_problems` (`crew1/tools/narrative_checks.py`): every finding of the narrative rules (`N-DEFINITION`, `N-SIGN`, `N-POPULATION`, `N-CAUSAL`, `N-ATTRIBUTION`, `N-EXCLUSION`; see "Narrative facts and narrative rules" below). `write_insights` also returns the required headings and the frozen split values from `stats.json` (`frozen_split_values`). The agent can then correct the text. The post-run validators remain the authority; `context_problems` is feedback only and is not a validator.
 
 Every tool argument is a named field or a list of typed objects, never a free-form mapping: CrewAI 1.15.28 sends the tools to Anthropic in strict mode, which closes every object, so a mapping argument could only be sent empty (p3-live-003). `tests/test_crew1_authoring.py` checks the converted schemas.
 
@@ -106,9 +106,10 @@ These settings are applied in code before CrewAI is imported, by `crew1/__init__
 - Crew and agents have no memory, knowledge, embeddings, delegation, code execution, reasoning or planning, and caching is off.
 - Limits:
   - A1: `max_iter` 12, `max_execution_time` 600 s, `max_rpm` 20;
-  - A2: `max_iter` 25, `max_execution_time` 900 s, `max_rpm` 20;
-  - A3: `max_iter` 15, `max_execution_time` 600 s, `max_rpm` 20;
-  - crew: `max_rpm` 20.
+  - A2: `max_iter` 18, `max_execution_time` 900 s, `max_rpm` 20;
+  - A3: `max_iter` 10, `max_execution_time` 600 s, `max_rpm` 20;
+  - crew: `max_rpm` 20; agent `max_retry_limit` 0.
+  - In crewai 1.15.28 `max_iter` counts model requests (one per executor iteration, however many parallel tool calls it returns), not tool calls. When it is reached, CrewAI sends one more request without tools for a forced final answer and the task completes with that text. Per agent there are therefore at most `max_iter` + 1 successful requests; the SDK's 2 retries apply only to failed HTTP requests. The values fit a legitimate run with every tool call in its own turn (A1 11, A2 17, A3 8 requests) and stop the loops seen in p3-live-002 (13 `write_insights` calls) and p3-live-003 (22 `assemble_eda_report` calls). `tests/test_crew1_iteration_caps.py` measures this on a mocked kickoff. These are iteration bounds, not a spending cap.
 - LLM: temperature 0, `max_tokens` 8192, timeout 180 s, 2 retries.
 - **Model:** `CREW_MODEL`, default `claude-haiku-4-5-20251001`. This dated Haiku id is listed in the installed `crewai==1.15.28` (`crewai/llms/constants.py`, `ANTHROPIC_MODELS`) and routes to CrewAI's native Anthropic provider (`anthropic==0.73.0`); LiteLLM is not installed.
 - **Key:** the provider SDK reads `ANTHROPIC_API_KEY` from the environment. Crew 1 code only checks that it is present. Its value is never read into a log, and any occurrence in the trace is redacted.
@@ -157,8 +158,8 @@ A run is **PASS** only if all nine pass. Otherwise the CLI exits `1`, the manife
 | V3 | the structural fields of `dataset_contract.json` equal a fresh build; only valid free-text descriptions may differ |
 | V4 | the P2 handoff gate, re-run independently, is PASS, and the crew's own `gate_result.json` is PASS |
 | V5 | every quantitative claim in the report narrative and in `insights.md` matches `stats.json` or the contracts (rules below) |
-| V6 | the report has every section with interpretation text and at least 4 embedded PNG charts; no forbidden claim |
-| V7 | `insights.md` has the 5 required sections. The frozen split note states the test minus train difference and its interval (pp, from `stats.json`), "frozen", "not tuned", "sampling" and "independent". The Limitations state synthetic data and no real-world validation. No forbidden claim |
+| V6 | the report has every section with interpretation text and at least 4 embedded PNG charts; no forbidden claim; no statement against the narrative facts (rules below) |
+| V7 | `insights.md` has the 5 required sections. The frozen split note states the test minus train difference and its interval (pp, from `stats.json`), "frozen", "not tuned", "sampling" and "independent". The Limitations state synthetic data and no real-world validation. No forbidden claim; no statement against the narrative facts |
 | V8 | `run_manifest.json` is complete (model id, package versions, input sha256s, Policy C counts, token usage, timings) |
 | V9 | `trace.jsonl` contains no key, no secret shape and no absolute path |
 
@@ -224,6 +225,43 @@ These are checked per sentence, and a sentence with a negation cue is allowed ("
 - recommending a re-split, re-draw, rebalancing, re-stratification or over/under-sampling of the frozen split.
 
 **Limitation:** the negation cue is sentence-wide, so a sentence that mixes a recommendation with an unrelated negation is not caught.
+
+### Narrative facts and narrative rules (V6, V7)
+
+p3-live-004 passed V1–V9 although its narrative defined the signed gap through commitments and payments, reversed the gap's sign, gave 375 instead of 397 as the production count of the eligible snapshots, asserted causes, and credited the documented sampling-outcome assessment to an analysis. V5 checks values, not meaning. The fix is in `crew1/tools/narrative_checks.py`:
+- **Narrative facts** (one deterministic source): the target definitions from the P2 contract (`docs/data_generation.md`; thresholds from `gate/reconstruct.py`), the eligible population (1,538 snapshots from 397 productions: 375 fully and 22 partially eligible; 3 of 400 have none; from the cleaning log, also in `stats.json` under `policy_c_exclusions`), the three statement kinds (facts, associations, hypotheses) and the analysis behind each figure. `list_analyses` (EDA) and `build_dataset_contract` (insights) return them; the definitions are also in both task instructions verbatim (`DEFINITIONS_TEXT`).
+- **Rules**, per sentence, in V6 (each report section) and V7 (`insights.md`), and as tool feedback (`context_problems`):
+  | Rule | Fails |
+  |---|---|
+  | `N-DEFINITION` | the gap or an overrun described through payments (except a sentence that only reports excluded payments), or the gap defined as commitments minus something |
+  | `N-SIGN` | a negative gap called over budget or underbudgeting, a positive gap called under budget or overbudgeting (per clause) |
+  | `N-POPULATION` | a production count other than the one with eligible snapshots attached to the eligible-snapshot count |
+  | `N-CAUSAL` | reflects, drives, reduces, influences, due to, impact or effect of, … about revisions, stages, fees, gaps or cost outcomes (not in questions, hypotheses — "whether", "hypothesis" — or negated sentences; in an exclusion sentence "because" and "due to" give the exclusion reason, which `N-EXCLUSION` checks) |
+  | `N-ATTRIBUTION` | the frozen split difference credited to the handoff gate; the sampling-outcome assessment credited to an analysis |
+  | `N-EXCLUSION` | an exclusion reason the cleaning log does not record (feedback only, not a validator failure) |
+- In the pipeline, V6 and V7 take the facts from the validators' own fresh Policy C recomputation, not from the run's outputs.
+- `tests/test_crew1_narrative_facts.py` replays the p3-live-004 and p3-live-003 statements (each fails) and correctly phrased counterparts (each passes), including the Policy C exclusion sentences the data-quality section requires.
+
+**Limitation:** the rules are pattern rules for known error types. They narrow, but do not close, the gap between a correct number and a correct interpretation.
+
+### Column descriptions
+
+Column descriptions are optional: the meta-contract (`contracts/dataset_contract.schema.json`) does not require them, and V3 compares the contract without them. p3-live-004 has none (0 of 37). Its trace shows why: the author's first call described 38 columns, 35 of which do not exist (a guessed raw-table schema, among them `snapshot_id`, `total_payment_pre_vat` and `signed_gap_pre_vat`, the same commitment-and-payment reading of the gap that `N-DEFINITION` now rejects). The tool rejected the call naming only the first unknown column, and the agent retried with `column_descriptions: null`. No tool output lists the 37 contract columns (some feature names appear only inside earlier analysis results). This is a quality improvement, not a P3 gate. A bounded improvement for a future run: return the 37 column names with their roles in `build_dataset_contract`'s output and in its error message, and ask for descriptions of the primary key and the four targets only (6 columns), each checked against the definitions above.
+
+### Audit of p3-live-005 (the published run)
+
+p3-live-005 (`artifacts/crew1/p3-live-005/`, model `claude-haiku-4-5-20251001`, code at `5cca25f`) is PASS on V1–V9, both in its manifest and when re-run independently; the P2 source and handoff gates pass on its outputs. An independent read-only audit recomputed its figures from `clean_data.csv` and the cleaning log rather than from `stats.json`. All counts, rates, Wilson and bootstrap intervals, gap statistics and Policy C counts match. None of the p3-live-004 errors recurs: the gap is defined from the verified final cost, the sign is read correctly, the eligible snapshots are credited to 397 productions, associations are not presented as causes, and the frozen split figures are credited to `frozen_split_prevalence_difference`.
+
+The audit found four narrative inaccuracies that the validators do not catch. **The artifacts are published unchanged**, because editing them would break the digests in `run_manifest.json`. Read them with these corrections:
+
+| # | Where | Statement | Correction |
+|---|---|---|---|
+| 1 | `insights.md`, Hypotheses | "fee modes (fixed, percentage, variable)" | `fee_mode` has two values only, `percent` (1,000 snapshots) and `amount` (538). No "fixed" or "variable" mode exists. |
+| 2 | `eda_report.html`, `correlations` | "Other features show correlations with absolute values below 0.13" | This holds for the Spearman correlation with the signed gap (largest other: `current_position_ils`, 0.124). It does not hold for the point-biserial correlation with `is_overrun`, which the previous sentence reports: `manual_costs_pre_vat` is 0.176 and `n_manual_costs` 0.101 (train group). |
+| 3 | `eda_report.html`, `data_quality`; `insights.md`, Data quality | "22 had at least one ineligible snapshot" (EDA) and "25 had at least one ineligible snapshot" (insights) | Both use the same words for different counts. 25 productions have at least one ineligible snapshot: 22 partially eligible and 3 with no eligible snapshot. With the 375 fully eligible productions this gives 400. |
+| 4 | `insights.md`, Hypotheses | "the temporal spread of costs (recency and age measures)" | The dataset contract has no recency or age column. Its time columns are `as_of_date`, `event_month`, `lead_time_days`, `days_since_contract` and `days_to_event`. |
+
+`dataset_contract.json` has no column descriptions (0 of 37), as in p3-live-004 and for the same reason (above). This is a documented limitation, not a requirement.
 
 ## Relationship to the P2 handoff gate
 

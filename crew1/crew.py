@@ -27,11 +27,21 @@ CONFIG = Path(__file__).resolve().parent / "config"
 DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 MODEL_RE = re.compile(r"claude-[a-z0-9][a-z0-9.\-]*")
 LLM_SETTINGS = {"temperature": 0.0, "max_tokens": 8192, "timeout": 180.0, "max_retries": 2}
+# In crewai 1.15.28 max_iter counts executor iterations: one model request each, however many parallel
+# tool calls that request returns. When it is reached, CrewAI makes ONE more request without tools for
+# a forced final answer and the task completes with that text. So per task attempt a request bound is
+# max_iter + 1; an agent retry (max_retry_limit) would re-run the task with a fresh counter, so it is 0.
+# Sized for a legitimate run with every tool call in its own turn (the live runs batched them):
+#   ingestion  7 loads + defects + Policy C + eligibility + final answer             = 11 -> 12
+#   EDA        list + 8 analyses + 4 charts + report + 2 corrections + final answer   = 17 -> 18
+#   contract   contract (+1 retry) + gate + insights + 3 corrections + final answer   =  8 -> 10
+# p3-live-003 looped 22 times at 25 (EDA) and p3-live-002 13 times at 15 (contract).
 AGENT_LIMITS = {
     "ingestion_engineer": {"max_iter": 12, "max_execution_time": 600, "max_rpm": 20},
-    "exploratory_analyst": {"max_iter": 25, "max_execution_time": 900, "max_rpm": 20},
-    "contract_author": {"max_iter": 15, "max_execution_time": 600, "max_rpm": 20},
+    "exploratory_analyst": {"max_iter": 18, "max_execution_time": 900, "max_rpm": 20},
+    "contract_author": {"max_iter": 10, "max_execution_time": 600, "max_rpm": 20},
 }
+AGENT_MAX_RETRY_LIMIT = 0
 CREW_MAX_RPM = 20
 
 
@@ -48,9 +58,10 @@ def resolve_model(environ=os.environ) -> str:
     return model
 
 
-def make_llm(model: str):
+def make_llm(model: str, **overrides):
+    """The crew's LLM. ``overrides`` replace settings for a caller outside the crew (the P3 schema probe)."""
     from crewai import LLM
-    return LLM(model=f"anthropic/{model}", **LLM_SETTINGS)
+    return LLM(model=f"anthropic/{model}", **{**LLM_SETTINGS, **overrides})
 
 
 def load_config() -> tuple[dict, dict]:
@@ -149,7 +160,7 @@ def build_crew(ws: Workspace, sources: Sources, model: str, recorder: Recorder |
             role=cfg["role"].strip(), goal=cfg["goal"].strip(), backstory=cfg["backstory"].strip(),
             tools=tools[key], llm=make_llm(model), allow_delegation=False, memory=False, knowledge_sources=None,
             embedder=None, allow_code_execution=False, reasoning=False, planning=False, multimodal=False,
-            inject_date=False, cache=False, max_retry_limit=1, respect_context_window=True,
+            inject_date=False, cache=False, max_retry_limit=AGENT_MAX_RETRY_LIMIT, respect_context_window=True,
             step_callback=step_cb, verbose=False, **AGENT_LIMITS[key])
     tasks = {}
     for name, cfg in tasks_cfg.items():

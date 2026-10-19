@@ -148,6 +148,10 @@ class ToolContext:
             return None
         return json.loads(self.ws.read_output("out.dataset_contract"))
 
+    def narrative_facts(self) -> dict:
+        log = self.log() if self.ws.has_output("out.cleaning_log") else None
+        return N.narrative_facts(log, self.contract())
+
     # ------------------------------------------------------------ A1
     def load_raw_table(self, name: str):
         if not (isinstance(name, str) and name.strip().startswith("raw.") and name.strip() != "raw.manifest"):
@@ -181,7 +185,8 @@ class ToolContext:
                 "report_sections": {s: t for s, (t, _, _) in E.SECTIONS.items()},
                 "minimum_charts": E.MIN_CHARTS,
                 "units": "rates are fractions (write them as %); differences between rates are percentage points "
-                         "(pp); amounts are ILS pre-VAT"}
+                         "(pp); amounts are ILS pre-VAT",
+                "narrative_facts": self.narrative_facts()}
 
     def run_analysis(self, analysis_id: str):
         if analysis_id not in E.ANALYSES:
@@ -225,7 +230,8 @@ class ToolContext:
         return {"written": "dataset_contract.json", "row_count": contract["row_count"],
                 "exclusion_counts": contract["exclusion_counts"], "columns": len(contract["columns"]),
                 "described_columns": sum(1 for c in contract["columns"] if "description" in c),
-                "raw_manifest_sha256": contract["raw_manifest_sha256"]}
+                "raw_manifest_sha256": contract["raw_manifest_sha256"],
+                "narrative_facts": self.narrative_facts()}
 
     def run_handoff_gate(self):
         result = run_gate(self.ws)
@@ -262,7 +268,8 @@ SPECS = {
                                "cleaning_log.json, and returns the counts. No values are imputed."),
     "eligibility_summary": (NoArgs, "Summarise Policy C snapshot eligibility: eligible and ineligible snapshots, "
                                     "by stage and by exclusion reason."),
-    "list_analyses": (NoArgs, "List the fixed menu of approved analyses, the chart ids and the report section ids."),
+    "list_analyses": (NoArgs, "List the fixed menu of approved analyses, the chart ids and the report section ids, "
+                              "and return the narrative facts (target definitions, eligible production counts)."),
     "run_analysis": (AnalysisArgs, "Run one approved analysis on clean_data.csv; results are added to stats.json "
                                    "and returned."),
     "render_chart": (ChartArgs, "Render one chart (PNG) from stats.json only. Its analysis must have been run."),

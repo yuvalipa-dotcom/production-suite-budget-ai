@@ -125,7 +125,8 @@ def test_split_and_cleaning_counts_are_checked_against_the_v5_sources(run_copy):
     good = f"\nThe split holds {n['train']:,} train, {n['test']:,} test and {n['demo']:,} demo snapshots.\n"
     _append(run_copy / "insights.md", good)
     assert V.v5_claims(run_copy, SOURCES)["status"] == "PASS"
-    wrong = "\nTrain has 1,100 snapshots, test 308 and demo 130; 22 duplicate commitments were dropped.\n"
+    # 19, not 22: since p3-live-004, 22 (partially eligible productions) is a V5 source in stats.json
+    wrong = "\nTrain has 1,100 snapshots, test 308 and demo 130; 19 duplicate commitments were dropped.\n"
     src = _sources(run_copy)
     assert not any(V.claim_matches(c, src) for c in V.extract_claims(wrong))     # precondition: all unverifiable
     _append(run_copy / "insights.md", wrong)
