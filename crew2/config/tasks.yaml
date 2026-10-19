@@ -1,0 +1,59 @@
+# Crew 2 tasks (CrewAI-standard configuration), run sequentially: T1 -> T2 -> T3.
+# Every number, split, fit, selection and metric comes from deterministic tools.
+
+prepare_and_prove_features:
+  agent: feature_engineer
+  description: >
+    Prepare the modelling input and prove feature availability.
+
+    1. Call build_handoff exactly once.
+    2. Call feature_availability.
+    3. Call run_leakage_checks.
+
+    Then write a short report: the handoff rows and exclusion counts, the number of features in the
+    primary (F27) and research (F29) sets and why two are excluded from the primary set, and the
+    result of every leakage check. Use only numbers your tools returned.
+  expected_output: >
+    A plain-text report of 120 to 300 words with the handoff verification, the feature sets and
+    each leakage check result, all copied from tool output.
+
+train_and_select:
+  agent: model_trainer
+  context: [prepare_and_prove_features]
+  description: >
+    Run the pre-registered training protocol.
+
+    1. Call list_runs.
+    2. Call run_grouped_cv once for EVERY run id that list_runs returns (9 runs).
+    3. Call apply_selection_rule. It takes no argument; the rule selects the model.
+    4. Call fit_final_models.
+
+    There is no human in the loop. Never choose or re-rank a model yourself, never ask a question,
+    and never call a tool of another agent. Report the mean Brier and PR-AUC of each primary run,
+    the selected candidate and the rule step that decided it, copied from tool output.
+  expected_output: >
+    A plain-text summary of the 9 CV runs (mean Brier and PR-AUC), the selection-rule result and
+    the final models' hashes, all copied from tool output.
+
+evaluate_and_document:
+  agent: evaluator
+  context: [prepare_and_prove_features, train_and_select]
+  description: >
+    Evaluate once and write the model card.
+
+    1. Call evaluate_on_test_once exactly once. Never call it again: a second call is refused.
+    2. Call predict_demo.
+    3. Call render_chart for cv_brier and for reliability_test.
+    4. Call write_model_card with narrative text in EVERY one of its ten section fields (2 to 5
+       sentences each).
+    5. Read the checks it returns. Correct every listed problem (missing or short sections,
+       unverified numbers, forbidden claims) and call write_model_card again until every list is
+       empty.
+
+    Rules for your text: copy every number exactly as the tools returned it, rounded to at most four
+    decimal places. Say that the data are synthetic and that predictions are experimental / demo
+    predictions. Do not claim real-world accuracy, do not predict outcomes, and do not recommend
+    re-splitting or rebalancing the frozen split.
+  expected_output: >
+    A short confirmation that model_card.md was written with every check list empty, and the
+    single test result of the selected model (Brier and PR-AUC with their 95% bootstrap intervals).
