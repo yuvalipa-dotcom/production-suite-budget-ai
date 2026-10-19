@@ -48,9 +48,10 @@ def resolve_model(environ=os.environ) -> str:
     return model
 
 
-def make_llm(model: str):
+def make_llm(model: str, **overrides):
+    """The crew's LLM. ``overrides`` replace settings for a caller outside the crew (the P3 schema probe)."""
     from crewai import LLM
-    return LLM(model=f"anthropic/{model}", **LLM_SETTINGS)
+    return LLM(model=f"anthropic/{model}", **{**LLM_SETTINGS, **overrides})
 
 
 def load_config() -> tuple[dict, dict]:
