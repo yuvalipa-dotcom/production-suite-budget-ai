@@ -60,6 +60,33 @@ A flagged line is spared only when all of the following hold:
 
 The scanner holds the approved value as an integer literal, so its own source contains no quoted hex string. The tests build every commit id at runtime. Tests prove that the approved value is the checker's baseline and the repository's `origin/main`. They also prove that modified values, other paths, other lines, a repeated value and additional secrets are all still detected.
 
+**P3 publication candidate (owner-approved compatibility fix).** After PR #3 merged, `origin/main` moved to the P2 merge commit `7140231`, whose first parent is the W-3 baseline `5951725` and whose tree equals the P2 tip. The checker now expects exactly five branches, the four above plus `p3-crew1`, and still rejects any other ref. The historical check is kept unchanged: `p2-quality-gate` must descend from `5951725`. A separate check requires `p3-crew1` to descend from the P3 baseline `7140231`, and requires that commit's first parent to be `5951725`. The scanner test no longer requires `origin/main` to *equal* a fixed id, which broke at the merge. It now requires both baselines to be ancestors of `origin/main` and the parent link above to hold.
+
+**P3 baseline commit id.** The P3 baseline's full commit id is exempted under the same four rules as the W-3 id. It applies in exactly two complete lines: the `P3_BASELINE` assignment in `tools/publication_check.py` and its assertion in `tests/test_publication_check.py`. Each approved id is spared only in its own line template, so swapping the two values is detected. The scanner again holds the value as an integer literal. Tests prove that modified values, the other baseline's value in the P3 line, other paths and lines, a repeated value, an unrelated commit id and additional secrets are all still detected.
+
+**P3 run digests in the p3-live-005 artifacts (owner-approved).** Four JSON artifacts of the published live run record SHA-256 provenance digests: `run_manifest.json` (`artifacts_sha256`, `input_sha256`), `gate_result.json` (`input_sha256s`), and `dataset_contract.json` and `cleaning_log.json` (`raw_manifest_sha256`). The scanner flags 25 of them as `Hex High Entropy String`: 17, 6, 1 and 1 respectively. The other five `artifacts_sha256` lines already match the dataset-manifest rule above, which is unchanged.
+
+All 30 digests in these files were verified independently, and none is a secret. Each equals the SHA-256 of the file it names: either an artifact of the same run, or a committed input at the run's code commit `5cca25f` (`raw/*` is `data/synthetic/v2/raw/*`). `tests/test_publish_scan.py` repeats this check for the 25 approved values.
+
+A finding is spared only when all of the following hold:
+
+- the path is exactly one of the four approved paths under `artifacts/crew1/p3-live-005/`;
+- the whole file is byte-identical to its approved blob (git blob id), so any change to the run record, inside or outside the digests, removes the exemption;
+- the finding type is exactly `Hex High Entropy String`;
+- the whole flagged line is one key with a lowercase hex-64 value, and the key names exactly one approved JSON location in that file, which holds that value;
+- the value occurs once in the file.
+
+There is no value or pattern allow-list. The blob ids are integer literals, so the scanner holds no quoted hex string. The exemption is applied where the history and working-tree scans collect findings (`_scan_tree`).
+
+Tests prove the following are all still detected:
+
+- a different digest in an approved slot;
+- any other edit to the file;
+- the same bytes at another path, including the same file under `p3-live-004`;
+- a planted token or an extra hex value in an approved file;
+- another finding type, or another line;
+- a synthetic file with the approved structure at an approved path.
+
 ## Proof that the checks work
 
 - `tests/test_publish_scan.py` checks both directions: planted token shapes, database URLs, local paths, environment-file names and private terms (including pattern rules with allow-lists) **are** detected, and healthy synthetic content passes. Planted values are built at runtime, so the test file contains no secret-shaped literal.

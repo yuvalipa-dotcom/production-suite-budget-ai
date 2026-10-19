@@ -9,6 +9,8 @@ import hashlib
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 REPO = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("publish_scan", REPO / "tools" / "publish_scan.py")
 scan = importlib.util.module_from_spec(spec)
@@ -156,16 +158,25 @@ def _checker_test_src(value=BASE, extra=""):
     return f'def test_x():\n    assert check.PUBLISHED_BASELINE == "{value}"\n{extra}'
 
 
-def test_git_baseline_is_the_public_origin_main_commit():
+def test_git_baselines_are_public_origin_main_commits():
+    """The W-3 baseline was origin/main before PR #3; the P3 baseline is the PR #3 merge, whose first parent
+    is the W-3 baseline. Both stay ancestors of origin/main (equality would break at every later merge)."""
     import subprocess
+
+    def git(*args):
+        return subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, text=True)
+
     pc_spec = importlib.util.spec_from_file_location("publication_check", REPO / "tools" / "publication_check.py")
     pc = importlib.util.module_from_spec(pc_spec)
     pc_spec.loader.exec_module(pc)
-    assert len(BASE) == 40 and set(BASE) <= set("0123456789abcdef") and BASE == pc.PUBLISHED_BASELINE
-    origin = subprocess.run(["git", "-C", str(REPO), "rev-parse", "--verify", "-q", "refs/remotes/origin/main"],
-                            capture_output=True, text=True).stdout.strip()
+    for value in (BASE, P3):
+        assert len(value) == 40 and set(value) <= set("0123456789abcdef")
+    assert BASE == pc.PUBLISHED_BASELINE and P3 == pc.P3_BASELINE and BASE != P3
+    origin = git("rev-parse", "--verify", "-q", "refs/remotes/origin/main").stdout.strip()
     if origin:                                    # absent in a remote-less dry-run clone
-        assert origin == BASE
+        assert git("rev-parse", "--verify", "-q", f"{P3}^1").stdout.strip() == BASE
+        for value in (BASE, P3):
+            assert git("merge-base", "--is-ancestor", value, origin).returncode == 0, value
 
 
 def test_git_baseline_lines_are_exempted(tmp_path):
@@ -205,6 +216,66 @@ def test_git_baseline_files_still_detect_additional_secrets(tmp_path):
     assert "github_token" in rules(scan._content_findings(CHECKER, _checker_src(extra=token), []))
 
 
+# ---------- P3: the public P2 merge commit (P3 starting baseline) in exactly two lines ----------
+
+P3 = scan.APPROVED_P3_BASELINE
+
+
+def _p3_checker_src(value=P3, extra=""):
+    return f'{_checker_src()}P3_BASELINE = "{value}"\n{extra}P3_BASELINE_DESCENDANTS = ("p3-crew1",)\n'
+
+
+def _p3_checker_test_src(value=P3, extra=""):
+    return f'{_checker_test_src()}    assert check.P3_BASELINE == "{value}"\n{extra}'
+
+
+def test_p3_baseline_exemption_is_exact():
+    assert scan.APPROVED_COMMIT_IDS == ((BASE, scan.GIT_BASELINE_LINES), (P3, scan.P3_BASELINE_LINES))
+    assert set(scan.P3_BASELINE_LINES) == {CHECKER, CHECKER_TEST}
+    assert scan.GIT_BASELINE_LINES == {CHECKER: 'PUBLISHED_BASELINE = "{}"',
+                                       CHECKER_TEST: '    assert check.PUBLISHED_BASELINE == "{}"'}
+
+
+def test_p3_baseline_lines_are_exempted(tmp_path):
+    assert _flagged(tmp_path, "tools/other.py", _p3_checker_src()), "the detector must flag it without the exemption"
+    assert _flagged(tmp_path, CHECKER, _p3_checker_src()) == []
+    assert _flagged(tmp_path, CHECKER_TEST, _p3_checker_test_src()) == []
+
+
+def test_p3_baseline_modified_values_are_detected(tmp_path):
+    for bad in (OTHER_SHA, P3.upper(), P3[:39], P3 + "0", P3[:-1] + ("0" if P3[-1] != "0" else "1"), BASE):
+        assert _flagged(tmp_path, CHECKER, _p3_checker_src(value=bad)), bad
+        assert _flagged(tmp_path, CHECKER_TEST, _p3_checker_test_src(value=bad)), bad
+
+
+def test_p3_baseline_unrelated_paths_lines_and_swaps_are_detected(tmp_path):
+    for logical in ("tools/publication_check_v2.py", "tests/test_other.py", "docs/" + CHECKER, "crew1/run.py"):
+        assert _flagged(tmp_path, logical, _p3_checker_src()), logical
+        assert _flagged(tmp_path, logical, _p3_checker_test_src()), logical
+    variants = [f'P3_BASELINE = "{P3}"  # note', f'  P3_BASELINE = "{P3}"', f"P3_BASELINE = '{P3}'",
+                f'OTHER_BASELINE = "{P3}"', f'PUBLISHED_BASELINE = "{P3}"']
+    for line in variants:
+        assert _flagged(tmp_path, CHECKER, f"import x\n{line}\n"), line
+    # each approved value is spared only in its own line: swapping the two values is detected
+    assert _flagged(tmp_path, CHECKER, f'import x\nP3_BASELINE = "{BASE}"\n')
+    assert _flagged(tmp_path, CHECKER_TEST, f'    assert check.P3_BASELINE == "{BASE}"\n')
+    assert _flagged(tmp_path, CHECKER_TEST, f'    assert check.PUBLISHED_BASELINE == "{P3}"\n')
+    # the approved line plus the same value anywhere else in the file: not spared
+    assert _flagged(tmp_path, CHECKER, _p3_checker_src(extra=f'MIRROR = "{P3}"\n'))
+    assert _flagged(tmp_path, CHECKER_TEST, _p3_checker_test_src(extra=f'    other = "{P3}"\n'))
+    assert not scan._approved_git_baseline(CHECKER, f'P3_BASELINE = "{P3}"', _p3_checker_src(), OTHER_SHA)
+    assert not scan._approved_git_baseline(CHECKER, f'P3_BASELINE = "{P3}"', _p3_checker_src(), BASE)
+
+
+def test_p3_baseline_files_still_detect_additional_secrets(tmp_path):
+    token = f'TOKEN = "{FAKE_GH}"\n'
+    assert _flagged(tmp_path, CHECKER, _p3_checker_src(extra=token))
+    assert _flagged(tmp_path, CHECKER_TEST, _p3_checker_test_src(extra="    " + token))
+    assert _flagged(tmp_path, CHECKER, _p3_checker_src(extra=f'OTHER = "{OTHER_SHA}"\n'))
+    assert _flagged(tmp_path, CHECKER, f'P3_BASELINE = "{P3}"; T = "{FAKE_GH}"\n')
+    assert "github_token" in rules(scan._content_findings(CHECKER, _p3_checker_src(extra=token), []))
+
+
 def test_manifest_exemption_is_unchanged():
     assert scan.MANIFEST_DIGEST_LINE.pattern == r'^\s*"[a-z_]+\.(csv|json)": "[0-9a-f]{64}",?\s*$'
 
@@ -218,3 +289,103 @@ def test_private_patterns_with_allow_list():
     assert scan._content_findings("a.md", "zorkless word", deny) == []          # word boundary respected
     # allow never suppresses a literal entry
     assert "private_denylist[0]" in rules(scan._content_findings("a.md", "unzork plainword", deny))
+
+
+# ---------- P3: the provenance digests of the four p3-live-005 JSON artifacts, and nothing else ----------
+
+RUN = REPO / scan.P3_RUN
+RUN_FILES = tuple(scan.APPROVED_P3_RUN_DIGESTS)
+
+
+def _tree_secrets(files: dict) -> list:
+    return scan._scan_tree(files, scan.Denylist([]), "t")["secret_findings"]
+
+
+def _run_bytes(logical):
+    p = REPO / logical
+    if not p.is_file():
+        pytest.skip("the p3-live-005 artifacts are not in this checkout")
+    return p.read_bytes()
+
+
+def test_p3_run_exemption_is_exact():
+    assert scan.P3_RUN == "artifacts/crew1/p3-live-005" and scan.P3_RUN_DIGEST_TYPE == "Hex High Entropy String"
+    assert {k: len(v[1]) for k, v in scan.APPROVED_P3_RUN_DIGESTS.items()} == {
+        f"{scan.P3_RUN}/run_manifest.json": 17, f"{scan.P3_RUN}/gate_result.json": 6,
+        f"{scan.P3_RUN}/dataset_contract.json": 1, f"{scan.P3_RUN}/cleaning_log.json": 1}
+
+
+def test_p3_run_artifacts_are_exempted_and_their_blobs_match():
+    for logical in RUN_FILES:
+        data = _run_bytes(logical)
+        assert hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest() == scan.APPROVED_P3_RUN_DIGESTS[logical][0]
+        assert scan._secret_findings(RUN / Path(logical).name, logical), "the detector must flag it unexempted"
+        assert _tree_secrets({logical: data}) == [], logical
+
+
+def test_p3_run_approved_digests_are_the_digests_of_the_named_files():
+    """Independent verification: each approved value is the sha256 of a run artifact or a committed input."""
+    import json
+    import subprocess
+    sha = lambda b: hashlib.sha256(b).hexdigest()
+
+    def named(key):
+        if (RUN / key).is_file():
+            return (RUN / key).read_bytes()
+        path = "data/synthetic/v2/" + key if key.startswith("raw/") else key
+        res = subprocess.run(["git", "-C", str(REPO), "show", f"5cca25f:{path}"], capture_output=True)
+        if res.returncode != 0:
+            pytest.skip("the run's code commit is not in this clone")
+        return res.stdout
+
+    n = 0
+    for logical, (_, locations) in scan.APPROVED_P3_RUN_DIGESTS.items():
+        doc = json.loads(_run_bytes(logical))
+        for loc in locations:
+            key = "raw/manifest.json" if loc == ("raw_manifest_sha256",) else loc[-1]
+            assert scan._json_at(doc, loc) == sha(named(key)), (logical, loc)
+            n += 1
+    assert n == 25
+
+
+def test_p3_run_exemption_requires_the_unchanged_file_at_its_path():
+    logical = f"{scan.P3_RUN}/run_manifest.json"
+    data = _run_bytes(logical)
+    value = scan._json_at(__import__("json").loads(data), ("input_sha256", "raw/payments.csv"))
+    # a different digest in an approved slot (same shape, same length)
+    assert _tree_secrets({logical: data.replace(value.encode(), DIGEST.encode())})
+    # any other change to the file, even outside the digests
+    assert _tree_secrets({logical: data.replace(b'"status": "PASS"', b'"status": "PAS5"')})
+    # the same bytes at any other path: an earlier run, another name, another folder
+    for other in ("artifacts/crew1/p3-live-004/run_manifest.json", f"{scan.P3_RUN}/manifest_copy.json",
+                  "run_manifest.json", f"{scan.P3_RUN}/gate_result.json"):
+        assert _tree_secrets({other: data}), other
+
+
+def test_p3_run_files_still_detect_other_secrets():
+    for logical in RUN_FILES:
+        data = _run_bytes(logical)
+        planted = data.replace(b"{", ('{\n  "token": "' + FAKE_GH + '",').encode(), 1)
+        assert _tree_secrets({logical: planted}), logical
+        assert "github_token" in rules(scan._content_findings(logical, planted.decode("utf-8"), []))
+        hexed = data.replace(b"{", ('{\n  "api_secret": "' + DIGEST2 + '",').encode(), 1)
+        assert _tree_secrets({logical: hexed}), logical
+
+
+def test_p3_run_exemption_never_spares_another_finding_type_or_line():
+    logical = f"{scan.P3_RUN}/dataset_contract.json"
+    data = _run_bytes(logical)
+    line = next(i for i, ln in enumerate(data.decode("utf-8").splitlines(), 1) if "raw_manifest_sha256" in ln)
+    assert scan._approved_p3_run_digest(logical, data, {"rule": "Hex High Entropy String", "line": line})
+    for finding in ({"rule": "Secret Keyword", "line": line}, {"rule": "Base64 High Entropy String", "line": line},
+                    {"rule": "Hex High Entropy String", "line": 1}, {"rule": "Hex High Entropy String", "line": 0},
+                    {"rule": "Hex High Entropy String", "line": 10 ** 6}):
+        assert not scan._approved_p3_run_digest(logical, data, finding), finding
+
+
+def test_p3_run_exemption_ignores_synthetic_files_at_the_approved_paths():
+    """Without the exact approved bytes nothing is spared, whatever the structure."""
+    for logical in RUN_FILES:
+        fake = ('{\n  "raw_manifest_sha256": "' + DIGEST + '",\n  "input_sha256": {\n    "raw/manifest.json": "'
+                + DIGEST2 + '"\n  }\n}\n').encode()
+        assert _lines(_tree_secrets({logical: fake})) == [2, 4], logical

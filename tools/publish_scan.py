@@ -19,6 +19,7 @@ Exit code 0 = no findings, 1 = findings.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -50,6 +51,35 @@ APPROVED_DIGEST_FIELDS = {
 }
 DIGEST_FIELD_LINE = re.compile(r'^\s*"(?P<key>[^"\\]+)": "(?P<value>[0-9a-f]{64})",?\s*$')
 
+# Narrow, documented exemption (P3, owner-approved): the sha256 provenance digests in four JSON artifacts
+# of the published live run p3-live-005, each the digest of an artifact of that run or of a committed
+# input (verified independently; docs/security_scan.md). A finding is spared only when ALL hold: (a) the
+# path is exactly an approved path; (b) the whole file is byte-identical to its approved blob (git blob
+# id), so the run record cannot change and keep the exemption; (c) the finding type is exactly the
+# approved detect-secrets type; (d) the whole flagged line is one key with a lowercase hex-64 value, the
+# key names exactly one approved JSON location of that file, and that location holds that value; (e) the
+# value occurs once in the file. Blob ids are integer literals, so this file contains no quoted hex string.
+P3_RUN = "artifacts/crew1/p3-live-005"
+P3_RUN_DIGEST_TYPE = "Hex High Entropy String"
+P3_RUN_INPUTS = ("contracts/column_roles.json", "contracts/dataset_contract.schema.json", "contracts/frozen_split.json",
+                 "raw/manifest.json")
+APPROVED_P3_RUN_DIGESTS = {   # path: (git blob id, JSON locations of the approved digests)
+    f"{P3_RUN}/run_manifest.json": (
+        f"{0x2db0c5c813c3eea9163ac0e2fe365d3e1088352b:040x}",
+        tuple(("artifacts_sha256", n) for n in ("eda_report.html", "insights.md", "trace.jsonl"))
+        + tuple(("input_sha256", n) for n in P3_RUN_INPUTS + (
+            "crew1/config/agents.yaml", "crew1/config/tasks.yaml", "docs/raw_data_dictionary.md",
+            "raw/budget_revisions.csv", "raw/category_plans.csv", "raw/commitments.csv", "raw/manual_costs.csv",
+            "raw/payments.csv", "raw/productions.csv", "raw/snapshot_schedule.csv"))),
+    f"{P3_RUN}/gate_result.json": (
+        f"{0x5e895d16991a1e41814a5a1c911b0cea3ef9f7bd:040x}",
+        tuple(("input_sha256s", n) for n in P3_RUN_INPUTS + ("clean_data.csv", "dataset_contract.json"))),
+    f"{P3_RUN}/dataset_contract.json": (f"{0xd5d9023285c831584c09b4e85b495f2e9fbb0447:040x}",
+                                        (("raw_manifest_sha256",),)),
+    f"{P3_RUN}/cleaning_log.json": (f"{0x83fd16ac59287c027a6f182fc88edf0e64d7f4d8:040x}",
+                                    (("raw_manifest_sha256",),)),
+}
+
 # Narrow, documented exemption (P2): the public W-3 merge commit (origin/main after PR #2), in exactly
 # two complete lines of two files. A flagged line is spared only when it equals its template filled
 # with this one value, the flagged secret is this value, and the value occurs once in the file.
@@ -59,6 +89,15 @@ GIT_BASELINE_LINES = {
     "tools/publication_check.py": 'PUBLISHED_BASELINE = "{}"',
     "tests/test_publication_check.py": '    assert check.PUBLISHED_BASELINE == "{}"',
 }
+
+# Narrow, documented exemption (P3), on the same rules: the public P2 merge commit (origin/main after
+# PR #3), the P3 starting baseline, in exactly two complete lines of the same two files.
+APPROVED_P3_BASELINE = f"{0x7140231951b1d2b82b8e1edcd92a0a8be5da15b8:040x}"
+P3_BASELINE_LINES = {
+    "tools/publication_check.py": 'P3_BASELINE = "{}"',
+    "tests/test_publication_check.py": '    assert check.P3_BASELINE == "{}"',
+}
+APPROVED_COMMIT_IDS = ((APPROVED_GIT_BASELINE, GIT_BASELINE_LINES), (APPROVED_P3_BASELINE, P3_BASELINE_LINES))
 
 GENERIC_PATTERNS = {
     "env_file_name": re.compile(r"(^|/)\.env(\.|$)"),
@@ -128,6 +167,21 @@ def _json_at(doc, path: tuple[str, ...]):
     return doc
 
 
+def _approved_p3_run_digest(logical: str, data: bytes, finding: dict) -> bool:
+    """True only for an approved provenance digest in an unchanged p3-live-005 artifact (see APPROVED_P3_RUN_DIGESTS)."""
+    approved = APPROVED_P3_RUN_DIGESTS.get(logical)
+    if not approved or finding["rule"] != P3_RUN_DIGEST_TYPE:
+        return False
+    blob, locations = approved
+    if hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest() != blob:
+        return False
+    text = data.decode("utf-8")
+    lines = text.splitlines()
+    m = DIGEST_FIELD_LINE.match(lines[finding["line"] - 1]) if 0 < finding["line"] <= len(lines) else None
+    at = [loc for loc in locations if m and loc[-1] == m["key"]]
+    return len(at) == 1 and _json_at(json.loads(text), at[0]) == m["value"] and text.count(m["value"]) == 1
+
+
 def _approved_digest(logical: str, line: str, text: str, secret_value: str | None) -> bool:
     """True only for an approved digest structure (see APPROVED_DIGEST_FIELDS)."""
     fields = APPROVED_DIGEST_FIELDS.get(logical)
@@ -143,10 +197,13 @@ def _approved_digest(logical: str, line: str, text: str, secret_value: str | Non
 
 
 def _approved_git_baseline(logical: str, line: str, text: str, secret_value: str | None) -> bool:
-    """True only for the two approved lines holding the public W-3 baseline commit id."""
-    template = GIT_BASELINE_LINES.get(logical)
-    return (template is not None and line == template.format(APPROVED_GIT_BASELINE)
-            and secret_value in (None, APPROVED_GIT_BASELINE) and text.count(APPROVED_GIT_BASELINE) == 1)
+    """True only for an approved line holding its approved public commit id (see APPROVED_COMMIT_IDS)."""
+    for value, lines in APPROVED_COMMIT_IDS:
+        template = lines.get(logical)
+        if (template is not None and line == template.format(value)
+                and secret_value in (None, value) and text.count(value) == 1):
+            return True
+    return False
 
 
 def _secret_findings(path_on_disk: Path, logical: str) -> list[dict]:
@@ -174,7 +231,7 @@ def _scan_tree(files: dict[str, bytes], deny: Denylist, label: str) -> dict:
             disk = Path(tmp) / logical
             disk.parent.mkdir(parents=True, exist_ok=True)
             disk.write_bytes(blob)
-            secrets += _secret_findings(disk, logical)
+            secrets += [f for f in _secret_findings(disk, logical) if not _approved_p3_run_digest(logical, blob, f)]
             content += _content_findings(logical, blob.decode("utf-8", errors="replace"), deny)
     return {"tree": label, "files": len(files), "secret_findings": secrets, "content_findings": content}
 

@@ -1,0 +1,140 @@
+# Crew 1 tasks (CrewAI-standard configuration), run sequentially: T1 -> T2 -> T3.
+# Every data value, transformation and contract field comes from deterministic tools.
+
+ingest_and_clean:
+  agent: ingestion_engineer
+  description: >
+    Ingest, profile, detect and clean the synthetic raw export.
+
+    1. Call load_raw_table for each raw table: raw.productions, raw.budget_revisions,
+       raw.category_plans, raw.commitments, raw.manual_costs, raw.payments, raw.snapshot_schedule.
+    2. Call detect_defects.
+    3. Call apply_policy_c exactly once. It writes clean_data.csv and cleaning_log.json.
+    4. Call eligibility_summary.
+
+    Then write the cleaning narrative: the defects found (by type and table), the Policy C
+    decisions (normalisations that were allowed, records that stay in the target, snapshots that
+    became ineligible and why, payment rows excluded), and the exclusions by reason.
+    Use only numbers that your tools returned, with their units.
+  expected_output: >
+    A cleaning narrative of 250 to 450 words in plain text, with the defect counts, the Policy C
+    decisions and the eligible and excluded snapshot counts by reason, all copied from tool output.
+
+explore_and_report:
+  agent: exploratory_analyst
+  context: [ingest_and_clean]
+  description: >
+    Produce the exploratory data analysis report of the eligible synthetic snapshots.
+
+    1. Call list_analyses.
+    2. Run the relevant analyses with run_analysis. Always include policy_c_exclusions and
+       frozen_split_prevalence_difference.
+    3. Render at least 4 charts with render_chart (each chart needs its analysis first).
+    4. Call assemble_eda_report once with interpretation text in EVERY one of its nine section
+       fields (overview, data_quality, prevalence, signed_gap, budget_revisions, fee_terms,
+       correlations, frozen_split, limitations). Each section: 2 to 5 sentences.
+    5. Read the checks it returns. Correct every problem it lists (missing or short sections,
+       unverified numbers, forbidden claims, context problems) and call assemble_eda_report again
+       until every list is empty.
+
+    There is no human in the loop: nobody will read or answer a question. Never end your task by
+    asking for information or waiting for input; take everything from the context and your tools.
+    Do not invent explanations, causes, reasons or numerical relationships (for example, which
+    productions a count of snapshots comes from) that a tool output does not state.
+
+    Authoritative definitions (P2 contract; copy them, never infer them): the signed gap is the
+    verified final cost plus the contractual fee when it is included in the budget, minus the
+    approved budget in effect at the snapshot (ILS, pre-VAT). A positive gap means over budget; a
+    negative gap means under budget. is_overrun means the signed gap exceeds 0.5 ILS;
+    is_material_overrun means the signed gap exceeds 2% of that budget. Payments and commitment
+    totals are not part of the signed gap or of either label.
+
+    Keep three kinds of statements apart. Facts: these definitions and the counts in the
+    narrative_facts that list_analyses returns, stated exactly (its population sentence gives the
+    production count of the eligible snapshots). Associations: differences between stages, groups,
+    revision buckets or fee terms, and correlations; never present them as causes, effects,
+    impacts or explanations, and never use words such as reflects, drives, reduces, influences or
+    due to for them. Hypotheses: questions for Crew 2. Credit each figure to the analysis that
+    computed it (narrative_facts.attribution).
+
+    Rules for your text: copy every number exactly as the tools returned it, rounded to at most
+    one decimal place, with its unit. Write rates as percentages (a fraction 0.4733 is 47.3%),
+    differences between rates in percentage points (pp), and amounts in ILS. Describe
+    associations, not causes. Do not predict outcomes, do not claim real-world accuracy, and do
+    not recommend re-splitting or rebalancing the frozen split.
+  expected_output: >
+    A short summary listing the analyses run, the charts rendered, and the key statistics with
+    their units copied from run_analysis output, including the overall overrun prevalence, the
+    prevalence by stage, the frozen split test minus train difference in pp with its 95%
+    bootstrap interval, and the number of eligible snapshots in each frozen split group (train,
+    test, demo) exactly as returned by run_analysis for frozen_split_prevalence_difference.
+
+contract_and_insights:
+  agent: contract_author
+  context: [ingest_and_clean, explore_and_report]
+  description: >
+    Publish the dataset contract, run the handoff gate and write insights.md.
+
+    1. Call build_dataset_contract. You may pass one-line plain-text descriptions for some
+       columns, as a list of {column, description} entries; every structural field is generated
+       by the tool.
+    2. Call run_handoff_gate. Report its status.
+    3. Call write_insights with a Markdown document that has exactly these five second-level
+       headings, copied character for character (write_insights also returns them as
+       required_headings), in this order:
+       ## Observations (descriptive, from eligible synthetic snapshots)
+       ## Hypotheses for Crew 2 (not predictions)
+       ## Frozen split note
+       ## Data quality and Policy C exclusions
+       ## Limitations
+       The Frozen split note must state the test minus train overrun-prevalence difference and
+       its 95% bootstrap interval in pp exactly as write_insights returns them in
+       frozen_split_values (copy its write_as text). Attribute them to the
+       frozen_split_prevalence_difference analysis in stats.json (a production-level bootstrap),
+       never to the handoff gate. If the context lacks them, call write_insights once to obtain
+       frozen_split_values, then write the note with them. The note must also say that the
+       split is frozen and was not tuned, and that the difference was assessed as a sampling
+       outcome independent of the outcome mechanism. The Limitations must say the data are
+       synthetic and there is no real-world validation.
+    4. Read the checks write_insights returns. Correct every problem it lists
+       (sections_missing_or_empty, frozen_split_note_problems, unverified_quantitative_claims,
+       forbidden_claims, context_problems) and call write_insights again until every list is
+       empty. Do not finish while any problem remains.
+
+    There is no human in the loop: nobody will read or answer a question. Never end your task by
+    asking for information or waiting for input; take everything from the context and your tools.
+    Do not invent explanations, causes, reasons or numerical relationships (for example, which
+    productions a count of snapshots comes from) that a tool output does not state.
+
+    Authoritative definitions (P2 contract; copy them, never infer them): the signed gap is the
+    verified final cost plus the contractual fee when it is included in the budget, minus the
+    approved budget in effect at the snapshot (ILS, pre-VAT). A positive gap means over budget; a
+    negative gap means under budget. is_overrun means the signed gap exceeds 0.5 ILS;
+    is_material_overrun means the signed gap exceeds 2% of that budget. Payments and commitment
+    totals are not part of the signed gap or of either label.
+
+    Keep three kinds of statements apart. Facts: these definitions and the counts in the
+    narrative_facts that build_dataset_contract returns, stated exactly (its population sentence
+    gives the production count of the eligible snapshots). Associations: differences between
+    stages, groups, revision buckets or fee terms, and correlations; never present them as causes,
+    effects, impacts or explanations, and never use words such as reflects, drives, reduces,
+    influences or due to for them. Hypotheses: questions for Crew 2. Credit each figure to the
+    analysis that computed it (narrative_facts.attribution).
+
+    Quantitative claims: every number in insights.md must come from stats.json (the run_analysis
+    results quoted in the context), from dataset_contract.json (the build_dataset_contract output:
+    row count, exclusion counts and columns), from narrative_facts, or from the approved
+    frozen-split counts. Write each with its unit. Do not quote any other number, such as the
+    defect, normalisation or duplicate counts from the cleaning narrative; describe those findings
+    in words.
+    Before you write any split count, verify it against the deterministic tool output: snapshot
+    counts per split group are the train, test and demo n values of
+    frozen_split_prevalence_difference in the context, also returned by write_insights as
+    eligible_snapshots_per_group. Never estimate, round or derive a split
+    count, and leave it out if you cannot verify it. write_insights checks every number against
+    these sources: remove or correct each number it lists as unverified. Hypotheses are
+    questions for the modelling crew to test, not predictions. Never write that anything will
+    predict, never claim real-world accuracy, and never recommend re-splitting or rebalancing.
+  expected_output: >
+    A short confirmation: the gate status, the contract row count and exclusion counts, and the
+    final write_insights checks.

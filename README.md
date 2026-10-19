@@ -26,6 +26,21 @@ See [`docs/roadmap.md`](docs/roadmap.md).
 
 The local, offline gate validates raw source files and a Crew-1 handoff (`clean_data.csv` + `dataset_contract.json`) before any downstream flow consumes it. Every expected value is rebuilt from the raw export under Policy C; groups and folds come from the frozen reference [`contracts/frozen_split.json`](contracts/frozen_split.json). Run `python -m gate.run --stage source --raw data/synthetic/v2/raw --out <output-dir>`; the handoff stage also requires `--data` and `--contract`. See [`docs/quality_gate.md`](docs/quality_gate.md).
 
+## P3 Crew 1: the data-analyst crew
+
+A CrewAI crew (`crew1/`) of three agents turns the raw export into the Crew-1 handoff:
+- a Data Ingestion & Cleaning Engineer;
+- an Exploratory Data Analyst;
+- a Data Contract & Insights Author.
+
+The handoff is `clean_data.csv`, `dataset_contract.json`, `eda_report.html` and `insights.md`.
+
+**Every value, Policy C transformation, statistic and contract field comes from deterministic Python tools; the agents choose the tools and write interpretation text only.** The crew works in an isolated workspace outside the repository and uses logical dataset names, never paths.
+
+Post-run validators re-check every output: a byte-identical recomputation, the P2 gate, and quantitative claims against the computed statistics with units.
+
+Install the pinned dependencies with `.venv\Scripts\python -m pip install -r requirements-crew.txt`. A live run (`python -m crew1.run --live --out artifacts/crew1/<run_id>`) needs `ANTHROPIC_API_KEY` in the environment; without `--live` or the key it exits `2` and makes no call. The offline tests need no key and block the network. See [`docs/crew1.md`](docs/crew1.md).
+
 ## Quick start (Python 3.13)
 
 ```
@@ -76,6 +91,7 @@ is_overrun     = budget_gap_ils > 0.5   (any positive excess; 0.5 is rounding to
 | [`docs/raw_cleaning_policy.md`](docs/raw_cleaning_policy.md) | public data-quality rules for the raw export (Policy C) |
 | [`docs/feature_availability.md`](docs/feature_availability.md) | feature vs outcome-only vs metadata roles; machine-readable in [`contracts/column_roles.json`](contracts/column_roles.json) |
 | [`docs/security_scan.md`](docs/security_scan.md) | pre-publication scan summary |
+| [`docs/crew1.md`](docs/crew1.md) | Crew 1 (P3): agents, tools, deterministic boundary, isolation, validators |
 
 ## Repository layout
 

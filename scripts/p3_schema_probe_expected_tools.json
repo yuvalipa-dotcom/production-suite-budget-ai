@@ -1,0 +1,103 @@
+{
+  "assemble_eda_report": {
+    "description": "Write eda_report.html: your interpretation text in each of the nine section fields, with the computed tables and rendered charts inserted by the tool. Returns checks of your text (unverified numbers, forbidden claims, missing sections, statements the tool outputs do not support).",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "budget_revisions": {
+          "description": "Plain-text interpretation for the report section 'Budget revisions'; blank lines separate paragraphs.",
+          "type": "string"
+        },
+        "correlations": {
+          "description": "Plain-text interpretation for the report section 'Feature correlations (train group)'; blank lines separate paragraphs.",
+          "type": "string"
+        },
+        "data_quality": {
+          "description": "Plain-text interpretation for the report section 'Data quality and Policy C exclusions'; blank lines separate paragraphs.",
+          "type": "string"
+        },
+        "fee_terms": {
+          "description": "Plain-text interpretation for the report section 'Fee mode and fee inclusion'; blank lines separate paragraphs.",
+          "type": "string"
+        },
+        "frozen_split": {
+          "description": "Plain-text interpretation for the report section 'Frozen split prevalence difference'; blank lines separate paragraphs.",
+          "type": "string"
+        },
+        "limitations": {
+          "description": "Plain-text interpretation for the report section 'Limitations'; blank lines separate paragraphs.",
+          "type": "string"
+        },
+        "overview": {
+          "description": "Plain-text interpretation for the report section 'Overview'; blank lines separate paragraphs.",
+          "type": "string"
+        },
+        "prevalence": {
+          "description": "Plain-text interpretation for the report section 'Overrun prevalence'; blank lines separate paragraphs.",
+          "type": "string"
+        },
+        "signed_gap": {
+          "description": "Plain-text interpretation for the report section 'Signed budget gap'; blank lines separate paragraphs.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "overview",
+        "data_quality",
+        "prevalence",
+        "signed_gap",
+        "budget_revisions",
+        "fee_terms",
+        "correlations",
+        "frozen_split",
+        "limitations"
+      ],
+      "type": "object"
+    },
+    "name": "assemble_eda_report",
+    "strict": true
+  },
+  "build_dataset_contract": {
+    "description": "Build dataset_contract.json deterministically from the actual clean_data.csv and the committed contracts. You may add only one-line column descriptions.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "column_descriptions": {
+          "anyOf": [
+            {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "column": {
+                    "description": "An exact column name of clean_data.csv.",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "One line of plain text describing the column.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "column",
+                  "description"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional one-line plain-text descriptions, one entry per column. Free text only: every structural field is built by the tool."
+        }
+      },
+      "required": [
+        "column_descriptions"
+      ],
+      "type": "object"
+    },
+    "name": "build_dataset_contract",
+    "strict": true
+  }
+}
