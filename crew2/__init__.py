@@ -1,9 +1,10 @@
 """Crew 2: the data-scientist crew (P4). ALL DATA IS SYNTHETIC.
 
-Importing this package applies the runtime safety settings BEFORE CrewAI can be
-imported by any of its modules (the same settings as Crew 1, with Crew 2's own
-app-data folder name). The deterministic modelling core lives in ``crew2.ml`` and
-never calls an LLM.
+Importing this package forces the telemetry and tracing settings BEFORE CrewAI can be
+imported by any of its modules (the same values as Crew 1). Crew 2's own CrewAI app-data
+folder name is set only while its crew is built and run (``crew2/crew.py``), so importing
+Crew 2 never changes Crew 1's process-wide settings. The deterministic modelling core lives
+in ``crew2.ml`` and never calls an LLM.
 """
 
 from __future__ import annotations
@@ -21,9 +22,12 @@ SAFETY_ENV = {
 }
 
 
-def apply_safety_env(environ=os.environ) -> None:
+IMPORT_ENV = {k: v for k, v in SAFETY_ENV.items() if k != "CREWAI_STORAGE_DIR"}
+
+
+def apply_safety_env(environ=os.environ, full: bool = False) -> None:
     """Force the safety settings (never defaults: an inherited value cannot re-enable telemetry)."""
-    environ.update(SAFETY_ENV)
+    environ.update(SAFETY_ENV if full else IMPORT_ENV)
 
 
 apply_safety_env()

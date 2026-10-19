@@ -9,7 +9,7 @@
 | P1 | Synthetic data generator, tests, documentation | this branch |
 | P2 | Dataset contract and executable validation gate ([`quality_gate.md`](quality_gate.md)) | implemented locally (branch `p2-quality-gate`), not published |
 | P3 | Crew 1: data-analyst agents (3) | not started |
-| P4 | Crew 2: data-scientist agents (3), model comparison, model card | not started |
+| P4 | Crew 2: data-scientist agents (3), model comparison, model card | implemented locally (branch `p4-crew2`), offline only, not published |
 | P5 | Flow and Streamlit demonstration, with one committed real run | not started |
 | P6–P8 | Product deliverable (below) | after P5, subject to separate approval |
 

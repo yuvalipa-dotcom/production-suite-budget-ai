@@ -53,3 +53,14 @@ All amounts in the product are stored as typed, with a per-amount VAT mode, and 
 - Every feature is a plain number or a small closed category list, with no free text and no per-production history beyond counts.
 - A future model can therefore be exported to plain JSON (coefficients, or tree thresholds, plus preprocessing constants) and scored inside the product without Python.
 - Whether such a model fits real productions requires later testing on verified real data.
+
+## Fields used by the P4 model (Crew 2)
+
+The selected model (calibrated logistic regression, selected by the pre-registered rule) uses the primary feature set `F27` (owner decision D2). That is every snapshot feature in the table above whose status is `EXISTS`, `EXISTS (approx.)` or `EXISTS (derivable)`:
+
+- **Used:** `stage` (from the snapshot date), `archetype`, `event_month`, `lead_time_days`, `days_since_contract`, `days_to_event`, `guest_count`, `budget_vat_mode`, `budget_pre_vat`, `fee_included`, `fee_mode`, `fee_contract_pre_vat`, `planned_total_pre_vat`, `n_categories_planned`, `n_categories_committed`, `n_categories_pending`, `n_commitments_active`, `n_manual_costs`, `manual_costs_pre_vat`, `committed_pre_vat`, `n_categories_over_plan`, `over_plan_pre_vat`, `n_substitutions_to_date`, `no_vat_share`, `current_position_ils`, `committed_ratio`, `cost_per_guest_pre_vat`.
+- **Not used (`PROPOSED`):** `budget_revisions_to_date` and `client_direct_share`. They appear only in the research variant `F29`, which was never used for selection.
+- **Manager-only inputs:** `fee_included`, `fee_mode` and `fee_contract_pre_vat`, and through them `current_position_ils` and `committed_ratio`, which include the fee if it is included. A product card built on this model is therefore manager-only, as the roadmap requires.
+- **Approximations:** `lead_time_days` and `days_since_contract` (creation date as a proxy for the contract date) and `n_substitutions_to_date` (a deleted quote is not always a substitution) are approximations in the product. Their effect on a real installation is untested.
+
+No commercial integration is part of P4. This mapping is a design aid only.

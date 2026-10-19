@@ -35,7 +35,26 @@ def load_config() -> tuple[dict, dict]:
     return agents, tasks
 
 
+@contextlib.contextmanager
+def crew2_storage():
+    """Crew 2's CrewAI app-data folder, set only while the crew is built (restored afterwards)."""
+    saved = os.environ.get("CREWAI_STORAGE_DIR")
+    os.environ["CREWAI_STORAGE_DIR"] = SAFETY_ENV["CREWAI_STORAGE_DIR"]
+    try:
+        yield
+    finally:
+        if saved is None:
+            os.environ.pop("CREWAI_STORAGE_DIR", None)
+        else:
+            os.environ["CREWAI_STORAGE_DIR"] = saved
+
+
 def build_crew(ctx: ToolContext, model: str, recorder: Recorder | None = None):
+    with crew2_storage():
+        return _build_crew(ctx, model, recorder)
+
+
+def _build_crew(ctx: ToolContext, model: str, recorder: Recorder | None = None):
     import warnings
 
     from crewai import Agent, Crew, Process, Task

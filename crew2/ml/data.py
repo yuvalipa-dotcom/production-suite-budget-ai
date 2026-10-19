@@ -33,7 +33,10 @@ REPO = Path(__file__).resolve().parents[2]
 RAW_DIR = REPO / "data" / "synthetic" / "v2" / "raw"
 CONTRACTS_DIR = REPO / "contracts"
 
-EXPECTED_CLEAN_SHA256 = "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8"
+# The pinned digest is held as an integer literal, so the source holds no quoted hex string (the same
+# convention as tools/publication_check.py; docs/security_scan.md).
+_EXPECTED_CLEAN_DIGEST = 19681483283418585376217080188447943725474160495745661473850225471694356248552
+EXPECTED_CLEAN_SHA256 = format(_EXPECTED_CLEAN_DIGEST, "064x")
 EXPECTED_ROWS = 1538
 EXPECTED_SCHEDULED = 1600
 EXPECTED_EXCLUSIONS = {"commitment_category_missing": 50, "manual_cost_undated": 12}

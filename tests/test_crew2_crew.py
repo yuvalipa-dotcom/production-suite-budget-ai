@@ -58,9 +58,18 @@ def test_three_agents_with_their_own_tools_and_limits(built):
     assert [t.name for t in crew.tasks] == ["prepare_and_prove_features", "train_and_select", "evaluate_and_document"]
 
 
-def test_safety_environment_is_forced():
-    assert os.environ["CREWAI_DISABLE_TELEMETRY"] == "true" and os.environ["CREWAI_TRACING_ENABLED"] == "false"
-    assert os.environ["CREWAI_STORAGE_DIR"] == crew2.SAFETY_ENV["CREWAI_STORAGE_DIR"] == "psba-crew2"
+def test_safety_environment_is_forced_without_changing_crew1_settings(tmp_path):
+    import crew1
+    for k, v in crew2.IMPORT_ENV.items():
+        assert os.environ[k] == v == crew1.SAFETY_ENV[k]
+    assert os.environ.get("CREWAI_STORAGE_DIR") == crew1.SAFETY_ENV["CREWAI_STORAGE_DIR"]   # importing crew2 kept it
+    from crew2.crew import crew2_storage, isolated_process_state
+    with crew2_storage():
+        assert os.environ["CREWAI_STORAGE_DIR"] == "psba-crew2"
+    assert os.environ["CREWAI_STORAGE_DIR"] == crew1.SAFETY_ENV["CREWAI_STORAGE_DIR"]
+    (tmp_path / "tmp").mkdir()
+    with isolated_process_state(tmp_path) as env:
+        assert env["CREWAI_STORAGE_DIR"] == "psba-crew2" and env["CREWAI_DISABLE_TELEMETRY"] == "true"
 
 
 def test_tool_arguments_are_typed_and_strict_schema_safe(built):
