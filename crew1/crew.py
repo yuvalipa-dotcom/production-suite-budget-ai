@@ -106,7 +106,8 @@ class Recorder:
             return value
         return self._clean(str(value))
 
-    def add(self, kind: str, **fields) -> None:
+    def add(self, kind: str, /, **fields) -> None:
+        # Positional-only, so a recorded field may itself be named "kind" (as agent steps are).
         self.events.append({"seq": len(self.events) + 1, "t": round(time.monotonic() - self.t0, 3), "event": kind,
                             **self._clean(fields)})
 

@@ -83,6 +83,20 @@ def test_limits_and_temperature(built):
         assert a.llm.model == DEFAULT_MODEL
 
 
+def test_the_wired_step_callback_records_crewai_steps(built):
+    """Regression (p3-live-001): the step callback raised "Recorder.add() got multiple values for argument 'kind'"."""
+    from crewai.agents.parser import AgentAction, AgentFinish
+    crew, _ = built
+    callback = crew.agents[0].step_callback
+    recorder = callback.__self__
+    before = len(recorder.events)
+    callback(AgentAction(thought="t", tool="load_raw_table", tool_input="{}", text="x", result="ok"))
+    callback(AgentFinish(thought="", output="done", text="done"))
+    steps = recorder.events[before:]
+    assert [(e["event"], e["kind"]) for e in steps] == [("agent_step", "AgentAction"), ("agent_step", "AgentFinish")]
+    assert steps[0]["tool"] == "load_raw_table" and steps[1]["output"] == "done"
+
+
 def test_telemetry_and_tracing_are_disabled():
     for k, v in crew1.SAFETY_ENV.items():
         assert os.environ.get(k) == v
