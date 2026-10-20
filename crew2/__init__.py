@@ -5,13 +5,17 @@ imported by any of its modules (the same values as Crew 1). Crew 2's own CrewAI 
 folder name is set only while its crew is built and run (``crew2/crew.py``), so importing
 Crew 2 never changes Crew 1's process-wide settings. The deterministic modelling core lives
 in ``crew2.ml`` and never calls an LLM.
+
+Importing this package does not import Crew 1 (P5 strict crew boundary): the file-based Flow
+path (``budget_flow``) uses ``crew2.ml`` without loading any Crew 1 module. The historical P4
+entry points still import Crew 1 where they need it (``crew2.crew``, ``crew2.tools``,
+``crew2.validators``, and ``crew2.ml.data.build_handoff``), and Crew 1 applies its own
+settings when it is imported. The forced values below are identical to Crew 1's.
 """
 
 from __future__ import annotations
 
 import os
-
-import crew1  # noqa: F401  (Crew 1 applies its own settings on import; Crew 2's are applied after them)
 
 SAFETY_ENV = {
     "CREWAI_DISABLE_TELEMETRY": "true",

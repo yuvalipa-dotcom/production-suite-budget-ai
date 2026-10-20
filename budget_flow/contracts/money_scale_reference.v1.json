@@ -1,0 +1,105 @@
+{
+  "version": "money_scale_reference.v1",
+  "synthetic": true,
+  "description": "Pinned scale reference for the monetary columns of a Crew-1 handoff (Flow contract flow-1). statistic is the median of absolute values, or the nearest-rank p90 of absolute values when the median is 0; TRAIN rows only.",
+  "source": {
+    "run": "p3-live-005",
+    "file": "artifacts/crew1/p3-live-005/clean_data.csv",
+    "identity": "byte-identical to the pinned P4 input (crew2.ml.data.EXPECTED_CLEAN_SHA256)",
+    "rows": "train split only",
+    "train_rows": 1084
+  },
+  "currency": {
+    "code": "ILS",
+    "minor_unit": "agora",
+    "minor_units_per_major": 100,
+    "amount_scale": "major units (shekels), not agorot",
+    "vat_basis": "pre-VAT"
+  },
+  "band": [
+    0.5,
+    2.0
+  ],
+  "columns": {
+    "budget_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "statistic": "median_abs",
+      "value": 230000.0,
+      "n": 1084,
+      "median_abs": 230000.0,
+      "p90_abs": 436000.0
+    },
+    "fee_contract_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "statistic": "median_abs",
+      "value": 24269.695,
+      "n": 1084,
+      "median_abs": 24269.695,
+      "p90_abs": 52000.0
+    },
+    "planned_total_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "statistic": "median_abs",
+      "value": 191400.85,
+      "n": 1084,
+      "median_abs": 191400.85,
+      "p90_abs": 367828.0
+    },
+    "manual_costs_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "statistic": "p90_abs",
+      "value": 12187.16,
+      "n": 1084,
+      "median_abs": 0.0,
+      "p90_abs": 12187.16
+    },
+    "committed_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "statistic": "median_abs",
+      "value": 126854.66,
+      "n": 1084,
+      "median_abs": 126854.66,
+      "p90_abs": 294409.22
+    },
+    "over_plan_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "statistic": "median_abs",
+      "value": 4581.514999999999,
+      "n": 1084,
+      "median_abs": 4581.514999999999,
+      "p90_abs": 27171.05
+    },
+    "current_position_ils": {
+      "unit": "ILS pre-VAT",
+      "statistic": "median_abs",
+      "value": 65245.315,
+      "n": 1084,
+      "median_abs": 65245.315,
+      "p90_abs": 226898.31
+    },
+    "cost_per_guest_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "statistic": "median_abs",
+      "value": 420.77,
+      "n": 1084,
+      "median_abs": 420.77,
+      "p90_abs": 988.66
+    },
+    "final_cost_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "statistic": "median_abs",
+      "value": 209986.79,
+      "n": 1084,
+      "median_abs": 209986.79,
+      "p90_abs": 404376.7
+    },
+    "budget_gap_ils": {
+      "unit": "ILS pre-VAT",
+      "statistic": "median_abs",
+      "value": 12856.18,
+      "n": 1084,
+      "median_abs": 12856.18,
+      "p90_abs": 43688.72
+    }
+  }
+}

@@ -23,7 +23,6 @@ from pathlib import Path
 
 import pandas as pd
 
-from crew1.tools.cleaning import build_clean_data
 from gate import handoff_spec as H
 from gate.checks import RAW_TABLES
 
@@ -71,6 +70,8 @@ def frozen_split(contracts_dir: Path = CONTRACTS_DIR) -> dict:
 
 def build_handoff(raw_dir: Path = RAW_DIR, contracts_dir: Path = CONTRACTS_DIR) -> tuple[str, dict]:
     """(clean_data.csv text, cleaning log), rebuilt with the deterministic Policy C cleaning function."""
+    from crew1.tools.cleaning import build_clean_data   # imported here: the file-based Flow path never loads Crew 1
+
     raw, manifest_sha = load_raw(raw_dir)
     return build_clean_data(raw, frozen_split(contracts_dir), manifest_sha)
 
