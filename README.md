@@ -12,15 +12,105 @@ probability, and by how much (signed, in ILS)?
 This repository is separate from any commercial product codebase. It contains
 only original code, synthetic data and documentation.
 
+## For the grader
+
+### Disclosures
+
+* **Synthetic data.** Every record is produced by the seeded simulation in `generator/` (seed `42`). No real
+  customer, vendor or event data exists in this repository. Results on this data are not evidence of real-world
+  predictive accuracy.
+* **Scripted model responses.** In the P5 Flow the CrewAI Flow, both crews, their agents and tasks run for real
+  (`crew.kickoff()`), but **every LLM response is scripted**: an in-process transport (`crew_common/scripted.py`)
+  answers each model request from a fixed script, marked `[SCRIPTED RESPONSE - not LLM inference]`. No model
+  inference, no network call, no API key. Every number, check, fit and artifact is computed by deterministic
+  Python tools. (P3's approved handoff `artifacts/crew1/p3-live-005/` came from one owner-approved live run.)
+* **Instructor approval.** _[OWNER TO COMPLETE before publication: what the instructor approved (for example the
+  synthetic dataset and the scripted LLM transport), by whom and when.]_
+* **AI assistance.** The code and documentation were developed with AI coding assistance (Claude Code) under the
+  owner's direction and review; see [AI assistance](#ai-assistance).
+
+### 5-minute quickstart (Windows, Python 3.13)
+
+See the verified results without running anything (the app has its own small environment):
+
+```
+git clone https://github.com/yuvalipa-dotcom/production-suite-budget-ai.git
+cd production-suite-budget-ai
+py -3.13 -m venv .venv-app
+.venv-app\Scripts\python -m pip install -r requirements-app.txt
+.venv-app\Scripts\streamlit run app\streamlit_app.py
+```
+
+The browser opens at http://localhost:8501 on the committed canonical run `p5e-run-001` (VERIFIED badge: every
+file matches its recorded sha256). Tabs: Overview, Model results, Artifacts, Contract gate demos, Run the full
+Flow, How it works. Nothing runs until you click a button. Stop the app with Ctrl+C.
+
+To run the Flow and the tests yourself, create the ML environment as well (a larger download):
+
+```
+py -3.13 -m venv .venv
+.venv\Scripts\python -m pip install -r requirements-ml.txt
+.venv\Scripts\python -m orchestrator.flow --out out/flow_runs/run-001 --n-jobs 5
+.venv\Scripts\python -m orchestrator.flow --out out/flow_runs/break-money --scenario money_x100
+.venv\Scripts\python -m pytest
+.venv-app\Scripts\python -m pytest app/tests -q
+```
+
+| Command | Expected | Time (reference machine) |
+|---|---|---|
+| Flow, normal run | `PASS`, exit code 0, 8 required outputs in `out/flow_runs/run-001/` | about 4–8 minutes (the TRAIN-only model selection: 9 pre-registered grouped-CV runs) |
+| Flow, `--scenario money_x100` | `STOPPED_CONTRACT`, exit code 3; Crew 2 never starts | about 15–25 seconds |
+| `pytest` (all of `tests/`) | all pass; 2 skips are expected on Windows without symlink rights and without a local-only P3 audit record | about 35 minutes (it includes full Flow runs) |
+
+Every Flow run needs a new, empty `--out` folder. The app's **Run the full Flow** and **Contract gate demos**
+buttons start the same commands (they use `.venv\Scripts\python.exe`).
+
+### Requirement → evidence
+
+| Requirement | Where | Tests | PR |
+|---|---|---|---|
+| Reproducible synthetic dataset, split by production | `generator/`, `data/synthetic/v2/`, [`docs/data_generation.md`](docs/data_generation.md), [`docs/split_protocol.md`](docs/split_protocol.md) | `tests/test_determinism.py`, `tests/test_split.py`, `tests/test_leakage_and_time.py` | #1, #2 |
+| Dataset contract and deterministic quality gate | `gate/`, `contracts/`, [`docs/quality_gate.md`](docs/quality_gate.md) | `tests/test_quality_gate.py`, `tests/test_handoff_gate.py` | #3 |
+| Crew 1, data-analyst crew (3 agents): `clean_data.csv`, `eda_report.html`, `insights.md`, `dataset_contract.json` | `crew1/`, `artifacts/crew1/p3-live-005/`, [`docs/crew1.md`](docs/crew1.md) | `tests/test_crew1_*.py` | #4 |
+| Crew 2, data-scientist crew (3 agents): features, model comparison, evaluation, model card | `crew2/`, [`docs/crew2.md`](docs/crew2.md), [`docs/p4_model_card.md`](docs/p4_model_card.md), [`docs/model_selection_rule.md`](docs/model_selection_rule.md) | `tests/test_crew2_*.py` | #5 |
+| File-only boundary: Crew 2 reads only the handoff folder | `budget_flow/`, `orchestrator/guard.py`, [`docs/flow.md`](docs/flow.md) | `tests/test_flow_handoff_boundary.py` | P5 |
+| TRAIN-only Crew 2; TEST never reopened (the P4 TEST result is cited, not recomputed) | `budget_flow/train.py`, `budget_flow/p4_reference.py` | `tests/test_flow_train.py` | P5 |
+| Real CrewAI kickoffs (agents, tasks, events) with the scripted transport | `crew_common/`, `flow_crews/`, `budget_flow/crew2_kickoff.py` | `tests/test_flow_kickoff.py`, `tests/test_crew_common.py` | P5 |
+| One CrewAI Flow: Crew 1 → contract gate → Crew 2, stopping before Crew 2 on a broken contract | `orchestrator/flow.py`, `orchestrator/scenarios.py`, `budget_flow/contract.py` | `tests/test_flow_contract.py`, `tests/test_flow_e2e.py` | P5 |
+| The 8 required outputs of a committed run, with hashes | `flow_evidence/runs/p5e-run-001/` (`crew1/`, `crew2/`, `flow_manifest.json`, `evidence.json`) | `tests/test_app_evidence.py`, `tests/test_flow_e2e.py` | P5 |
+| Five committed contract breaks (rename, money ×100, row deletion, contract column deletion, label leakage) | `flow_evidence/runs/p5e-break-*/` | `tests/test_flow_e2e.py` | P5 |
+| Streamlit demonstration | `app/`, [`docs/app.md`](docs/app.md) | `tests/test_app_evidence.py`, `app/tests/test_app_ui.py` | P5 |
+| Pre-publication security scan | `tools/`, [`docs/security_scan.md`](docs/security_scan.md) | `tests/test_publish_scan*.py`, `tests/test_publication_check*.py` | all |
+
+"P5" is the pull request that publishes the branch `p5-flow`.
+
+### The model file
+
+`flow_evidence/runs/p5e-run-001/crew2/model.joblib` (33,798 bytes; sha256 `053cb987dfef…`, the full value is in
+that run's `evidence.json`) is a **pickle artifact: load it only from this verified repository**, after checking
+its sha256. The Streamlit app never loads it; it shows its metadata only.
+
 ## Status
 
 | Phase | Content | Status |
 |---|---|---|
 | **P1** | Synthetic data generator, tests, documentation | done (branch `p1-synthetic-generator`) |
 | **P1-R / P1-R2** | Remediation: target audit, dataset v2, raw export, reconciliation, reports; Policy C cleaning and outcome-only contract | **branch `p1-remediation`** |
-| P2–P5 | Dataset contract and gate, two CrewAI crews, Flow, Streamlit | not started |
+| **P2** | Dataset contract and deterministic quality gate | done |
+| **P3** | Crew 1: the data-analyst crew | done (PR #4) |
+| **P4** | Crew 2: predictive modelling, validation, single TEST evaluation | done (PR #5) |
+| **P5** | File-only crew boundary, TRAIN-only Crew 2, real CrewAI kickoffs, one CrewAI Flow with a contract gate, Streamlit demo | branch `p5-flow` |
 
 See [`docs/roadmap.md`](docs/roadmap.md).
+
+## P5 the end-to-end Flow and the demo app
+
+One CrewAI Flow runs Crew 1 → contract gate → Crew 2 (TRAIN-only); a failed contract stops the run before Crew 2.
+The CrewAI orchestration and every Python computation are real; **the LLM responses are scripted** (no inference,
+no network). Run `.venv\Scripts\python -m orchestrator.flow --out out/flow_runs/run-001 --n-jobs 5`; see
+[`docs/flow.md`](docs/flow.md). The Streamlit app (own environment) shows the verified canonical run in
+[`flow_evidence/`](flow_evidence/) and starts runs only on request: `.venv-app\Scripts\streamlit run
+app\streamlit_app.py`; see [`docs/app.md`](docs/app.md).
 
 ## P2 deterministic quality gate
 
@@ -107,7 +197,7 @@ docs/                documentation
 
 ## AI assistance
 
-The code in this repository was developed with AI coding assistance (Claude Code), under the owner's direction and review. Commits carry a `Co-Authored-By` trailer that records this.
+The code in this repository was developed with AI coding assistance (Claude Code), under the owner's direction and review. Commits carry a `Co-Authored-By` trailer that records this. The P5 LLM responses are scripted, not generated by a model at run time (see [Disclosures](#disclosures)).
 
 ## Licence
 
