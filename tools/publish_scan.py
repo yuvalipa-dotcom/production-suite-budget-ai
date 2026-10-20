@@ -99,6 +99,19 @@ P3_BASELINE_LINES = {
 }
 APPROVED_COMMIT_IDS = ((APPROVED_GIT_BASELINE, GIT_BASELINE_LINES), (APPROVED_P3_BASELINE, P3_BASELINE_LINES))
 
+# Narrow, documented exemption (P4, owner-approved): the sha256 digest of the deterministic Policy C
+# clean data, as a quoted literal in ONE historical file version (commit b2146c5; later versions hold it
+# as an integer literal). A flagged secret is spared only when ALL hold: (a) the path is exactly the
+# approved path; (b) the finding type is exactly the approved detect-secrets type; (c) the whole line
+# equals the template filled with this one value, and the flagged secret is this value; (d) the value
+# occurs once in the file; (e) the whole file is byte-identical to the approved historical blob (its git
+# blob id). Both values are held as integer literals so this file contains no quoted hex string.
+APPROVED_P4_CLEAN_DIGEST = f"{0x2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8:064x}"
+P4_CLEAN_DIGEST_PATH = "crew2/ml/data.py"
+P4_CLEAN_DIGEST_LINE = 'EXPECTED_CLEAN_SHA256 = "{}"'
+P4_CLEAN_DIGEST_TYPE = "Hex High Entropy String"
+P4_CLEAN_DIGEST_BLOB = f"{0xe0c7b3aefbefe1ce9308fc8ccb17a2e2f573c09f:040x}"
+
 GENERIC_PATTERNS = {
     "env_file_name": re.compile(r"(^|/)\.env(\.|$)"),
     "private_key_block": re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
@@ -206,11 +219,27 @@ def _approved_git_baseline(logical: str, line: str, text: str, secret_value: str
     return False
 
 
+def git_blob_id(data: bytes) -> str:
+    """The git object id of a file's bytes (``git hash-object``)."""
+    return hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
+
+
+def _approved_p4_clean_digest(logical: str, line: str, data: bytes, secret_type: str,
+                              secret_value: str | None) -> bool:
+    """True only for the approved P4 clean-data digest in its one historical file version."""
+    value = APPROVED_P4_CLEAN_DIGEST
+    return (logical == P4_CLEAN_DIGEST_PATH and secret_type == P4_CLEAN_DIGEST_TYPE
+            and line == P4_CLEAN_DIGEST_LINE.format(value) and secret_value == value
+            and data.decode("utf-8", errors="replace").count(value) == 1
+            and git_blob_id(data) == P4_CLEAN_DIGEST_BLOB)
+
+
 def _secret_findings(path_on_disk: Path, logical: str) -> list[dict]:
     coll = SecretsCollection()
     with default_settings():
         coll.scan_file(str(path_on_disk))
     out = []
+    data = path_on_disk.read_bytes()
     text = path_on_disk.read_text(encoding="utf-8", errors="replace")
     lines = text.splitlines()
     for _, secret in coll:
@@ -219,6 +248,8 @@ def _secret_findings(path_on_disk: Path, logical: str) -> list[dict]:
             continue
         value = getattr(secret, "secret_value", None)
         if _approved_digest(logical, line, text, value) or _approved_git_baseline(logical, line, text, value):
+            continue
+        if _approved_p4_clean_digest(logical, line, data, secret.type, value):
             continue
         out.append({"file": logical, "line": secret.line_number, "rule": secret.type})
     return out

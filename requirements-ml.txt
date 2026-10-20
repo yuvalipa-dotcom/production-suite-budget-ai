@@ -1,0 +1,8 @@
+# Crew 2 (P4) ML dependencies, pinned to the versions resolved and installed into .venv on 2026-10-19.
+# Install with: .venv\Scripts\python -m pip install -r requirements-ml.txt
+# Top-level addition: scikit-learn==1.9.1. Below it, its resolved transitive dependencies, pinned for reproducibility.
+-r requirements-crew.txt
+scikit-learn==1.9.1
+joblib==1.6.0
+scipy==1.18.1
+threadpoolctl==3.7.0
