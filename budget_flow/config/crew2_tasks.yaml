@@ -1,0 +1,48 @@
+# Crew 2 tasks for the Flow (P5-D), run sequentially: T1 -> T2 -> T3. ALL DATA IS SYNTHETIC.
+# Every check, fit, selection and artifact comes from deterministic Python tools.
+
+validate_handoff_and_features:
+  agent: handoff_validator
+  description: >
+    Validate the delivered Crew 1 handoff and prepare the features.
+
+    1. Call validate_handoff.
+    2. Call write_features.
+
+    Then report the contract result, the row counts per split and the feature table written, using only
+    numbers your tools returned.
+  expected_output: >
+    A short plain-text report: contract version and violations, rows per split, test vault state, and the
+    features.csv summary (rows, 27 features, no outcome column).
+
+train_select_and_fit:
+  agent: train_only_modeler
+  context: [validate_handoff_and_features]
+  description: >
+    Run the pre-registered TRAIN-only protocol.
+
+    1. Call check_preregistration.
+    2. Call list_runs.
+    3. Call run_grouped_cv once for EVERY run id that list_runs returns (9 runs).
+    4. Call apply_selection_rule. It takes no argument; the rule selects the model.
+    5. Call fit_final_models.
+    6. Call verify_reproducibility.
+
+    Never choose or re-rank a model yourself and never call a tool of another agent.
+  expected_output: >
+    A plain-text summary: the selected candidate and the rule step that decided it, its parameters, and the
+    reproducibility verdict against the approved P4 cross-validation.
+
+write_and_verify_artifacts:
+  agent: evaluation_author
+  context: [validate_handoff_and_features, train_select_and_fit]
+  description: >
+    Produce and verify the Crew 2 artifacts.
+
+    1. Call write_model.
+    2. Call write_evaluation_report.
+    3. Call write_model_card.
+    4. Call verify_artifacts and report every check it returns.
+  expected_output: >
+    A short confirmation that model.joblib, evaluation_report.md and model_card.md were written, and the
+    result of every artifact check (including features.csv and the sealed test vault).
