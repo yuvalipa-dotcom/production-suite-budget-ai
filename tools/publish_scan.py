@@ -112,6 +112,81 @@ P4_CLEAN_DIGEST_LINE = 'EXPECTED_CLEAN_SHA256 = "{}"'
 P4_CLEAN_DIGEST_TYPE = "Hex High Entropy String"
 P4_CLEAN_DIGEST_BLOB = f"{0xe0c7b3aefbefe1ce9308fc8ccb17a2e2f573c09f:040x}"
 
+# Narrow, documented exemption (P5-F, proposed for owner approval): the sha256 provenance digests in 29 JSON
+# records of the six canonical Flow runs under flow_evidence/runs/ (verified independently: each value is the
+# sha256 of a file, a pinned P4 model digest, or a reproducible digest of a scripted LLM request or of a run's
+# tampered handoff copy; docs/security_scan.md). A finding is spared only when ALL hold: (a) the path is exactly
+# an approved path; (b) the whole file is byte-identical to its approved blob (git blob id); (c) the finding type
+# is exactly the approved detect-secrets type; (d) the whole flagged line is one key with a lowercase hex-64
+# value; (e) every JSON location holding that value matches an approved location pattern of that file, and one
+# of them ends in the line's key (a manifest may list one output digest under two approved keys); (f) the value
+# occurs in the file exactly as often as at those locations. In a pattern, "#"
+# is any list index and "*" any key that is a plain name (a file name or a model role). Blob ids are integer
+# literals, so this file contains no quoted hex string.
+P5_EVIDENCE = "flow_evidence/runs"
+P5_DIGEST_TYPE = "Hex High Entropy String"
+P5_DIGEST_LOCATIONS = {   # file inside a run: approved JSON location patterns of its digests
+    "crew1/crew_kickoff.json": (("handoff_sha256", "*"), ("llm_transport", "exchanges", "#", "request_sha256")),
+    "crew1/dataset_contract.json": (("raw_manifest_sha256",),),
+    "crew1/gate_result.json": (("input_sha256s", "*"),),
+    "crew2/crew_kickoff.json": (("llm_transport", "exchanges", "#", "request_sha256"),),
+    "crew2/run_manifest.json": (("artifacts", "*", "sha256"), ("input_sha256", "*"),
+                                ("selected_model", "model_sha256", "*")),
+    "evidence.json": (("files_sha256", "*"), ("omitted_sha256", "*")),
+    "flow_manifest.json": (("crew1", "outputs_sha256", "*"), ("crew2", "input_sha256", "*"),
+                           ("crew2", "selected_model", "model_sha256", "*"), ("required_outputs_sha256", "*")),
+    "handoff/flow_contract.json": (("base_contract", "sha256"), ("clean_data", "sha256"), ("reference", "sha256")),
+    "handoff/gate_report.json": (("validated_files_sha256", "*"),),
+}
+_P5_BLOBS = {
+    "p5e-break-column_rename": {
+        "crew1/crew_kickoff.json": 0x8172b7184e8e1ee82bfb738decec3c57234f27bd,
+        "evidence.json": 0x0e5994b61617e346b21baa2bbfa65f967ee4c5c9,
+        "flow_manifest.json": 0xcb1d450d085bce6e241966fbeb55797e85e2dceb,
+        "handoff/gate_report.json": 0xd1411d64170be08d2b3e524c3e6f98cfded991c3,
+    },
+    "p5e-break-contract_column_deletion": {
+        "crew1/crew_kickoff.json": 0xae32a90a132c8d871114217801f4737444e5655a,
+        "evidence.json": 0x8da4873fd1956fe18c0ab55d79f32f471e82e732,
+        "flow_manifest.json": 0x7c01e6fcb210d391a603720983e4a13166d0e003,
+        "handoff/gate_report.json": 0x4adb536c6ce9695a9f681e6ec7672a8eb3bf322d,
+    },
+    "p5e-break-label_leakage": {
+        "crew1/crew_kickoff.json": 0x903cfac4f37dbc524866a41d48f927efc65106cf,
+        "evidence.json": 0xe05d144ce74af527b4e7f745467f683d928c37d5,
+        "flow_manifest.json": 0x6b1aab3d5a72d6b9eb762391e67a03348394dc72,
+        "handoff/gate_report.json": 0x7507e0499023dc7c27f8d0910edcb0b398ee0bd3,
+    },
+    "p5e-break-money_x100": {
+        "crew1/crew_kickoff.json": 0xc43d3e00281cf0fc9b266a9bd9d350839c110916,
+        "evidence.json": 0x2f476d21314fb8c9c98ff57915a14e9eb95c339a,
+        "flow_manifest.json": 0x2f0723e56cb09e1c37fbc7e6f79da295abb0da73,
+        "handoff/gate_report.json": 0x4bcb9495bf3fbcebf4e505f2d8744321f7d17011,
+    },
+    "p5e-break-row_deletion": {
+        "crew1/crew_kickoff.json": 0xf2080776e5e5c3f32e0777adc111da16c021c53d,
+        "evidence.json": 0x550c3a01e0b337b28d475f5e57f10b81abddd4a3,
+        "flow_manifest.json": 0x2cb12823071ce4b32048661f1e523fa1d3ac356f,
+        "handoff/gate_report.json": 0x1508fb60954b575d56aa00944d037c1ad34b44bf,
+    },
+    "p5e-run-001": {
+        "crew1/crew_kickoff.json": 0x768219fa823c7750b8fbacfb26064e08692f1d9f,
+        "crew1/dataset_contract.json": 0xfd25d7d2aae89de157729d1eb48a0ab65f15951a,
+        "crew1/gate_result.json": 0xe23e3aa53902ab88e18e62096d94df9e583c504b,
+        "crew2/crew_kickoff.json": 0xe6feccb9b1bb769160fc7dfb8a8afbe73518f78d,
+        "crew2/run_manifest.json": 0x00d5eec1c288466058dc664b2e043f096f7fdfee,
+        "evidence.json": 0x3de90044396988131a57f05de46213e263c31fa1,
+        "flow_manifest.json": 0x5075856a964349b148bc9ca064cbc070658b5ef1,
+        "handoff/flow_contract.json": 0xe542d5c05cace6436f7aa50ef0e8e4e35680d969,
+        "handoff/gate_report.json": 0xa93ff1a6eb73e29dd41da8bb6b2812a5344eef2b,
+    },
+}
+APPROVED_P5_FLOW_DIGESTS = {   # path: (git blob id, approved JSON location patterns)
+    f"{P5_EVIDENCE}/{run}/{rel}": (f"{blob:040x}", P5_DIGEST_LOCATIONS[rel])
+    for run, files in _P5_BLOBS.items() for rel, blob in files.items()
+}
+P5_PLAIN_KEY = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_./\-]*")
+
 GENERIC_PATTERNS = {
     "env_file_name": re.compile(r"(^|/)\.env(\.|$)"),
     "private_key_block": re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
@@ -195,6 +270,42 @@ def _approved_p3_run_digest(logical: str, data: bytes, finding: dict) -> bool:
     return len(at) == 1 and _json_at(json.loads(text), at[0]) == m["value"] and text.count(m["value"]) == 1
 
 
+def _json_paths_of(doc, value, path=()):
+    """Every JSON location (keys and list indices) whose value equals ``value``."""
+    if isinstance(doc, dict):
+        for k, v in doc.items():
+            yield from _json_paths_of(v, value, path + (k,))
+    elif isinstance(doc, list):
+        for i, v in enumerate(doc):
+            yield from _json_paths_of(v, value, path + (i,))
+    elif doc == value:
+        yield path
+
+
+def _p5_location_ok(loc: tuple, patterns: tuple) -> bool:
+    def fits(pattern):
+        return len(pattern) == len(loc) and all(
+            (isinstance(k, int) and not isinstance(k, bool)) if p == "#" else
+            (isinstance(k, str) and bool(P5_PLAIN_KEY.fullmatch(k))) if p == "*" else k == p
+            for p, k in zip(pattern, loc))
+    return any(fits(p) for p in patterns)
+
+
+def _approved_p5_flow_digest(logical: str, data: bytes, finding: dict) -> bool:
+    """True only for an approved digest in an unchanged canonical Flow evidence file (see APPROVED_P5_FLOW_DIGESTS)."""
+    approved = APPROVED_P5_FLOW_DIGESTS.get(logical)
+    if not approved or finding["rule"] != P5_DIGEST_TYPE or git_blob_id(data) != approved[0]:
+        return False
+    text = data.decode("utf-8")
+    lines = text.splitlines()
+    m = DIGEST_FIELD_LINE.match(lines[finding["line"] - 1]) if 0 < finding["line"] <= len(lines) else None
+    if not m:
+        return False
+    at = list(_json_paths_of(json.loads(text), m["value"]))
+    return (all(_p5_location_ok(loc, approved[1]) for loc in at) and any(loc[-1] == m["key"] for loc in at)
+            and text.count(m["value"]) == len(at))
+
+
 def _approved_digest(logical: str, line: str, text: str, secret_value: str | None) -> bool:
     """True only for an approved digest structure (see APPROVED_DIGEST_FIELDS)."""
     fields = APPROVED_DIGEST_FIELDS.get(logical)
@@ -262,7 +373,8 @@ def _scan_tree(files: dict[str, bytes], deny: Denylist, label: str) -> dict:
             disk = Path(tmp) / logical
             disk.parent.mkdir(parents=True, exist_ok=True)
             disk.write_bytes(blob)
-            secrets += [f for f in _secret_findings(disk, logical) if not _approved_p3_run_digest(logical, blob, f)]
+            secrets += [f for f in _secret_findings(disk, logical)
+                        if not _approved_p3_run_digest(logical, blob, f) and not _approved_p5_flow_digest(logical, blob, f)]
             content += _content_findings(logical, blob.decode("utf-8", errors="replace"), deny)
     return {"tree": label, "files": len(files), "secret_findings": secrets, "content_findings": content}
 

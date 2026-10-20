@@ -142,3 +142,49 @@ Both approved values are held in the scanner as integer literals, so the scanner
 **Scan result** (P4 closure, all local branches, every reachable commit including `b2146c5`, plus the tracked working tree): 52 commits, 233 distinct blob/path pairs, **0 secret findings, 0 content findings**.
 - The private denylist was not applied (0 entries). It is kept outside this worktree, and the P4 instruction limits work to this worktree.
 - That denylist scan must still be run before publication.
+
+## P5-F exemption: the provenance digests of the canonical Flow evidence (proposed, awaiting owner approval)
+
+**Finding.** Scanning the P5 publication candidate (every tracked file plus every untracked, non-ignored file) flagged **248** `Hex High Entropy String` findings, all in **29 JSON records** of the six canonical Flow runs under `flow_evidence/runs/` (`p5e-run-001` and the five `p5e-break-*` runs). There were no other secret findings and no content findings. No finding was in source code, documentation or tests.
+
+**Why none is a secret.** Every flagged line is one key with a lowercase hex-64 value. All 248 values were verified independently:
+
+| Kind | Count | Verification |
+|---|---|---|
+| sha256 of a file in the publication set (run outputs, handoff copies, committed inputs) | 130 | recomputed from the files |
+| `model_sha256` of the two final models | 4 | equal to the P4 digests pinned in `budget_flow/p4_reference.py`; the shipped `model.joblib` also reproduces the pinned P4 TRAIN predictions of both models (max difference 1.1e-16 on 1,084 rows) |
+| `request_sha256`: sha256 of each request body sent to the in-process scripted LLM transport (`crew_common/scripted.py`) | 107 | reproduced exactly by independent runs (five fresh break runs and an earlier full app run) |
+| `validated_files_sha256` of a break run's tampered handoff copy (not exported on purpose) | 7 | reproduced exactly by fresh runs of the same scenario |
+
+No key is used anywhere in the Flow (the model responses are scripted; there is no network call), so no request body contains a credential, and a sha256 digest grants no access in any case.
+
+**Exact scope** (`tools/publish_scan.py`, `_approved_p5_flow_digest`), the same design as the p3-live-005 rule. A finding is spared only when **all** of these hold:
+1. the path is exactly one of the 29 approved paths under `flow_evidence/runs/`;
+2. the whole file is byte-identical to its approved blob (git blob id, held as an integer literal), so any change to a run record, inside or outside the digests, removes the exemption;
+3. the finding type is exactly `Hex High Entropy String`;
+4. the whole flagged line is one key with a lowercase hex-64 value;
+5. every JSON location holding that value matches an approved location pattern of that file (for example `files_sha256.<file name>` or `llm_transport.exchanges[<index>].request_sha256`), and one of them ends in the line's key;
+6. the value occurs in the file exactly as often as at those locations.
+
+There is no value or pattern allow-list, no other file type, and no other run. The earlier exemptions are unchanged.
+
+**Proof.** `tests/test_publish_scan_p5.py`:
+- each of the 29 files is flagged without the exemption (248 findings in total) and spared with it;
+- every spared value is classified as above (130 / 4 / 107 / 7); `tests/test_flow_e2e.py` asserts that a fresh run reproduces the request digests and the break runs' gate digests;
+- a different digest in an approved slot, any other edit, and the same bytes at any other path (a local run, another run id, another file name) are all detected;
+- a planted token and an extra hex value in an approved file are still detected;
+- another finding type, another line and a synthetic file with the approved structure at an approved path are not spared;
+- the location patterns reject string list indices, other keys, other depths and non-plain names.
+
+**Scan result** (P5-F, publication candidate in the working tree, 257 files): **0 secret findings, 0 content findings.** The private denylist was not applied (0 entries; it is kept outside this worktree) and must still be run before publication.
+
+**Note on re-export.** Re-exporting any canonical run changes its blob ids and voids the exemption for that file by design; a new export needs a new owner-approved review.
+
+## P5-G: the publication candidate is a parameter
+
+The dry-run checker's fixed branch list is unchanged (the W-3, P2, P3 and P4 branches). A later candidate is named
+per run with `--candidate-branch <name>` instead of being written into the code. The name must be a later phase
+branch (`p5-…` and above, lowercase, hyphen-separated), never a fixed branch or another name. The candidate gets
+the same ref, history, working-tree, path and object checks, and it must descend from `CANDIDATE_BASELINE`, the
+published `main` after P4 (`ea7366f`, the PR #5 merge, held as an integer literal). Tests:
+`tests/test_publication_check_p5.py`.

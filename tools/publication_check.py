@@ -1,7 +1,10 @@
 """Publication dry-run checks on a disposable clone (refs, history scans, exclusions, objects, ignores).
 
     python tools/publication_check.py --clone <dry-run clone> --origin-repo <academic repo>
-        --denylist <private list> --out <raw output json, outside the clone>
+        --denylist <private list> --out <raw output json, outside the clone> [--candidate-branch <name>]
+
+--candidate-branch names the one new publication candidate (e.g. the P5 branch) for this dry run. It is checked
+like the fixed branches and must build on CANDIDATE_BASELINE; the fixed list itself is never extended in code.
 
 Run only after the clone's remote has been removed. Writes nothing inside the clone
 except branch checkouts. Prints a summary; full detail goes to --out.
@@ -44,6 +47,11 @@ FORBIDDEN_PATH = re.compile(
     r"|(^|/)\.env(\.[^/]*)?$"
     r"|private_denylist|publish_scan_raw|defect_log|defect_catalogue|process_log"
 )
+# A candidate branch: a later phase branch (e.g. the P5 branch), never a fixed branch or any other name.
+CANDIDATE_BRANCH = re.compile(r"p(?:[5-9]|[1-9][0-9])-[a-z0-9]+(?:-[a-z0-9]+)*")
+# origin/main after the P4 publication (the PR #5 merge). A candidate branch must build on it.
+# Held as an integer literal so that this file gains no quoted hex string (docs/security_scan.md).
+CANDIDATE_BASELINE = f"{0xea7366fc4bf5a07a07d263c52c992e7d8d6e1eb8:040x}"
 LFS_POINTER = b"version https://git-lfs.github.com/spec/"
 MAX_BYTES = 5 * 1024 * 1024
 IGNORE_PROBES = (".env", ".env.local", "config/.env.production", ".venv/x", "venv/x", "env/x",
@@ -59,7 +67,17 @@ def git(repo: Path, *args: str, check: bool = True) -> str:
     return res.stdout
 
 
-def refs_report(clone: Path) -> dict:
+def publication_branches(candidate: str | None = None) -> tuple[str, ...]:
+    """The fixed branch set, plus the one candidate branch named for this run (validated)."""
+    if candidate is None:
+        return PUBLICATION_BRANCHES
+    if not CANDIDATE_BRANCH.fullmatch(candidate) or candidate in PUBLICATION_BRANCHES:
+        raise ValueError(f"not an acceptable candidate branch: {candidate!r}")
+    return PUBLICATION_BRANCHES + (candidate,)
+
+
+def refs_report(clone: Path, branches: tuple[str, ...] = PUBLICATION_BRANCHES) -> dict:
+    expected = {f"refs/heads/{b}" for b in branches}
     refs = set(git(clone, "for-each-ref", "--format=%(refname)").split())
     packed = clone / ".git" / "packed-refs"
     packed_refs = set()
@@ -70,8 +88,8 @@ def refs_report(clone: Path) -> dict:
     return {
         "remotes": git(clone, "remote").split(),
         "refs": sorted(refs | packed_refs),
-        "unexpected_refs": sorted((refs | packed_refs) - EXPECTED_REFS),
-        "missing_refs": sorted(EXPECTED_REFS - refs),
+        "unexpected_refs": sorted((refs | packed_refs) - expected),
+        "missing_refs": sorted(expected - refs),
         "stash": git(clone, "stash", "list").strip(),
         "notes": git(clone, "notes", "list", check=False).strip(),
         "head": git(clone, "symbolic-ref", "HEAD").strip(),
@@ -117,9 +135,9 @@ def tree_checks(clone: Path) -> dict:
             "lfs_pointers": sorted(lfs), "files_over_5mb": sorted(large), "binary_files": sorted(binary)}
 
 
-def worktree_checks(clone: Path, deny) -> list[dict]:
+def worktree_checks(clone: Path, deny, branches: tuple[str, ...] = PUBLICATION_BRANCHES) -> list[dict]:
     out = []
-    for branch in PUBLICATION_BRANCHES:
+    for branch in branches:
         git(clone, "checkout", "-q", branch)
         files = [p for p in clone.rglob("*") if p.is_file() and ".git" not in p.relative_to(clone).parts]
         rel = [p.relative_to(clone).as_posix() for p in files]
@@ -132,7 +150,7 @@ def worktree_checks(clone: Path, deny) -> list[dict]:
             "status_clean": git(clone, "status", "--porcelain").strip() == "",
         })
         out.append(result)
-    git(clone, "checkout", "-q", PUBLICATION_BRANCHES[-1])
+    git(clone, "checkout", "-q", branches[-1])
     return out
 
 
@@ -161,11 +179,11 @@ def message_checks(clone: Path, deny) -> dict:
             "content_findings": content}
 
 
-def objects_report(repo: Path) -> dict:
+def objects_report(repo: Path, branches: tuple[str, ...] = PUBLICATION_BRANCHES) -> dict:
     fsck = git(repo, "fsck", "--unreachable", "--dangling", "--no-reflogs", "--no-progress", check=False)
     lines = [ln for ln in fsck.splitlines() if ln.strip()]
     reflog = git(repo, "reflog", "--all", check=False).splitlines()
-    reachable = git(repo, "rev-list", "--objects", *PUBLICATION_BRANCHES).splitlines()
+    reachable = git(repo, "rev-list", "--objects", *branches).splitlines()
     return {"unreachable_or_dangling": len(lines),
             "unreachable_or_dangling_kinds": sorted({ln.split()[1] for ln in lines if len(ln.split()) > 1}),
             "reflog_entries": len(reflog),
@@ -188,11 +206,17 @@ def main() -> int:
     ap.add_argument("--origin-repo", type=Path, required=True)
     ap.add_argument("--denylist", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--candidate-branch", default=None,
+                    help="the one new publication candidate branch (a later phase branch)")
     args = ap.parse_args()
+    try:
+        branches = publication_branches(args.candidate_branch)
+    except ValueError as exc:
+        raise SystemExit(str(exc))
     if args.out.resolve().is_relative_to(args.clone.resolve()):
         raise SystemExit("--out must be outside the clone")
     deny = scan._denylist(args.denylist)
-    refs = refs_report(args.clone)
+    refs = refs_report(args.clone, branches)
     baseline = baseline_report(args.clone)
     p3_baseline = baseline_report(args.clone, P3_BASELINE, P3_BASELINE_DESCENDANTS)
     p3_baseline["first_parent_is_published_baseline"] = lineage_ok(args.clone)
@@ -200,22 +224,26 @@ def main() -> int:
     p4_baseline["builds_on_p3_baseline"] = subprocess.run(
         ["git", "-C", str(args.clone), "merge-base", "--is-ancestor", P3_BASELINE, P4_BASELINE],
         capture_output=True).returncode == 0
+    candidate = (baseline_report(args.clone, CANDIDATE_BASELINE, (args.candidate_branch,))
+                 if args.candidate_branch else {"baseline": CANDIDATE_BASELINE, "descends": {}, "all_descend": True})
     history, n_commits, n_pairs = scan.scan_history(args.clone, deny)
     trees = tree_checks(args.clone)
-    worktrees = worktree_checks(args.clone, deny)
+    worktrees = worktree_checks(args.clone, deny, branches)
     messages = message_checks(args.clone, deny)
     report = {
         "refs": refs,
         "baseline": baseline,
         "p3_baseline": p3_baseline,
         "p4_baseline": p4_baseline,
+        "candidate_baseline": candidate,
         "history_scan": {"commits": n_commits, "distinct_blob_path_pairs": n_pairs,
                          "secret_findings": [f for r in history for f in r["secret_findings"]],
                          "content_findings": [f for r in history for f in r["content_findings"]]},
         "tree_checks": trees,
         "worktrees": [{k: v for k, v in w.items()} for w in worktrees],
         "messages": messages,
-        "objects": {"clone": objects_report(args.clone), "academic": objects_report(args.origin_repo)},
+        "objects": {"clone": objects_report(args.clone, branches),
+                    "academic": objects_report(args.origin_repo, branches)},
         "ignore": ignore_report(args.clone),
         "private_denylist_entries": len(deny),
     }
@@ -224,7 +252,7 @@ def main() -> int:
     ok = (not refs["remotes"] and not refs["unexpected_refs"] and not refs["missing_refs"]
           and not refs["stash"] and not refs["notes"] and baseline["all_descend"] and p3_baseline["all_descend"]
           and p3_baseline["first_parent_is_published_baseline"]
-          and p4_baseline["all_descend"] and p4_baseline["builds_on_p3_baseline"]
+          and p4_baseline["all_descend"] and p4_baseline["builds_on_p3_baseline"] and candidate["all_descend"]
           and not report["history_scan"]["secret_findings"] and not report["history_scan"]["content_findings"]
           and not trees["forbidden_paths"] and not trees["submodules"] and not trees["lfs_pointers"]
           and not trees["files_over_5mb"]
@@ -239,6 +267,7 @@ def main() -> int:
         "p3_baseline_first_parent_ok": p3_baseline["first_parent_is_published_baseline"],
         "p4_baseline_descends": p4_baseline["descends"],
         "p4_baseline_builds_on_p3_baseline": p4_baseline["builds_on_p3_baseline"],
+        "candidate_branch": args.candidate_branch, "candidate_baseline_descends": candidate["descends"],
         "commits_scanned": n_commits, "distinct_blob_path_pairs": n_pairs,
         "history_secret_findings": len(report["history_scan"]["secret_findings"]),
         "history_content_findings": len(report["history_scan"]["content_findings"]),
