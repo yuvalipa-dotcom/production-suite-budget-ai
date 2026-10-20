@@ -1,0 +1,19 @@
+# Streamlit settings for the demo app (P5-F): local only, no usage statistics.
+
+[browser]
+gatherUsageStats = false
+
+[server]
+address = "localhost"
+headless = true
+runOnSave = false
+
+[client]
+toolbarMode = "minimal"
+
+[theme]
+base = "light"
+primaryColor = "#2563eb"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f3f6fb"
+textColor = "#1f2937"
