@@ -1,0 +1,227 @@
+{
+  "file": "features.csv",
+  "synthetic": true,
+  "encoding": "utf-8, LF, comma-separated, header row",
+  "key": [
+    "production_id",
+    "stage"
+  ],
+  "feature_set": "F27",
+  "n_features": 27,
+  "excluded": {
+    "outcome columns (never present)": [
+      "final_cost_pre_vat",
+      "budget_gap_ils",
+      "is_overrun",
+      "is_material_overrun"
+    ],
+    "research-only features (not in F27)": [
+      "budget_revisions_to_date",
+      "client_direct_share"
+    ],
+    "metadata": [
+      "as_of_date"
+    ]
+  },
+  "columns": {
+    "handoff_row": {
+      "type": "integer",
+      "role": "identifier",
+      "description": "0-based row position in the delivered clean_data.csv"
+    },
+    "production_id": {
+      "type": "string",
+      "role": "identifier",
+      "description": "synthetic production id"
+    },
+    "split": {
+      "type": "string",
+      "role": "split metadata",
+      "allowed": [
+        "demo",
+        "test",
+        "train"
+      ],
+      "description": "frozen split (contracts/frozen_split.json); only train rows are used for fitting"
+    },
+    "cv_fold": {
+      "type": "integer",
+      "role": "split metadata",
+      "range": [
+        -1,
+        4
+      ],
+      "description": "frozen production-grouped CV fold; -1 for every non-train row"
+    },
+    "stage": {
+      "type": "string",
+      "role": "feature (F27)",
+      "allowed": [
+        "S0",
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "archetype": {
+      "type": "string",
+      "role": "feature (F27)",
+      "allowed": [
+        "bar_bat_mitzvah",
+        "conference",
+        "corporate",
+        "wedding"
+      ],
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "event_month": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "lead_time_days": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "unit": "days",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "days_since_contract": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "unit": "days",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "days_to_event": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "unit": "days",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "guest_count": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "unit": "people",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "budget_vat_mode": {
+      "type": "string",
+      "role": "feature (F27)",
+      "allowed": [
+        "excludes_vat",
+        "includes_vat",
+        "no_vat"
+      ],
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "budget_pre_vat": {
+      "type": "number",
+      "role": "feature (F27)",
+      "unit": "ILS pre-VAT",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "fee_included": {
+      "type": "boolean",
+      "role": "feature (F27)",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "fee_mode": {
+      "type": "string",
+      "role": "feature (F27)",
+      "allowed": [
+        "amount",
+        "percent"
+      ],
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "fee_contract_pre_vat": {
+      "type": "number",
+      "role": "feature (F27)",
+      "unit": "ILS pre-VAT",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "planned_total_pre_vat": {
+      "type": "number",
+      "role": "feature (F27)",
+      "unit": "ILS pre-VAT",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "n_categories_planned": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "n_categories_committed": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "n_categories_pending": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "n_commitments_active": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "n_manual_costs": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "manual_costs_pre_vat": {
+      "type": "number",
+      "role": "feature (F27)",
+      "unit": "ILS pre-VAT",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "committed_pre_vat": {
+      "type": "number",
+      "role": "feature (F27)",
+      "unit": "ILS pre-VAT",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "n_categories_over_plan": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "over_plan_pre_vat": {
+      "type": "number",
+      "role": "feature (F27)",
+      "unit": "ILS pre-VAT",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "n_substitutions_to_date": {
+      "type": "integer",
+      "role": "feature (F27)",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "no_vat_share": {
+      "type": "number",
+      "role": "feature (F27)",
+      "unit": "ratio",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "current_position_ils": {
+      "type": "number",
+      "role": "feature (F27)",
+      "unit": "ILS pre-VAT",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "committed_ratio": {
+      "type": "number",
+      "role": "feature (F27)",
+      "unit": "ratio",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    },
+    "cost_per_guest_pre_vat": {
+      "type": "number",
+      "role": "feature (F27)",
+      "unit": "ILS pre-VAT",
+      "description": "as-of-snapshot value from Crew 1's validated handoff"
+    }
+  }
+}

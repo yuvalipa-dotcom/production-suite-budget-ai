@@ -1,0 +1,21 @@
+{
+  "run_id": "p5e-break-contract_column_deletion",
+  "status": "STOPPED_CONTRACT",
+  "scenario": "contract_column_deletion",
+  "synthetic": true,
+  "exported_from": "out/flow_runs (verified before export)",
+  "files_sha256": {
+    "handoff/gate_report.json": "4222748fe2e7516d8c815674be5760581920f5e0357583762b4ce5fcc98fc8f2",
+    "handoff/scenario.json": "f03561b26142c62085ad5b9d8c4269ba4ae43a50a6015c1f1285f0684b0d7be4",
+    "crew1/crew_kickoff.json": "91ae0d29f120d2586fc14955888497d52b442aab41fc90dabbde384c0fd92b5b",
+    "flow_manifest.json": "bed41217580b244301c0f037b27fd1a3412823ee5f502c628c70ab4ac68727a4",
+    "flow_events.jsonl": "bd8adb192c427e3acc68dea583357d033d9b6c7b9fd40fdfbb03b4fa06a8e944"
+  },
+  "omitted_sha256": {
+    "crew1/clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "crew1/eda_report.html": "494a7685603029dfa50b8a95bf4ac4cbbeb81acac03257f07c77b166e867f805",
+    "crew1/insights.md": "6816a705171175c5d0b6515f3cd6b1794ee5ac9dc0287b0303a6e52a2c272a6a",
+    "crew1/dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db"
+  },
+  "omitted_reason": "Crew 1's outputs of a stopped run are not copied (they were verified before export); their sha256 values are recorded here and in flow_manifest.json"
+}

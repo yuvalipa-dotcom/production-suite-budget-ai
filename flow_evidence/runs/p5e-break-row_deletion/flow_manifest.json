@@ -1,0 +1,186 @@
+{
+  "synthetic": true,
+  "status": "STOPPED_CONTRACT",
+  "exit_code": 3,
+  "status_meaning": "the contract gate stopped the run on purpose; Crew 2 never ran and no model was trained",
+  "scenario": "row_deletion",
+  "disclosure": "The CrewAI Flow, both Crews, their Agents and Tasks run for real (crew.kickoff() inside Flow methods). The LLM responses are scripted (scripted in-process transport (no LLM inference, no network)): no model inference takes place. Every number, check, fit and artifact is computed by deterministic Python tools.",
+  "flow": {
+    "class": "BudgetFlow (crewai.flow.flow.Flow)",
+    "flow_id": "b5e88cb5-1f68-4449-bc04-9ed9b7ec52f4",
+    "decorators": {
+      "start": [
+        "run_crew1"
+      ],
+      "listen": [
+        "prepare_handoff",
+        "run_crew2 (route PASS)",
+        "finish_pass (route COMPLETE)",
+        "stop_on_contract (route STOPPED_CONTRACT)",
+        "record_failure (route FAILED_RUNTIME)",
+        "write_manifest (or_ finish_pass, stop_on_contract, record_failure)"
+      ],
+      "router": [
+        "contract_gate",
+        "verify_outputs"
+      ]
+    },
+    "methods_executed": [
+      "run_crew1",
+      "prepare_handoff",
+      "contract_gate",
+      "stop_on_contract",
+      "write_manifest"
+    ],
+    "routes": {
+      "contract_gate": "STOPPED_CONTRACT"
+    },
+    "events": "flow_events.jsonl"
+  },
+  "crew1": {
+    "kickoff": "crew1/crew_kickoff.json",
+    "agents_executed": [
+      "Data Ingestion & Cleaning Engineer",
+      "Exploratory Data Analyst",
+      "Data Contract & Insights Author"
+    ],
+    "crewai_events": {
+      "crew_kickoff_started": 1,
+      "task_started": 3,
+      "agent_execution_started": 3,
+      "llm_call_started": 14,
+      "tool_usage_finished": 31,
+      "task_completed": 3,
+      "agent_execution_completed": 3,
+      "crew_kickoff_completed": 1
+    },
+    "llm_requests": 14,
+    "python_tool_calls": 31,
+    "gate": {
+      "status": "PASS",
+      "checks": 22
+    },
+    "outputs_sha256": {
+      "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+      "eda_report.html": "494a7685603029dfa50b8a95bf4ac4cbbeb81acac03257f07c77b166e867f805",
+      "insights.md": "6816a705171175c5d0b6515f3cd6b1794ee5ac9dc0287b0303a6e52a2c272a6a",
+      "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db"
+    }
+  },
+  "handoff": {
+    "crew1_outputs_missing": [],
+    "as_delivered_sha256": {
+      "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+      "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+      "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+    },
+    "scenario": {
+      "scenario": "row_deletion",
+      "change": "required snapshot row 4 (train, stage S0) deleted from clean_data.csv",
+      "attacker_regenerated_flow_contract": false,
+      "applied_to": "the Flow's isolated handoff copy only (Crew 1 outputs untouched)"
+    },
+    "as_gated_sha256": {
+      "clean_data.csv": "67994f0a5f5ef154c411489420462a270c4dea08f8af70cd43c22a6c3a7d2d68",
+      "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+      "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+    }
+  },
+  "gate": {
+    "contract": "flow-1",
+    "decision": "STOPPED_CONTRACT",
+    "violation_codes": [
+      "CONTENT_DIGEST_MISMATCH",
+      "PROFILE_DECLARATION_MISMATCH",
+      "ROW_COUNT_MISMATCH"
+    ],
+    "violations": [
+      {
+        "code": "ROW_COUNT_MISMATCH",
+        "column": null,
+        "detail": "1537 rows, contract declares 1538"
+      },
+      {
+        "code": "CONTENT_DIGEST_MISMATCH",
+        "column": null,
+        "detail": "clean_data.csv differs from the file the Flow contract was written for"
+      },
+      {
+        "code": "PROFILE_DECLARATION_MISMATCH",
+        "column": "budget_pre_vat",
+        "detail": "declared scale profile differs from the measured TRAIN profile"
+      },
+      {
+        "code": "PROFILE_DECLARATION_MISMATCH",
+        "column": "fee_contract_pre_vat",
+        "detail": "declared scale profile differs from the measured TRAIN profile"
+      },
+      {
+        "code": "PROFILE_DECLARATION_MISMATCH",
+        "column": "planned_total_pre_vat",
+        "detail": "declared scale profile differs from the measured TRAIN profile"
+      },
+      {
+        "code": "PROFILE_DECLARATION_MISMATCH",
+        "column": "manual_costs_pre_vat",
+        "detail": "declared scale profile differs from the measured TRAIN profile"
+      },
+      {
+        "code": "PROFILE_DECLARATION_MISMATCH",
+        "column": "committed_pre_vat",
+        "detail": "declared scale profile differs from the measured TRAIN profile"
+      },
+      {
+        "code": "PROFILE_DECLARATION_MISMATCH",
+        "column": "over_plan_pre_vat",
+        "detail": "declared scale profile differs from the measured TRAIN profile"
+      },
+      {
+        "code": "PROFILE_DECLARATION_MISMATCH",
+        "column": "current_position_ils",
+        "detail": "declared scale profile differs from the measured TRAIN profile"
+      },
+      {
+        "code": "PROFILE_DECLARATION_MISMATCH",
+        "column": "cost_per_guest_pre_vat",
+        "detail": "declared scale profile differs from the measured TRAIN profile"
+      },
+      {
+        "code": "PROFILE_DECLARATION_MISMATCH",
+        "column": "final_cost_pre_vat",
+        "detail": "declared scale profile differs from the measured TRAIN profile"
+      },
+      {
+        "code": "PROFILE_DECLARATION_MISMATCH",
+        "column": "budget_gap_ils",
+        "detail": "declared scale profile differs from the measured TRAIN profile"
+      }
+    ],
+    "violation_count": 12,
+    "validated_files_sha256": {
+      "clean_data.csv": "67994f0a5f5ef154c411489420462a270c4dea08f8af70cd43c22a6c3a7d2d68",
+      "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+      "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+    }
+  },
+  "crew2": {
+    "kickoff_invoked": false,
+    "kickoffs": 0
+  },
+  "required_outputs_sha256": {
+    "crew1/clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "crew1/eda_report.html": "494a7685603029dfa50b8a95bf4ac4cbbeb81acac03257f07c77b166e867f805",
+    "crew1/insights.md": "6816a705171175c5d0b6515f3cd6b1794ee5ac9dc0287b0303a6e52a2c272a6a",
+    "crew1/dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db"
+  },
+  "crew1_outputs_unchanged_by_the_flow": true,
+  "error": null,
+  "timing": {
+    "started_at": "2026-10-20T16:21:02+00:00",
+    "total_seconds": 14.2,
+    "crew1_kickoff": 11.7,
+    "prepare_handoff": 0.1,
+    "contract_gate": 0.1
+  },
+  "n_jobs": 5
+}

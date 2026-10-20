@@ -1,0 +1,6 @@
+{
+  "scenario": "column_rename",
+  "change": "column budget_pre_vat renamed to budget_ils in clean_data.csv",
+  "attacker_regenerated_flow_contract": false,
+  "applied_to": "the Flow's isolated handoff copy only (Crew 1 outputs untouched)"
+}

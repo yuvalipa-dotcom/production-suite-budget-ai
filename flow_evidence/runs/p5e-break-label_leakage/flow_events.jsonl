@@ -1,0 +1,12 @@
+{"event": "flow_started", "flow": "BudgetFlow", "t": 0.009}
+{"event": "method_started", "flow": "BudgetFlow", "method": "run_crew1", "t": 0.01}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "run_crew1", "result": "crew1 done", "t": 11.597}
+{"event": "method_started", "flow": "BudgetFlow", "method": "prepare_handoff", "t": 11.597}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "prepare_handoff", "result": "handoff ready", "t": 11.686}
+{"event": "method_started", "flow": "BudgetFlow", "method": "contract_gate", "t": 11.686}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "contract_gate", "result": "STOPPED_CONTRACT", "t": 11.767}
+{"event": "method_started", "flow": "BudgetFlow", "method": "stop_on_contract", "t": 11.767}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "stop_on_contract", "result": "STOPPED_CONTRACT", "t": 11.769}
+{"event": "method_started", "flow": "BudgetFlow", "method": "write_manifest", "t": 11.769}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "write_manifest", "result": "STOPPED_CONTRACT", "t": 11.773}
+{"event": "flow_finished", "flow": "BudgetFlow", "t": 11.774}

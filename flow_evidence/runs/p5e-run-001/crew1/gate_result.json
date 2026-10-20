@@ -1,0 +1,150 @@
+{
+  "checks": [
+    {
+      "details": "",
+      "id": "G-IN-FILES",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-CONTRACT-SCHEMA",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-CONTRACT-PROVENANCE",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-SCHEMA-COLUMNS",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-SCHEMA-DTYPES",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-ROLES",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-LEAKAGE-OUTCOME",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-KEY-UNIQUE",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-ELIGIBILITY-SET",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-ELIGIBILITY-COUNTS",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-TARGET-GAP",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-TARGET-LABEL",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-TARGET-CONSISTENCY",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-FIN-RECON",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-FIN-ASOF-BUDGET",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-NONFIN-RULES",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-SPLIT-GROUP",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-SPLIT-FOLD",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-NULLS",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "",
+      "id": "G-RANGES",
+      "severity": "HARD",
+      "status": "PASS"
+    },
+    {
+      "details": "row-level is_overrun rate rebuilt from raw, groups from the frozen split; before Policy C eligibility filtering (1600 snapshots): train 44.0% (493/1120), test 59.1% (189/320), demo 46.2% (74/160); after Policy C eligibility filtering (1538 snapshots): train 44.5% (482/1084), test 59.2% (181/306), demo 43.9% (65/148); test minus train: +15.0 pp before, +14.7 pp after (warning at 5.0 pp); historical context, not recomputed: docs/split_report.md records a test-minus-train row-level overrun gap of +15.0 pp for the frozen split",
+      "id": "W-PREVALENCE-IMBALANCE",
+      "severity": "WARN",
+      "status": "WARN"
+    },
+    {
+      "details": "synthetic data; no real-world validation",
+      "id": "I-SYNTHETIC",
+      "severity": "INFO",
+      "status": "PASS"
+    }
+  ],
+  "input_sha256s": {
+    "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "contracts/column_roles.json": "ece753463263717758a5cb110b570f71d326feb909ef2b07db4a33f936bcd552",
+    "contracts/dataset_contract.schema.json": "c2967ecfb2fdeaee8561b97f14826009a13ec9a6ffb6f31409969b555d0ef305",
+    "contracts/frozen_split.json": "064e1909b340a60c946084e0ebaf20fecd2acdce4fcb27930176c532e86158c1",
+    "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+    "raw/manifest.json": "82724a3dcac035ae83795299a9850380c6993dcc2ea837b7e95aa9a11942cef7"
+  },
+  "limitations": [
+    "Offline deterministic validation; synthetic data only.",
+    "Expected values are rebuilt from the raw export under Policy C; no model is validated."
+  ],
+  "stage": "handoff",
+  "status": "PASS"
+}

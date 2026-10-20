@@ -1,0 +1,38 @@
+{
+  "contract": "flow-1",
+  "decision": "STOPPED_CONTRACT",
+  "violation_codes": [
+    "BASE_CONTRACT_COLUMNS",
+    "BASE_CONTRACT_DIGEST_MISMATCH",
+    "COLUMN_SET_MISMATCH",
+    "CONTENT_DIGEST_MISMATCH"
+  ],
+  "violations": [
+    {
+      "code": "BASE_CONTRACT_COLUMNS",
+      "column": null,
+      "detail": "declared columns differ from the approved specification (missing [], extra ['overrun_hint'])"
+    },
+    {
+      "code": "COLUMN_SET_MISMATCH",
+      "column": null,
+      "detail": "missing [], extra ['overrun_hint']"
+    },
+    {
+      "code": "CONTENT_DIGEST_MISMATCH",
+      "column": null,
+      "detail": "clean_data.csv differs from the file the Flow contract was written for"
+    },
+    {
+      "code": "BASE_CONTRACT_DIGEST_MISMATCH",
+      "column": null,
+      "detail": "dataset_contract.json differs from the file the Flow contract was written for"
+    }
+  ],
+  "violation_count": 4,
+  "validated_files_sha256": {
+    "clean_data.csv": "4b5aa47025a58c6f135e9231cf52a2ecbdc3443d4d1dc9657e8116ac7ac13bcf",
+    "dataset_contract.json": "87e631f1c6e7775b80860bdb01e03802f02e5d6a25d1b7f8651608551183a021",
+    "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+  }
+}

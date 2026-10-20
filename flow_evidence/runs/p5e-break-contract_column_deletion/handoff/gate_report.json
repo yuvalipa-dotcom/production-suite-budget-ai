@@ -1,0 +1,26 @@
+{
+  "contract": "flow-1",
+  "decision": "STOPPED_CONTRACT",
+  "violation_codes": [
+    "BASE_CONTRACT_COLUMNS",
+    "BASE_CONTRACT_DIGEST_MISMATCH"
+  ],
+  "violations": [
+    {
+      "code": "BASE_CONTRACT_COLUMNS",
+      "column": null,
+      "detail": "declared columns differ from the approved specification (missing ['budget_pre_vat'], extra [])"
+    },
+    {
+      "code": "BASE_CONTRACT_DIGEST_MISMATCH",
+      "column": null,
+      "detail": "dataset_contract.json differs from the file the Flow contract was written for"
+    }
+  ],
+  "violation_count": 2,
+  "validated_files_sha256": {
+    "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "dataset_contract.json": "0f1494cbae89e4f0205ad1a04947d4b89b631f193824435b0a870d2a3cb1d90c",
+    "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+  }
+}
