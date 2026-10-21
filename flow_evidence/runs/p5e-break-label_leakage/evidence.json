@@ -1,0 +1,21 @@
+{
+  "run_id": "p5e-break-label_leakage",
+  "status": "STOPPED_CONTRACT",
+  "scenario": "label_leakage",
+  "synthetic": true,
+  "exported_from": "out/flow_runs (verified before export)",
+  "files_sha256": {
+    "handoff/gate_report.json": "d7ef7c3c9365f53c4a2ae61de86597518fd6916bef03ff484dd7347c6760b599",
+    "handoff/scenario.json": "a0a192e9e663a4dd63c4dd522b418c8de6a6f9675c94b61e667fc87541e7fdc3",
+    "crew1/crew_kickoff.json": "b3fd147288760bdd50c14e8c6bc11422c83dd7f031b37eaf37401eaef0010309",
+    "flow_manifest.json": "a0a92a2805a26d48a86a2203a775045af249b21cbd9c805d8503f2d704472777",
+    "flow_events.jsonl": "74e2f7600f6d8dafbdcb94f5b92c9876680e9f281c46beb43f38a2a07d326e6a"
+  },
+  "omitted_sha256": {
+    "crew1/clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "crew1/eda_report.html": "494a7685603029dfa50b8a95bf4ac4cbbeb81acac03257f07c77b166e867f805",
+    "crew1/insights.md": "6816a705171175c5d0b6515f3cd6b1794ee5ac9dc0287b0303a6e52a2c272a6a",
+    "crew1/dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db"
+  },
+  "omitted_reason": "Crew 1's outputs of a stopped run are not copied (they were verified before export); their sha256 values are recorded here and in flow_manifest.json"
+}

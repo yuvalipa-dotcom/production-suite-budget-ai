@@ -1,0 +1,77 @@
+{
+  "contract": "flow-1",
+  "decision": "STOPPED_CONTRACT",
+  "violation_codes": [
+    "CONTENT_DIGEST_MISMATCH",
+    "PROFILE_DECLARATION_MISMATCH",
+    "ROW_COUNT_MISMATCH"
+  ],
+  "violations": [
+    {
+      "code": "ROW_COUNT_MISMATCH",
+      "column": null,
+      "detail": "1537 rows, contract declares 1538"
+    },
+    {
+      "code": "CONTENT_DIGEST_MISMATCH",
+      "column": null,
+      "detail": "clean_data.csv differs from the file the Flow contract was written for"
+    },
+    {
+      "code": "PROFILE_DECLARATION_MISMATCH",
+      "column": "budget_pre_vat",
+      "detail": "declared scale profile differs from the measured TRAIN profile"
+    },
+    {
+      "code": "PROFILE_DECLARATION_MISMATCH",
+      "column": "fee_contract_pre_vat",
+      "detail": "declared scale profile differs from the measured TRAIN profile"
+    },
+    {
+      "code": "PROFILE_DECLARATION_MISMATCH",
+      "column": "planned_total_pre_vat",
+      "detail": "declared scale profile differs from the measured TRAIN profile"
+    },
+    {
+      "code": "PROFILE_DECLARATION_MISMATCH",
+      "column": "manual_costs_pre_vat",
+      "detail": "declared scale profile differs from the measured TRAIN profile"
+    },
+    {
+      "code": "PROFILE_DECLARATION_MISMATCH",
+      "column": "committed_pre_vat",
+      "detail": "declared scale profile differs from the measured TRAIN profile"
+    },
+    {
+      "code": "PROFILE_DECLARATION_MISMATCH",
+      "column": "over_plan_pre_vat",
+      "detail": "declared scale profile differs from the measured TRAIN profile"
+    },
+    {
+      "code": "PROFILE_DECLARATION_MISMATCH",
+      "column": "current_position_ils",
+      "detail": "declared scale profile differs from the measured TRAIN profile"
+    },
+    {
+      "code": "PROFILE_DECLARATION_MISMATCH",
+      "column": "cost_per_guest_pre_vat",
+      "detail": "declared scale profile differs from the measured TRAIN profile"
+    },
+    {
+      "code": "PROFILE_DECLARATION_MISMATCH",
+      "column": "final_cost_pre_vat",
+      "detail": "declared scale profile differs from the measured TRAIN profile"
+    },
+    {
+      "code": "PROFILE_DECLARATION_MISMATCH",
+      "column": "budget_gap_ils",
+      "detail": "declared scale profile differs from the measured TRAIN profile"
+    }
+  ],
+  "violation_count": 12,
+  "validated_files_sha256": {
+    "clean_data.csv": "67994f0a5f5ef154c411489420462a270c4dea08f8af70cd43c22a6c3a7d2d68",
+    "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+    "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+  }
+}

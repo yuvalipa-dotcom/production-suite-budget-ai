@@ -1,0 +1,870 @@
+{
+  "synthetic": true,
+  "orchestration": "real CrewAI crew.kickoff(): Crew, 3 Agents, 3 Tasks, sequential process",
+  "llm_responses": "scripted in-process transport (no LLM inference, no network)",
+  "disclosure": "The CrewAI orchestration is real. The model responses are scripted (not LLM inference); every scripted text starts with '[SCRIPTED RESPONSE - not LLM inference]'. Every number, check, fit and artifact was computed by deterministic Python tools (computed_by: python).",
+  "agents": [
+    {
+      "key": "handoff_validator",
+      "role": "Handoff & Feature Validator",
+      "tools": [
+        "validate_handoff",
+        "write_features"
+      ]
+    },
+    {
+      "key": "train_only_modeler",
+      "role": "TRAIN-only Model Trainer",
+      "tools": [
+        "check_preregistration",
+        "list_runs",
+        "run_grouped_cv",
+        "apply_selection_rule",
+        "fit_final_models",
+        "verify_reproducibility"
+      ]
+    },
+    {
+      "key": "evaluation_author",
+      "role": "Evaluation & Ethics Author",
+      "tools": [
+        "write_model",
+        "write_evaluation_report",
+        "write_model_card",
+        "verify_artifacts"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "name": "validate_handoff_and_features",
+      "agent": "Handoff & Feature Validator"
+    },
+    {
+      "name": "train_select_and_fit",
+      "agent": "TRAIN-only Model Trainer"
+    },
+    {
+      "name": "write_and_verify_artifacts",
+      "agent": "Evaluation & Ethics Author"
+    }
+  ],
+  "task_outputs": [
+    {
+      "task": "validate_handoff_and_features",
+      "agent": "Handoff & Feature Validator",
+      "source": "scripted",
+      "text": "[SCRIPTED RESPONSE - not LLM inference] Handoff accepted under contract flow-1 with 0 violations: train 1084, test 306, demo 148 rows; non-train labels redacted; test vault sealed. features.csv written with 27 features and no outcome column. (Values quoted from the tool results by the script.)"
+    },
+    {
+      "task": "train_select_and_fit",
+      "agent": "TRAIN-only Model Trainer",
+      "source": "scripted",
+      "text": "[SCRIPTED RESPONSE - not LLM inference] The pre-registered rule selected LR (lowest mean grouped-CV Brier), parameters {'C': 10.0}, refit on 1084 train rows. Reproduction of the approved P4 CV: exact, ok=True. (Values quoted from the tool results by the script.)"
+    },
+    {
+      "task": "write_and_verify_artifacts",
+      "agent": "Evaluation & Ethics Author",
+      "source": "scripted",
+      "text": "[SCRIPTED RESPONSE - not LLM inference] model.joblib, evaluation_report.md and model_card.md written; 13 artifact checks passed, test vault sealed and unopened. (Values quoted from the tool results by the script.)"
+    }
+  ],
+  "crewai_events": {
+    "crewai_version": "1.15.28",
+    "event_counts": {
+      "crew_kickoff_started": 1,
+      "task_started": 3,
+      "agent_execution_started": 3,
+      "llm_call_started": 23,
+      "tool_usage_finished": 20,
+      "task_completed": 3,
+      "agent_execution_completed": 3,
+      "crew_kickoff_completed": 1
+    },
+    "agents_executed": [
+      "Handoff & Feature Validator",
+      "TRAIN-only Model Trainer",
+      "Evaluation & Ethics Author"
+    ],
+    "tasks_completed": [
+      "validate_handoff_and_features",
+      "train_select_and_fit",
+      "write_and_verify_artifacts"
+    ],
+    "tools_by_agent": {
+      "Handoff & Feature Validator": [
+        "validate_handoff",
+        "write_features"
+      ],
+      "TRAIN-only Model Trainer": [
+        "check_preregistration",
+        "list_runs",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "apply_selection_rule",
+        "fit_final_models",
+        "verify_reproducibility"
+      ],
+      "Evaluation & Ethics Author": [
+        "write_model",
+        "write_evaluation_report",
+        "write_model_card",
+        "verify_artifacts"
+      ]
+    },
+    "events": [
+      {
+        "event": "crew_kickoff_started",
+        "crew": "crew"
+      },
+      {
+        "event": "task_started",
+        "task": "validate_handoff_and_features",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "validate_handoff",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "write_features",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "task_completed",
+        "task": "validate_handoff_and_features",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "task_started",
+        "task": "train_select_and_fit",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "check_preregistration",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "list_runs",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "apply_selection_rule",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "fit_final_models",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "verify_reproducibility",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "task_completed",
+        "task": "train_select_and_fit",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "task_started",
+        "task": "write_and_verify_artifacts",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "write_model",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "write_evaluation_report",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "write_model_card",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "verify_artifacts",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "task_completed",
+        "task": "write_and_verify_artifacts",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "crew_kickoff_completed",
+        "crew": "crew"
+      }
+    ]
+  },
+  "llm_transport": {
+    "source": "scripted in-process transport (no LLM inference, no network)",
+    "requests": 23,
+    "requests_by_agent": {
+      "handoff_validator": 3,
+      "train_only_modeler": 15,
+      "evaluation_author": 5
+    },
+    "forced_final_answers": {
+      "handoff_validator": 0,
+      "train_only_modeler": 0,
+      "evaluation_author": 0
+    },
+    "network_attempts_blocked": [],
+    "scripted_mark": "[SCRIPTED RESPONSE - not LLM inference]",
+    "exchanges": [
+      {
+        "n": 1,
+        "agent": "handoff_validator",
+        "source": "scripted",
+        "request_sha256": "69b6e6225ce60c26974953e1062a88e44f1f3052689113d4da3e116a600c9a50",
+        "request_messages": 1,
+        "tools_offered": [
+          "validate_handoff",
+          "write_features"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "validate_handoff"
+        ],
+        "text": null
+      },
+      {
+        "n": 2,
+        "agent": "handoff_validator",
+        "source": "scripted",
+        "request_sha256": "a9a81090b5b50b75d12dc6d913ee930e59e43f876802e43be45fc50b800c9d72",
+        "request_messages": 3,
+        "tools_offered": [
+          "validate_handoff",
+          "write_features"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "write_features"
+        ],
+        "text": null
+      },
+      {
+        "n": 3,
+        "agent": "handoff_validator",
+        "source": "scripted",
+        "request_sha256": "2f5f25a568be010ac510c81e77424925bfaf4fe5c8871596f1d52fc1794bb993",
+        "request_messages": 5,
+        "tools_offered": [
+          "validate_handoff",
+          "write_features"
+        ],
+        "response": "final_text",
+        "tool_calls": [],
+        "text": "[SCRIPTED RESPONSE - not LLM inference] Handoff accepted under contract flow-1 with 0 violations: train 1084, test 306, demo 148 rows; non-train labels redacted; test vault sealed. features.csv written with 27 features and no outcome column. (Values quoted from the tool results by the script.)"
+      },
+      {
+        "n": 4,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "a00385970f5e0750925b3ed538948298cb5d32fa537f3062566624c7e950f75f",
+        "request_messages": 1,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "check_preregistration"
+        ],
+        "text": null
+      },
+      {
+        "n": 5,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "e46ae4ccec7b54d6b547a2bbb3b07fa1dec6ec2bb48e9908ae45e764a0620aef",
+        "request_messages": 3,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "list_runs"
+        ],
+        "text": null
+      },
+      {
+        "n": 6,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "7c8a891bb61952d16474d8b825fab09089e8ccc3be9e304842443a7d85719728",
+        "request_messages": 5,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "run_grouped_cv"
+        ],
+        "text": null
+      },
+      {
+        "n": 7,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "ee1c45a3e1e3344faae74a19afe95bc10e891f17adfcc0684cd253bb2bc2ed1f",
+        "request_messages": 7,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "run_grouped_cv"
+        ],
+        "text": null
+      },
+      {
+        "n": 8,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "bdae88ab46e34a39949adef5bddc76679b059993e15e5bb6ed49af368e7b9b8c",
+        "request_messages": 9,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "run_grouped_cv"
+        ],
+        "text": null
+      },
+      {
+        "n": 9,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "dde6a0a2cdb3c9617cbed30daa790b55cdcb6ff1cbda23282c3eedfefaf58f5c",
+        "request_messages": 11,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "run_grouped_cv"
+        ],
+        "text": null
+      },
+      {
+        "n": 10,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "5c69ca51964ab252b9775d683d9280a5f541fd8232a47dfab1752fc1e4a44437",
+        "request_messages": 13,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "run_grouped_cv"
+        ],
+        "text": null
+      },
+      {
+        "n": 11,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "d2a86972eadf61546605a9b778f6cb5380abd65105bea8624e6bc1a614940985",
+        "request_messages": 15,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "run_grouped_cv"
+        ],
+        "text": null
+      },
+      {
+        "n": 12,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "e22ddc933ead9d3daaf75069ca7a62cd59e7c283c7333ad9dc0b53b085cca318",
+        "request_messages": 17,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "run_grouped_cv"
+        ],
+        "text": null
+      },
+      {
+        "n": 13,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "297742a4af6c4d32541456f9e9581df3f5816d3c6905a8ae1ce37a6ce032a72e",
+        "request_messages": 19,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "run_grouped_cv"
+        ],
+        "text": null
+      },
+      {
+        "n": 14,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "fbccbd69b64272acf50d5eac0867d27a6ea4b11896e9abaca047327ed2702880",
+        "request_messages": 21,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "run_grouped_cv"
+        ],
+        "text": null
+      },
+      {
+        "n": 15,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "54e2335b54b3d0e5af901fcaa4deaf803c1f47ae2830e6333dccf939fc933ccb",
+        "request_messages": 23,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "apply_selection_rule"
+        ],
+        "text": null
+      },
+      {
+        "n": 16,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "0229fede5c69765dbdab0b7f65f36e0d96c7647c43fca73a8fd996dbf0e926c6",
+        "request_messages": 25,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "fit_final_models"
+        ],
+        "text": null
+      },
+      {
+        "n": 17,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "c533be14352ba1453b95c69108a13ea9e8057db64a50ba2adb7f5525bd52a7ff",
+        "request_messages": 27,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "verify_reproducibility"
+        ],
+        "text": null
+      },
+      {
+        "n": 18,
+        "agent": "train_only_modeler",
+        "source": "scripted",
+        "request_sha256": "f319e606e8d1e511ea7f4f38afa292f96c6a134f7d6576f603eca7f7a0fe6cc6",
+        "request_messages": 29,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "response": "final_text",
+        "tool_calls": [],
+        "text": "[SCRIPTED RESPONSE - not LLM inference] The pre-registered rule selected LR (lowest mean grouped-CV Brier), parameters {'C': 10.0}, refit on 1084 train rows. Reproduction of the approved P4 CV: exact, ok=True. (Values quoted from the tool results by the script.)"
+      },
+      {
+        "n": 19,
+        "agent": "evaluation_author",
+        "source": "scripted",
+        "request_sha256": "5e1642d0c450f800dfa6b3f75d9cc89c14fe69c128fd42388761ba9365cb9325",
+        "request_messages": 1,
+        "tools_offered": [
+          "verify_artifacts",
+          "write_evaluation_report",
+          "write_model",
+          "write_model_card"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "write_model"
+        ],
+        "text": null
+      },
+      {
+        "n": 20,
+        "agent": "evaluation_author",
+        "source": "scripted",
+        "request_sha256": "b1dc857a3d320ce0308070f700fee66cd56994d8e9ec9989d252d1a47cc44a7a",
+        "request_messages": 3,
+        "tools_offered": [
+          "verify_artifacts",
+          "write_evaluation_report",
+          "write_model",
+          "write_model_card"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "write_evaluation_report"
+        ],
+        "text": null
+      },
+      {
+        "n": 21,
+        "agent": "evaluation_author",
+        "source": "scripted",
+        "request_sha256": "9de46603861fe627da7f3b64cf888bd6222d22203d4de84c78f94775e8e989ff",
+        "request_messages": 5,
+        "tools_offered": [
+          "verify_artifacts",
+          "write_evaluation_report",
+          "write_model",
+          "write_model_card"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "write_model_card"
+        ],
+        "text": null
+      },
+      {
+        "n": 22,
+        "agent": "evaluation_author",
+        "source": "scripted",
+        "request_sha256": "d2807eb5e28387c5fa5ebbc19d87879cc31e915eed544edc35ec39453dedca9e",
+        "request_messages": 7,
+        "tools_offered": [
+          "verify_artifacts",
+          "write_evaluation_report",
+          "write_model",
+          "write_model_card"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "verify_artifacts"
+        ],
+        "text": null
+      },
+      {
+        "n": 23,
+        "agent": "evaluation_author",
+        "source": "scripted",
+        "request_sha256": "2f17c7a2bc53e74fceb2c1235497faf5d88c4d822fdbd764c6294296927e3a04",
+        "request_messages": 9,
+        "tools_offered": [
+          "verify_artifacts",
+          "write_evaluation_report",
+          "write_model",
+          "write_model_card"
+        ],
+        "response": "final_text",
+        "tool_calls": [],
+        "text": "[SCRIPTED RESPONSE - not LLM inference] model.joblib, evaluation_report.md and model_card.md written; 13 artifact checks passed, test vault sealed and unopened. (Values quoted from the tool results by the script.)"
+      }
+    ]
+  },
+  "python_tool_calls": {
+    "computed_by": "python",
+    "calls": 20,
+    "failed": 0,
+    "by_agent": {
+      "handoff_validator": [
+        "validate_handoff",
+        "write_features"
+      ],
+      "train_only_modeler": [
+        "check_preregistration",
+        "list_runs",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "apply_selection_rule",
+        "fit_final_models",
+        "verify_reproducibility"
+      ],
+      "evaluation_author": [
+        "write_model",
+        "write_evaluation_report",
+        "write_model_card",
+        "verify_artifacts"
+      ]
+    }
+  },
+  "token_usage_reported_by_crewai": {
+    "total_tokens": 0,
+    "prompt_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "completion_tokens": 0,
+    "reasoning_tokens": 0,
+    "cache_creation_tokens": 0,
+    "successful_requests": 23
+  },
+  "model_id_configured": "anthropic/claude-haiku-4-5-20251001 (never called: answered by the scripted transport)",
+  "llm_settings": {
+    "temperature": 0.0,
+    "max_tokens": 8192,
+    "timeout": 180.0,
+    "max_retries": 2
+  },
+  "agent_limits": {
+    "handoff_validator": {
+      "max_iter": 6,
+      "max_execution_time": 600
+    },
+    "train_only_modeler": {
+      "max_iter": 20,
+      "max_execution_time": 7200
+    },
+    "evaluation_author": {
+      "max_iter": 8,
+      "max_execution_time": 600
+    }
+  },
+  "agent_max_retry_limit": 0
+}

@@ -1,0 +1,6 @@
+{
+  "scenario": "label_leakage",
+  "change": "outcome label is_overrun copied into a new input column overrun_hint, declared as a feature",
+  "attacker_regenerated_flow_contract": false,
+  "applied_to": "the Flow's isolated handoff copy only (Crew 1 outputs untouched)"
+}

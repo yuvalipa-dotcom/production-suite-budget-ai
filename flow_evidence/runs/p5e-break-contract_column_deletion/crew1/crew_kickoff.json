@@ -1,0 +1,709 @@
+{
+  "synthetic": true,
+  "orchestration": "real CrewAI crew.kickoff() of the approved P3 Crew 1 (crew1.crew.build_crew, unchanged)",
+  "llm_responses": "scripted in-process transport (no LLM inference, no network)",
+  "disclosure": "The CrewAI orchestration is real. The model responses are scripted (not LLM inference); every scripted text starts with '[SCRIPTED RESPONSE - not LLM inference]'. Every data value, statistic, chart, contract and gate result was computed by Crew 1's deterministic Python tools.",
+  "agents": [
+    {
+      "role": "Data Ingestion & Cleaning Engineer",
+      "tools": [
+        "load_raw_table",
+        "detect_defects",
+        "apply_policy_c",
+        "eligibility_summary"
+      ]
+    },
+    {
+      "role": "Exploratory Data Analyst",
+      "tools": [
+        "list_analyses",
+        "run_analysis",
+        "render_chart",
+        "assemble_eda_report"
+      ]
+    },
+    {
+      "role": "Data Contract & Insights Author",
+      "tools": [
+        "build_dataset_contract",
+        "run_handoff_gate",
+        "write_insights"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "name": "ingest_and_clean",
+      "agent": "Data Ingestion & Cleaning Engineer"
+    },
+    {
+      "name": "explore_and_report",
+      "agent": "Exploratory Data Analyst"
+    },
+    {
+      "name": "contract_and_insights",
+      "agent": "Data Contract & Insights Author"
+    }
+  ],
+  "task_outputs": [
+    {
+      "task": "ingest_and_clean",
+      "agent": "Data Ingestion & Cleaning Engineer",
+      "source": "scripted",
+      "text": "[SCRIPTED RESPONSE - not LLM inference] Ingestion and Policy C cleaning complete; counts are in the tool results."
+    },
+    {
+      "task": "explore_and_report",
+      "agent": "Exploratory Data Analyst",
+      "source": "scripted",
+      "text": "[SCRIPTED RESPONSE - not LLM inference] EDA report assembled from the computed statistics."
+    },
+    {
+      "task": "contract_and_insights",
+      "agent": "Data Contract & Insights Author",
+      "source": "scripted",
+      "text": "[SCRIPTED RESPONSE - not LLM inference] Dataset contract written and the handoff gate run; insights written."
+    }
+  ],
+  "crewai_events": {
+    "crewai_version": "1.15.28",
+    "event_counts": {
+      "crew_kickoff_started": 1,
+      "task_started": 3,
+      "agent_execution_started": 3,
+      "llm_call_started": 14,
+      "tool_usage_finished": 31,
+      "agent_execution_completed": 3,
+      "task_completed": 3,
+      "crew_kickoff_completed": 1
+    },
+    "agents_executed": [
+      "Data Ingestion & Cleaning Engineer",
+      "Exploratory Data Analyst",
+      "Data Contract & Insights Author"
+    ],
+    "tasks_completed": [
+      "ingest_and_clean",
+      "explore_and_report",
+      "contract_and_insights"
+    ],
+    "tools_by_agent": {
+      "Data Ingestion & Cleaning Engineer": [
+        "load_raw_table",
+        "load_raw_table",
+        "load_raw_table",
+        "load_raw_table",
+        "load_raw_table",
+        "load_raw_table",
+        "load_raw_table",
+        "detect_defects",
+        "apply_policy_c",
+        "eligibility_summary"
+      ],
+      "Exploratory Data Analyst": [
+        "list_analyses",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "render_chart",
+        "render_chart",
+        "render_chart",
+        "render_chart",
+        "render_chart",
+        "render_chart",
+        "render_chart",
+        "render_chart",
+        "assemble_eda_report"
+      ],
+      "Data Contract & Insights Author": [
+        "build_dataset_contract",
+        "run_handoff_gate",
+        "write_insights"
+      ]
+    },
+    "events": [
+      {
+        "event": "crew_kickoff_started",
+        "crew": "crew"
+      },
+      {
+        "event": "task_started",
+        "task": "ingest_and_clean",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "detect_defects",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "apply_policy_c",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "eligibility_summary",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "task_completed",
+        "task": "ingest_and_clean",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "task_started",
+        "task": "explore_and_report",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "list_analyses",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "assemble_eda_report",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "task_completed",
+        "task": "explore_and_report",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "task_started",
+        "task": "contract_and_insights",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "build_dataset_contract",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_handoff_gate",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "write_insights",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "task_completed",
+        "task": "contract_and_insights",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "crew_kickoff_completed",
+        "crew": "crew"
+      }
+    ]
+  },
+  "llm_transport": {
+    "source": "scripted in-process transport (no LLM inference, no network)",
+    "requests": 14,
+    "requests_by_agent": {
+      "ingestion_engineer": 5,
+      "exploratory_analyst": 5,
+      "contract_author": 4
+    },
+    "forced_final_answers": {
+      "ingestion_engineer": 0,
+      "exploratory_analyst": 0,
+      "contract_author": 0
+    },
+    "network_attempts_blocked": [],
+    "scripted_mark": "[SCRIPTED RESPONSE - not LLM inference]",
+    "exchanges": [
+      {
+        "n": 1,
+        "agent": "ingestion_engineer",
+        "source": "scripted",
+        "request_sha256": "a3d391b376282e4161600c2c75e4d1bc9ecdd388f5646cb86e5e858ca8a2b002",
+        "request_messages": 1,
+        "tools_offered": [
+          "apply_policy_c",
+          "detect_defects",
+          "eligibility_summary",
+          "load_raw_table"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "load_raw_table",
+          "load_raw_table",
+          "load_raw_table",
+          "load_raw_table",
+          "load_raw_table",
+          "load_raw_table",
+          "load_raw_table"
+        ],
+        "text": null
+      },
+      {
+        "n": 2,
+        "agent": "ingestion_engineer",
+        "source": "scripted",
+        "request_sha256": "c528a0b3c8b906ce174f3284eaecb950bce8136202c7d3939047882e8dd1e352",
+        "request_messages": 3,
+        "tools_offered": [
+          "apply_policy_c",
+          "detect_defects",
+          "eligibility_summary",
+          "load_raw_table"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "detect_defects"
+        ],
+        "text": null
+      },
+      {
+        "n": 3,
+        "agent": "ingestion_engineer",
+        "source": "scripted",
+        "request_sha256": "32906ff944d237726ed3fe714add26e054c1a10fa3a506f8c19a6e5c3f17cc52",
+        "request_messages": 5,
+        "tools_offered": [
+          "apply_policy_c",
+          "detect_defects",
+          "eligibility_summary",
+          "load_raw_table"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "apply_policy_c"
+        ],
+        "text": null
+      },
+      {
+        "n": 4,
+        "agent": "ingestion_engineer",
+        "source": "scripted",
+        "request_sha256": "5df0dd8521d02cdfe944ddb79442131d42bc240e556f4384cce11761a1af9d8a",
+        "request_messages": 7,
+        "tools_offered": [
+          "apply_policy_c",
+          "detect_defects",
+          "eligibility_summary",
+          "load_raw_table"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "eligibility_summary"
+        ],
+        "text": null
+      },
+      {
+        "n": 5,
+        "agent": "ingestion_engineer",
+        "source": "scripted",
+        "request_sha256": "5b038c769cc599666e2c8269a598940c15564d7be5f9d3541880512c2a4defd6",
+        "request_messages": 9,
+        "tools_offered": [
+          "apply_policy_c",
+          "detect_defects",
+          "eligibility_summary",
+          "load_raw_table"
+        ],
+        "response": "final_text",
+        "tool_calls": [],
+        "text": "[SCRIPTED RESPONSE - not LLM inference] Ingestion and Policy C cleaning complete; counts are in the tool results."
+      },
+      {
+        "n": 6,
+        "agent": "exploratory_analyst",
+        "source": "scripted",
+        "request_sha256": "b38f3847c7a44953406728fef3e639a0d6aa01949e9b36a7634a044a374cd2c0",
+        "request_messages": 1,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "list_analyses"
+        ],
+        "text": null
+      },
+      {
+        "n": 7,
+        "agent": "exploratory_analyst",
+        "source": "scripted",
+        "request_sha256": "b408c92673101723217191485a161e937ddf34c0be37a53c2dc2a49bbaa0f159",
+        "request_messages": 3,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "run_analysis",
+          "run_analysis",
+          "run_analysis",
+          "run_analysis",
+          "run_analysis",
+          "run_analysis",
+          "run_analysis",
+          "run_analysis"
+        ],
+        "text": null
+      },
+      {
+        "n": 8,
+        "agent": "exploratory_analyst",
+        "source": "scripted",
+        "request_sha256": "23abea60c7982021b2c8e06dd29e7c90be731b72f40a52c82656e91cbd9a587a",
+        "request_messages": 5,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "render_chart",
+          "render_chart",
+          "render_chart",
+          "render_chart",
+          "render_chart",
+          "render_chart",
+          "render_chart",
+          "render_chart"
+        ],
+        "text": null
+      },
+      {
+        "n": 9,
+        "agent": "exploratory_analyst",
+        "source": "scripted",
+        "request_sha256": "acb508674e54782e6f07d3890e964d4fc1fa10058b8efb0178d6ea388f7be375",
+        "request_messages": 7,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "assemble_eda_report"
+        ],
+        "text": null
+      },
+      {
+        "n": 10,
+        "agent": "exploratory_analyst",
+        "source": "scripted",
+        "request_sha256": "53ae920965b2980216cd8c224a436a54fe5671d5ec6dfe5b40644841f8ab49ca",
+        "request_messages": 9,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "response": "final_text",
+        "tool_calls": [],
+        "text": "[SCRIPTED RESPONSE - not LLM inference] EDA report assembled from the computed statistics."
+      },
+      {
+        "n": 11,
+        "agent": "contract_author",
+        "source": "scripted",
+        "request_sha256": "282fa01c6463312e4c46f1e9fa55294f316e2559b9332cd6ab0b9c42c4eb8bd3",
+        "request_messages": 1,
+        "tools_offered": [
+          "build_dataset_contract",
+          "run_handoff_gate",
+          "write_insights"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "build_dataset_contract"
+        ],
+        "text": null
+      },
+      {
+        "n": 12,
+        "agent": "contract_author",
+        "source": "scripted",
+        "request_sha256": "a001d30a4e3a621108bd117e1e7011f05ff5844c97a9693f0d9057211cdd10f5",
+        "request_messages": 3,
+        "tools_offered": [
+          "build_dataset_contract",
+          "run_handoff_gate",
+          "write_insights"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "run_handoff_gate"
+        ],
+        "text": null
+      },
+      {
+        "n": 13,
+        "agent": "contract_author",
+        "source": "scripted",
+        "request_sha256": "80539f56fb5b30c58ab3a5cce741f8a4de3a43c93e99f9aa41504eae28f5d0f0",
+        "request_messages": 5,
+        "tools_offered": [
+          "build_dataset_contract",
+          "run_handoff_gate",
+          "write_insights"
+        ],
+        "response": "tool_use",
+        "tool_calls": [
+          "write_insights"
+        ],
+        "text": null
+      },
+      {
+        "n": 14,
+        "agent": "contract_author",
+        "source": "scripted",
+        "request_sha256": "678b9516aa9d355009ae4854b1ecdd119cc65b081a29dd1afea3ac3bd6f1c255",
+        "request_messages": 7,
+        "tools_offered": [
+          "build_dataset_contract",
+          "run_handoff_gate",
+          "write_insights"
+        ],
+        "response": "final_text",
+        "tool_calls": [],
+        "text": "[SCRIPTED RESPONSE - not LLM inference] Dataset contract written and the handoff gate run; insights written."
+      }
+    ]
+  },
+  "python_tool_calls": {
+    "computed_by": "python",
+    "calls": 31,
+    "failed": 0
+  },
+  "rate_limit_note": "max_rpm switched off for the scripted transport only",
+  "gate": {
+    "status": "PASS",
+    "checks": 22
+  },
+  "handoff_sha256": {
+    "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db"
+  },
+  "timing": {
+    "started_at": "2026-10-20T17:41:33+00:00",
+    "kickoff_seconds": 19.4
+  },
+  "analyses_requested": [
+    "descriptive_statistics",
+    "overrun_prevalence",
+    "signed_gap_distribution",
+    "budget_revision_effects",
+    "feature_correlations",
+    "fee_breakdown",
+    "frozen_split_prevalence_difference",
+    "policy_c_exclusions"
+  ],
+  "charts_rendered": [
+    "prevalence_by_stage",
+    "prevalence_by_archetype",
+    "split_prevalence",
+    "gap_histogram",
+    "gap_by_stage",
+    "revision_effects",
+    "fee_breakdown",
+    "feature_correlations"
+  ]
+}

@@ -1,0 +1,346 @@
+{
+  "columns": [
+    {
+      "dtype": "string",
+      "name": "production_id",
+      "nullable": false,
+      "role": "id",
+      "unit": ""
+    },
+    {
+      "allowed": [
+        "S0",
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "description": "Snapshot stage, S0 to S3.",
+      "dtype": "string",
+      "name": "stage",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "date",
+      "name": "as_of_date",
+      "nullable": false,
+      "role": "metadata",
+      "unit": ""
+    },
+    {
+      "allowed": [
+        "bar_bat_mitzvah",
+        "conference",
+        "corporate",
+        "wedding"
+      ],
+      "dtype": "string",
+      "name": "archetype",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "integer",
+      "max": 12,
+      "min": 1,
+      "name": "event_month",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "integer",
+      "min": 1,
+      "name": "lead_time_days",
+      "nullable": false,
+      "role": "feature",
+      "unit": "days"
+    },
+    {
+      "dtype": "integer",
+      "min": 0,
+      "name": "days_since_contract",
+      "nullable": false,
+      "role": "feature",
+      "unit": "days"
+    },
+    {
+      "dtype": "integer",
+      "min": 0,
+      "name": "days_to_event",
+      "nullable": false,
+      "role": "feature",
+      "unit": "days"
+    },
+    {
+      "dtype": "integer",
+      "min": 1,
+      "name": "guest_count",
+      "nullable": false,
+      "role": "feature",
+      "unit": "people"
+    },
+    {
+      "allowed": [
+        "excludes_vat",
+        "includes_vat",
+        "no_vat"
+      ],
+      "dtype": "string",
+      "name": "budget_vat_mode",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "number",
+      "min": 0.01,
+      "name": "budget_pre_vat",
+      "nullable": false,
+      "role": "feature",
+      "unit": "ILS pre-VAT"
+    },
+    {
+      "dtype": "integer",
+      "min": 0,
+      "name": "budget_revisions_to_date",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "boolean",
+      "name": "fee_included",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "allowed": [
+        "amount",
+        "percent"
+      ],
+      "dtype": "string",
+      "name": "fee_mode",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "number",
+      "min": 0,
+      "name": "fee_contract_pre_vat",
+      "nullable": false,
+      "role": "feature",
+      "unit": "ILS pre-VAT"
+    },
+    {
+      "dtype": "number",
+      "min": 0,
+      "name": "planned_total_pre_vat",
+      "nullable": false,
+      "role": "feature",
+      "unit": "ILS pre-VAT"
+    },
+    {
+      "dtype": "integer",
+      "min": 0,
+      "name": "n_categories_planned",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "integer",
+      "min": 0,
+      "name": "n_categories_committed",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "integer",
+      "min": 0,
+      "name": "n_categories_pending",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "integer",
+      "min": 0,
+      "name": "n_commitments_active",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "integer",
+      "min": 0,
+      "name": "n_manual_costs",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "number",
+      "min": 0,
+      "name": "manual_costs_pre_vat",
+      "nullable": false,
+      "role": "feature",
+      "unit": "ILS pre-VAT"
+    },
+    {
+      "dtype": "number",
+      "min": 0,
+      "name": "committed_pre_vat",
+      "nullable": false,
+      "role": "feature",
+      "unit": "ILS pre-VAT"
+    },
+    {
+      "dtype": "integer",
+      "min": 0,
+      "name": "n_categories_over_plan",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "number",
+      "min": 0,
+      "name": "over_plan_pre_vat",
+      "nullable": false,
+      "role": "feature",
+      "unit": "ILS pre-VAT"
+    },
+    {
+      "dtype": "integer",
+      "min": 0,
+      "name": "n_substitutions_to_date",
+      "nullable": false,
+      "role": "feature",
+      "unit": ""
+    },
+    {
+      "dtype": "number",
+      "max": 1,
+      "min": 0,
+      "name": "no_vat_share",
+      "nullable": false,
+      "role": "feature",
+      "unit": "ratio"
+    },
+    {
+      "dtype": "number",
+      "max": 1,
+      "min": 0,
+      "name": "client_direct_share",
+      "nullable": false,
+      "role": "feature",
+      "unit": "ratio"
+    },
+    {
+      "dtype": "number",
+      "name": "current_position_ils",
+      "nullable": false,
+      "role": "feature",
+      "unit": "ILS pre-VAT"
+    },
+    {
+      "dtype": "number",
+      "min": 0,
+      "name": "committed_ratio",
+      "nullable": false,
+      "role": "feature",
+      "unit": "ratio"
+    },
+    {
+      "dtype": "number",
+      "min": 0,
+      "name": "cost_per_guest_pre_vat",
+      "nullable": false,
+      "role": "feature",
+      "unit": "ILS pre-VAT"
+    },
+    {
+      "dtype": "number",
+      "min": 0,
+      "name": "final_cost_pre_vat",
+      "nullable": false,
+      "role": "target",
+      "unit": "ILS pre-VAT"
+    },
+    {
+      "dtype": "number",
+      "name": "budget_gap_ils",
+      "nullable": false,
+      "role": "target",
+      "unit": "ILS pre-VAT"
+    },
+    {
+      "dtype": "boolean",
+      "name": "is_overrun",
+      "nullable": false,
+      "role": "target",
+      "unit": ""
+    },
+    {
+      "dtype": "boolean",
+      "name": "is_material_overrun",
+      "nullable": false,
+      "role": "target",
+      "unit": ""
+    },
+    {
+      "allowed": [
+        "demo",
+        "test",
+        "train"
+      ],
+      "dtype": "string",
+      "name": "split",
+      "nullable": false,
+      "role": "metadata",
+      "unit": ""
+    },
+    {
+      "dtype": "integer",
+      "max": 4,
+      "min": -1,
+      "name": "cv_fold",
+      "nullable": false,
+      "role": "metadata",
+      "unit": ""
+    }
+  ],
+  "dataset": "production-suite-budget-ai Crew-1 handoff (synthetic)",
+  "exclusion_counts": {
+    "commitment_category_missing": 50,
+    "manual_cost_undated": 12
+  },
+  "outcome_only_exclusions": [
+    "commitments.final_pre_vat",
+    "productions.fee_concession_pre_vat",
+    "productions.final_budget_entered",
+    "productions.final_company_profit_pre_vat",
+    "productions.final_cost_pre_vat",
+    "productions.final_fee_contract_pre_vat",
+    "productions.financial_close_date",
+    "productions.n_budget_revisions",
+    "snapshots.budget_gap_ils",
+    "snapshots.final_cost_pre_vat",
+    "snapshots.is_material_overrun",
+    "snapshots.is_overrun"
+  ],
+  "primary_key": [
+    "production_id",
+    "stage"
+  ],
+  "raw_manifest_sha256": "82724a3dcac035ae83795299a9850380c6993dcc2ea837b7e95aa9a11942cef7",
+  "row_count": 1538,
+  "split_policy": "frozen: contracts/frozen_split.json",
+  "version": "v2"
+}

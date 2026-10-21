@@ -1,0 +1,131 @@
+{
+  "version": "flow-1",
+  "synthetic": true,
+  "base_contract": {
+    "file": "dataset_contract.json",
+    "version": "v2",
+    "sha256": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db"
+  },
+  "clean_data": {
+    "file": "clean_data.csv",
+    "sha256": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "rows": 1538
+  },
+  "currency": {
+    "code": "ILS",
+    "minor_unit": "agora",
+    "minor_units_per_major": 100,
+    "amount_scale": "major units (shekels), not agorot",
+    "vat_basis": "pre-VAT"
+  },
+  "reference": {
+    "version": "money_scale_reference.v1",
+    "sha256": "76be7919eccd8f5bc2753bf24b23cad86090d66f8c4b7a196c2668c983ce5686",
+    "band": [
+      0.5,
+      2.0
+    ]
+  },
+  "monetary_columns": {
+    "budget_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "currency": "ILS",
+      "vat_basis": "pre-VAT",
+      "profile": {
+        "n": 1084,
+        "median_abs": 230000.0,
+        "p90_abs": 436000.0
+      }
+    },
+    "fee_contract_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "currency": "ILS",
+      "vat_basis": "pre-VAT",
+      "profile": {
+        "n": 1084,
+        "median_abs": 24269.695,
+        "p90_abs": 52000.0
+      }
+    },
+    "planned_total_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "currency": "ILS",
+      "vat_basis": "pre-VAT",
+      "profile": {
+        "n": 1084,
+        "median_abs": 191400.85,
+        "p90_abs": 367828.0
+      }
+    },
+    "manual_costs_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "currency": "ILS",
+      "vat_basis": "pre-VAT",
+      "profile": {
+        "n": 1084,
+        "median_abs": 0.0,
+        "p90_abs": 12187.16
+      }
+    },
+    "committed_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "currency": "ILS",
+      "vat_basis": "pre-VAT",
+      "profile": {
+        "n": 1084,
+        "median_abs": 126854.66,
+        "p90_abs": 294409.22
+      }
+    },
+    "over_plan_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "currency": "ILS",
+      "vat_basis": "pre-VAT",
+      "profile": {
+        "n": 1084,
+        "median_abs": 4581.514999999999,
+        "p90_abs": 27171.05
+      }
+    },
+    "current_position_ils": {
+      "unit": "ILS pre-VAT",
+      "currency": "ILS",
+      "vat_basis": "pre-VAT",
+      "profile": {
+        "n": 1084,
+        "median_abs": 65245.315,
+        "p90_abs": 226898.31
+      }
+    },
+    "cost_per_guest_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "currency": "ILS",
+      "vat_basis": "pre-VAT",
+      "profile": {
+        "n": 1084,
+        "median_abs": 420.77,
+        "p90_abs": 988.66
+      }
+    },
+    "final_cost_pre_vat": {
+      "unit": "ILS pre-VAT",
+      "currency": "ILS",
+      "vat_basis": "pre-VAT",
+      "profile": {
+        "n": 1084,
+        "median_abs": 209986.79,
+        "p90_abs": 404376.7
+      }
+    },
+    "budget_gap_ils": {
+      "unit": "ILS pre-VAT",
+      "currency": "ILS",
+      "vat_basis": "pre-VAT",
+      "profile": {
+        "n": 1084,
+        "median_abs": 12856.18,
+        "p90_abs": 43688.72
+      }
+    }
+  }
+}

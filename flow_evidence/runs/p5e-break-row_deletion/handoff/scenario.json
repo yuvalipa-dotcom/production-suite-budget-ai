@@ -1,0 +1,6 @@
+{
+  "scenario": "row_deletion",
+  "change": "required snapshot row 4 (train, stage S0) deleted from clean_data.csv",
+  "attacker_regenerated_flow_contract": false,
+  "applied_to": "the Flow's isolated handoff copy only (Crew 1 outputs untouched)"
+}

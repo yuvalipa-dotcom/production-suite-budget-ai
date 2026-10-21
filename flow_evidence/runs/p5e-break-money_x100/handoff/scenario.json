@@ -1,0 +1,6 @@
+{
+  "scenario": "money_x100",
+  "change": "budget_pre_vat multiplied by 100 in clean_data.csv; flow_contract.json regenerated from it",
+  "attacker_regenerated_flow_contract": true,
+  "applied_to": "the Flow's isolated handoff copy only (Crew 1 outputs untouched)"
+}

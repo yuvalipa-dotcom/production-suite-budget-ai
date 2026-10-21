@@ -1,0 +1,164 @@
+{
+  "synthetic": true,
+  "step": "Flow Crew 2 kickoff (P5-D)",
+  "status": "PASS",
+  "selected_model": {
+    "candidate": "LR",
+    "decided_by": "lowest mean grouped-CV Brier",
+    "params": {
+      "C": 10.0
+    },
+    "model_sha256": {
+      "primary": "bc7b312e127b01d12999998f4b680180dd5150a2bf199e35c582ac5dd3252d81",
+      "secondary": "55a5c9e39c7e532f2583a07a72c65df0ccdc20314e09ca528ee557e98c47ee36"
+    },
+    "train_rows": 1084,
+    "audit_violations": {
+      "primary": 0,
+      "secondary": 0
+    }
+  },
+  "test_vault": {
+    "class": "SealedVault",
+    "opened": false,
+    "opens": 0,
+    "test_metrics_computed": false
+  },
+  "historical_test": {
+    "source_run": "p4-offline-002",
+    "cited_from": "p4_reference.v1.json",
+    "recomputed": false
+  },
+  "reproducibility": {
+    "mode": "exact",
+    "reference": "p4_reference.v1",
+    "source_run": "p4-offline-002",
+    "tolerances": null,
+    "max_abs_deviation": {
+      "cv_mean": 0.0,
+      "fold_score": 0.0,
+      "prediction": 0.0
+    },
+    "final_model_sha256_equal_to_p4": {
+      "primary": true,
+      "secondary": true
+    },
+    "selection_equal": true,
+    "parameters_equal": true,
+    "ok": true
+  },
+  "contract": {
+    "version": "flow-1",
+    "ok": true,
+    "violations": 0,
+    "scale_ratios": {
+      "budget_pre_vat": 1.0,
+      "fee_contract_pre_vat": 1.0,
+      "planned_total_pre_vat": 1.0,
+      "manual_costs_pre_vat": 1.0,
+      "committed_pre_vat": 1.0,
+      "over_plan_pre_vat": 1.0,
+      "current_position_ils": 1.0,
+      "cost_per_guest_pre_vat": 1.0,
+      "final_cost_pre_vat": 1.0,
+      "budget_gap_ils": 1.0
+    }
+  },
+  "environment": {
+    "python": "3.13.15",
+    "system": "Windows",
+    "machine": "AMD64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "cpu_count": 8,
+    "threadpools": [
+      {
+        "internal_api": "openblas",
+        "version": "0.3.34.106.0",
+        "num_threads": 8
+      },
+      {
+        "internal_api": "openmp",
+        "version": null,
+        "num_threads": 8
+      },
+      {
+        "internal_api": "openblas",
+        "version": "0.3.31.dev",
+        "num_threads": 8
+      }
+    ]
+  },
+  "seeds": {
+    "seed": 42,
+    "tuning_splits": "[seed, fold code, 1]",
+    "calibration_splits": "[seed, fold code, 2, j]",
+    "fold_code": "outer fold 0-4; final refit 5",
+    "gradient_boosting_random_state": 42
+  },
+  "input_sha256": {
+    "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+    "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656",
+    "contracts/frozen_split.json": "064e1909b340a60c946084e0ebaf20fecd2acdce4fcb27930176c532e86158c1",
+    "budget_flow/contracts/money_scale_reference.v1.json": "76be7919eccd8f5bc2753bf24b23cad86090d66f8c4b7a196c2668c983ce5686",
+    "budget_flow/contracts/p4_reference.v1.json": "c03383de5ff3a4f9965458c5aa66c6ebeee05cff51fb600c026708ccd82dabd1",
+    "budget_flow/contracts/p4_train_predictions.v1.csv": "109f39e9d73baf6c5feaf78791afc5c3dd1f7c3c02c537bbaebca34c1aaaf530",
+    "docs/model_selection_rule.md": "b69fba1307d226ba952d4306b194b8d1d88ebb148b5920751da454c1dd8bc008",
+    "crew2/ml/selection.py": "66f337df23d79b4ae2281ba64cb7d234304a302d98ebfb9863b66d38700402a9"
+  },
+  "artifacts": {
+    "features.csv": {
+      "sha256": "a0ec48bd45254b64979e7eb8692185394a7ed59ca6ddf8771c827294b7c034e0",
+      "bytes": 257028
+    },
+    "features.schema.json": {
+      "sha256": "95e0f238ffd80b5242578c16dfd8004cefe5f6c0782db5d6034c0f2065f4dcc1",
+      "bytes": 6471
+    },
+    "model.joblib": {
+      "sha256": "053cb987dfef0953823e79b94c01ee2009350589e92275475af8879e9b1c6bb2",
+      "bytes": 33798
+    },
+    "evaluation_report.md": {
+      "sha256": "f04800a0fc47e2bf53b22a347d674f1639104a405417334aae105081494016c7",
+      "bytes": 5679
+    },
+    "model_card.md": {
+      "sha256": "39c21e11e84587729f56b133d8cb1d777479ed66487e0efce85463e3f64b8218",
+      "bytes": 3848
+    }
+  },
+  "timing": {
+    "started_at": "2026-10-20T16:16:19+00:00",
+    "kickoff_seconds": 223.8,
+    "steps_seconds": {
+      "F27.is_overrun.B0": 7.5,
+      "F27.is_overrun.LR": 4.8,
+      "F27.is_overrun.GB": 66.4,
+      "F27.is_material_overrun.B0": 0.1,
+      "F27.is_material_overrun.LR": 4.0,
+      "F27.is_material_overrun.GB": 63.5,
+      "F29.is_overrun.B0": 0.1,
+      "F29.is_overrun.LR": 4.5,
+      "F29.is_overrun.GB": 65.6,
+      "final_refit": 5.0
+    },
+    "n_jobs": 5
+  },
+  "orchestration": {
+    "kickoff": "crew_kickoff.json",
+    "trace": "trace.jsonl",
+    "agents_executed": [
+      "Handoff & Feature Validator",
+      "TRAIN-only Model Trainer",
+      "Evaluation & Ethics Author"
+    ],
+    "llm_responses": "scripted in-process transport (no LLM inference, no network)"
+  }
+}

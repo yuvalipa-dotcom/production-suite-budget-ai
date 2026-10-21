@@ -1,0 +1,579 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Production Suite Budget AI Flow contract flow-1 (extends dataset_contract v2; synthetic data)",
+  "type": "object",
+  "required": [
+    "version",
+    "synthetic",
+    "base_contract",
+    "clean_data",
+    "currency",
+    "reference",
+    "monetary_columns"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "flow-1"
+    },
+    "synthetic": {
+      "const": true
+    },
+    "base_contract": {
+      "type": "object",
+      "required": [
+        "file",
+        "version",
+        "sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "const": "dataset_contract.json"
+        },
+        "version": {
+          "const": "v2"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "clean_data": {
+      "type": "object",
+      "required": [
+        "file",
+        "sha256",
+        "rows"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "const": "clean_data.csv"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "currency": {
+      "type": "object",
+      "required": [
+        "code",
+        "minor_unit",
+        "minor_units_per_major",
+        "amount_scale",
+        "vat_basis"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "minor_unit": {
+          "type": "string"
+        },
+        "minor_units_per_major": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "amount_scale": {
+          "type": "string"
+        },
+        "vat_basis": {
+          "type": "string"
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "required": [
+        "version",
+        "sha256",
+        "band"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "money_scale_reference.v1"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "band": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "monetary_columns": {
+      "type": "object",
+      "required": [
+        "budget_pre_vat",
+        "fee_contract_pre_vat",
+        "planned_total_pre_vat",
+        "manual_costs_pre_vat",
+        "committed_pre_vat",
+        "over_plan_pre_vat",
+        "current_position_ils",
+        "cost_per_guest_pre_vat",
+        "final_cost_pre_vat",
+        "budget_gap_ils"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "budget_pre_vat": {
+          "type": "object",
+          "required": [
+            "unit",
+            "currency",
+            "vat_basis",
+            "profile"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "vat_basis": {
+              "type": "string"
+            },
+            "profile": {
+              "type": "object",
+              "required": [
+                "n",
+                "median_abs",
+                "p90_abs"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "median_abs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p90_abs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "fee_contract_pre_vat": {
+          "type": "object",
+          "required": [
+            "unit",
+            "currency",
+            "vat_basis",
+            "profile"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "vat_basis": {
+              "type": "string"
+            },
+            "profile": {
+              "type": "object",
+              "required": [
+                "n",
+                "median_abs",
+                "p90_abs"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "median_abs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p90_abs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "planned_total_pre_vat": {
+          "type": "object",
+          "required": [
+            "unit",
+            "currency",
+            "vat_basis",
+            "profile"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "vat_basis": {
+              "type": "string"
+            },
+            "profile": {
+              "type": "object",
+              "required": [
+                "n",
+                "median_abs",
+                "p90_abs"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "median_abs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p90_abs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "manual_costs_pre_vat": {
+          "type": "object",
+          "required": [
+            "unit",
+            "currency",
+            "vat_basis",
+            "profile"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "vat_basis": {
+              "type": "string"
+            },
+            "profile": {
+              "type": "object",
+              "required": [
+                "n",
+                "median_abs",
+                "p90_abs"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "median_abs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p90_abs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "committed_pre_vat": {
+          "type": "object",
+          "required": [
+            "unit",
+            "currency",
+            "vat_basis",
+            "profile"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "vat_basis": {
+              "type": "string"
+            },
+            "profile": {
+              "type": "object",
+              "required": [
+                "n",
+                "median_abs",
+                "p90_abs"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "median_abs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p90_abs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "over_plan_pre_vat": {
+          "type": "object",
+          "required": [
+            "unit",
+            "currency",
+            "vat_basis",
+            "profile"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "vat_basis": {
+              "type": "string"
+            },
+            "profile": {
+              "type": "object",
+              "required": [
+                "n",
+                "median_abs",
+                "p90_abs"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "median_abs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p90_abs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "current_position_ils": {
+          "type": "object",
+          "required": [
+            "unit",
+            "currency",
+            "vat_basis",
+            "profile"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "vat_basis": {
+              "type": "string"
+            },
+            "profile": {
+              "type": "object",
+              "required": [
+                "n",
+                "median_abs",
+                "p90_abs"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "median_abs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p90_abs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "cost_per_guest_pre_vat": {
+          "type": "object",
+          "required": [
+            "unit",
+            "currency",
+            "vat_basis",
+            "profile"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "vat_basis": {
+              "type": "string"
+            },
+            "profile": {
+              "type": "object",
+              "required": [
+                "n",
+                "median_abs",
+                "p90_abs"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "median_abs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p90_abs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "final_cost_pre_vat": {
+          "type": "object",
+          "required": [
+            "unit",
+            "currency",
+            "vat_basis",
+            "profile"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "vat_basis": {
+              "type": "string"
+            },
+            "profile": {
+              "type": "object",
+              "required": [
+                "n",
+                "median_abs",
+                "p90_abs"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "median_abs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p90_abs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "budget_gap_ils": {
+          "type": "object",
+          "required": [
+            "unit",
+            "currency",
+            "vat_basis",
+            "profile"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "vat_basis": {
+              "type": "string"
+            },
+            "profile": {
+              "type": "object",
+              "required": [
+                "n",
+                "median_abs",
+                "p90_abs"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "median_abs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p90_abs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

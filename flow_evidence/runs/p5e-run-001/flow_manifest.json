@@ -1,0 +1,198 @@
+{
+  "synthetic": true,
+  "status": "PASS",
+  "exit_code": 0,
+  "status_meaning": "both crews ran and all 8 required outputs were verified",
+  "scenario": "none",
+  "disclosure": "The CrewAI Flow, both Crews, their Agents and Tasks run for real (crew.kickoff() inside Flow methods). The LLM responses are scripted (scripted in-process transport (no LLM inference, no network)): no model inference takes place. Every number, check, fit and artifact is computed by deterministic Python tools.",
+  "flow": {
+    "class": "BudgetFlow (crewai.flow.flow.Flow)",
+    "flow_id": "91c0ef09-e978-41b5-8244-8f14c69d6abe",
+    "decorators": {
+      "start": [
+        "run_crew1"
+      ],
+      "listen": [
+        "prepare_handoff",
+        "run_crew2 (route PASS)",
+        "finish_pass (route COMPLETE)",
+        "stop_on_contract (route STOPPED_CONTRACT)",
+        "record_failure (route FAILED_RUNTIME)",
+        "write_manifest (or_ finish_pass, stop_on_contract, record_failure)"
+      ],
+      "router": [
+        "contract_gate",
+        "verify_outputs"
+      ]
+    },
+    "methods_executed": [
+      "run_crew1",
+      "prepare_handoff",
+      "contract_gate",
+      "run_crew2",
+      "verify_outputs",
+      "finish_pass",
+      "write_manifest"
+    ],
+    "routes": {
+      "contract_gate": "PASS",
+      "verify_outputs": "COMPLETE"
+    },
+    "events": "flow_events.jsonl"
+  },
+  "crew1": {
+    "kickoff": "crew1/crew_kickoff.json",
+    "agents_executed": [
+      "Data Ingestion & Cleaning Engineer",
+      "Exploratory Data Analyst",
+      "Data Contract & Insights Author"
+    ],
+    "crewai_events": {
+      "crew_kickoff_started": 1,
+      "task_started": 3,
+      "agent_execution_started": 3,
+      "llm_call_started": 14,
+      "tool_usage_finished": 31,
+      "agent_execution_completed": 3,
+      "task_completed": 3,
+      "crew_kickoff_completed": 1
+    },
+    "llm_requests": 14,
+    "python_tool_calls": 31,
+    "gate": {
+      "status": "PASS",
+      "checks": 22
+    },
+    "outputs_sha256": {
+      "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+      "eda_report.html": "494a7685603029dfa50b8a95bf4ac4cbbeb81acac03257f07c77b166e867f805",
+      "insights.md": "6816a705171175c5d0b6515f3cd6b1794ee5ac9dc0287b0303a6e52a2c272a6a",
+      "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db"
+    }
+  },
+  "handoff": {
+    "crew1_outputs_missing": [],
+    "as_delivered_sha256": {
+      "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+      "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+      "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+    },
+    "as_gated_sha256": {
+      "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+      "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+      "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+    }
+  },
+  "gate": {
+    "contract": "flow-1",
+    "decision": "PASS",
+    "violation_codes": [],
+    "violations": [],
+    "violation_count": 0,
+    "validated_files_sha256": {
+      "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+      "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+      "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+    }
+  },
+  "crew2": {
+    "kickoff_invoked": true,
+    "kickoffs": 1,
+    "kickoff": "crew2/crew_kickoff.json",
+    "agents_executed": [
+      "Handoff & Feature Validator",
+      "TRAIN-only Model Trainer",
+      "Evaluation & Ethics Author"
+    ],
+    "crewai_events": {
+      "crew_kickoff_started": 1,
+      "task_started": 3,
+      "agent_execution_started": 3,
+      "llm_call_started": 23,
+      "tool_usage_finished": 20,
+      "task_completed": 3,
+      "agent_execution_completed": 3,
+      "crew_kickoff_completed": 1
+    },
+    "llm_requests": 23,
+    "python_tool_calls": 20,
+    "selected_model": {
+      "candidate": "LR",
+      "decided_by": "lowest mean grouped-CV Brier",
+      "params": {
+        "C": 10.0
+      },
+      "model_sha256": {
+        "primary": "bc7b312e127b01d12999998f4b680180dd5150a2bf199e35c582ac5dd3252d81",
+        "secondary": "55a5c9e39c7e532f2583a07a72c65df0ccdc20314e09ca528ee557e98c47ee36"
+      },
+      "train_rows": 1084,
+      "audit_violations": {
+        "primary": 0,
+        "secondary": 0
+      }
+    },
+    "reproducibility": {
+      "mode": "exact",
+      "reference": "p4_reference.v1",
+      "source_run": "p4-offline-002",
+      "tolerances": null,
+      "max_abs_deviation": {
+        "cv_mean": 0.0,
+        "fold_score": 0.0,
+        "prediction": 0.0
+      },
+      "final_model_sha256_equal_to_p4": {
+        "primary": true,
+        "secondary": true
+      },
+      "selection_equal": true,
+      "parameters_equal": true,
+      "ok": true
+    },
+    "test_vault": {
+      "class": "SealedVault",
+      "opened": false,
+      "opens": 0,
+      "test_metrics_computed": false
+    },
+    "historical_test": {
+      "source_run": "p4-offline-002",
+      "cited_from": "p4_reference.v1.json",
+      "recomputed": false
+    },
+    "input_sha256": {
+      "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+      "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+      "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656",
+      "contracts/frozen_split.json": "064e1909b340a60c946084e0ebaf20fecd2acdce4fcb27930176c532e86158c1",
+      "budget_flow/contracts/money_scale_reference.v1.json": "76be7919eccd8f5bc2753bf24b23cad86090d66f8c4b7a196c2668c983ce5686",
+      "budget_flow/contracts/p4_reference.v1.json": "c03383de5ff3a4f9965458c5aa66c6ebeee05cff51fb600c026708ccd82dabd1",
+      "budget_flow/contracts/p4_train_predictions.v1.csv": "109f39e9d73baf6c5feaf78791afc5c3dd1f7c3c02c537bbaebca34c1aaaf530",
+      "docs/model_selection_rule.md": "b69fba1307d226ba952d4306b194b8d1d88ebb148b5920751da454c1dd8bc008",
+      "crew2/ml/selection.py": "66f337df23d79b4ae2281ba64cb7d234304a302d98ebfb9863b66d38700402a9"
+    },
+    "boundary_violations": []
+  },
+  "required_outputs_sha256": {
+    "crew1/clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "crew1/eda_report.html": "494a7685603029dfa50b8a95bf4ac4cbbeb81acac03257f07c77b166e867f805",
+    "crew1/insights.md": "6816a705171175c5d0b6515f3cd6b1794ee5ac9dc0287b0303a6e52a2c272a6a",
+    "crew1/dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+    "crew2/features.csv": "a0ec48bd45254b64979e7eb8692185394a7ed59ca6ddf8771c827294b7c034e0",
+    "crew2/model.joblib": "053cb987dfef0953823e79b94c01ee2009350589e92275475af8879e9b1c6bb2",
+    "crew2/evaluation_report.md": "f04800a0fc47e2bf53b22a347d674f1639104a405417334aae105081494016c7",
+    "crew2/model_card.md": "39c21e11e84587729f56b133d8cb1d777479ed66487e0efce85463e3f64b8218"
+  },
+  "crew1_outputs_unchanged_by_the_flow": true,
+  "error": null,
+  "timing": {
+    "started_at": "2026-10-20T16:16:05+00:00",
+    "total_seconds": 237.6,
+    "crew1_kickoff": 11.6,
+    "prepare_handoff": 0.0,
+    "contract_gate": 0.1,
+    "crew2_kickoff": 223.9
+  },
+  "n_jobs": 5
+}

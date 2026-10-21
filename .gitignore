@@ -1,5 +1,6 @@
-# Local Python environment
+# Local Python environments (ML: .venv; Streamlit demo app: .venv-app)
 .venv/
+.venv-app/
 __pycache__/
 *.pyc
 .pytest_cache/
@@ -7,6 +8,7 @@ __pycache__/
 # Environment and secrets: never committed
 .env
 .env*
+.streamlit/secrets.toml
 
 # Security scanner raw output: never committed
 scan_output/

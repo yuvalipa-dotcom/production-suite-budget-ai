@@ -1,0 +1,135 @@
+{
+  "synthetic": true,
+  "status": "STOPPED_CONTRACT",
+  "exit_code": 3,
+  "status_meaning": "the contract gate stopped the run on purpose; Crew 2 never ran and no model was trained",
+  "scenario": "contract_column_deletion",
+  "disclosure": "The CrewAI Flow, both Crews, their Agents and Tasks run for real (crew.kickoff() inside Flow methods). The LLM responses are scripted (scripted in-process transport (no LLM inference, no network)): no model inference takes place. Every number, check, fit and artifact is computed by deterministic Python tools.",
+  "flow": {
+    "class": "BudgetFlow (crewai.flow.flow.Flow)",
+    "flow_id": "08d5a560-fd27-46d1-879a-6fbf5c71f2f0",
+    "decorators": {
+      "start": [
+        "run_crew1"
+      ],
+      "listen": [
+        "prepare_handoff",
+        "run_crew2 (route PASS)",
+        "finish_pass (route COMPLETE)",
+        "stop_on_contract (route STOPPED_CONTRACT)",
+        "record_failure (route FAILED_RUNTIME)",
+        "write_manifest (or_ finish_pass, stop_on_contract, record_failure)"
+      ],
+      "router": [
+        "contract_gate",
+        "verify_outputs"
+      ]
+    },
+    "methods_executed": [
+      "run_crew1",
+      "prepare_handoff",
+      "contract_gate",
+      "stop_on_contract",
+      "write_manifest"
+    ],
+    "routes": {
+      "contract_gate": "STOPPED_CONTRACT"
+    },
+    "events": "flow_events.jsonl"
+  },
+  "crew1": {
+    "kickoff": "crew1/crew_kickoff.json",
+    "agents_executed": [
+      "Data Ingestion & Cleaning Engineer",
+      "Exploratory Data Analyst",
+      "Data Contract & Insights Author"
+    ],
+    "crewai_events": {
+      "crew_kickoff_started": 1,
+      "task_started": 3,
+      "agent_execution_started": 3,
+      "llm_call_started": 14,
+      "tool_usage_finished": 31,
+      "agent_execution_completed": 3,
+      "task_completed": 3,
+      "crew_kickoff_completed": 1
+    },
+    "llm_requests": 14,
+    "python_tool_calls": 31,
+    "gate": {
+      "status": "PASS",
+      "checks": 22
+    },
+    "outputs_sha256": {
+      "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+      "eda_report.html": "494a7685603029dfa50b8a95bf4ac4cbbeb81acac03257f07c77b166e867f805",
+      "insights.md": "6816a705171175c5d0b6515f3cd6b1794ee5ac9dc0287b0303a6e52a2c272a6a",
+      "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db"
+    }
+  },
+  "handoff": {
+    "crew1_outputs_missing": [],
+    "as_delivered_sha256": {
+      "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+      "dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db",
+      "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+    },
+    "scenario": {
+      "scenario": "contract_column_deletion",
+      "change": "the definition of the required column budget_pre_vat deleted from dataset_contract.json",
+      "attacker_regenerated_flow_contract": false,
+      "applied_to": "the Flow's isolated handoff copy only (Crew 1 outputs untouched)"
+    },
+    "as_gated_sha256": {
+      "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+      "dataset_contract.json": "0f1494cbae89e4f0205ad1a04947d4b89b631f193824435b0a870d2a3cb1d90c",
+      "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+    }
+  },
+  "gate": {
+    "contract": "flow-1",
+    "decision": "STOPPED_CONTRACT",
+    "violation_codes": [
+      "BASE_CONTRACT_COLUMNS",
+      "BASE_CONTRACT_DIGEST_MISMATCH"
+    ],
+    "violations": [
+      {
+        "code": "BASE_CONTRACT_COLUMNS",
+        "column": null,
+        "detail": "declared columns differ from the approved specification (missing ['budget_pre_vat'], extra [])"
+      },
+      {
+        "code": "BASE_CONTRACT_DIGEST_MISMATCH",
+        "column": null,
+        "detail": "dataset_contract.json differs from the file the Flow contract was written for"
+      }
+    ],
+    "violation_count": 2,
+    "validated_files_sha256": {
+      "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+      "dataset_contract.json": "0f1494cbae89e4f0205ad1a04947d4b89b631f193824435b0a870d2a3cb1d90c",
+      "flow_contract.json": "031a3ac0462a7142225be7167cc0ef7b4609979f375a53add5be8bc74b0e5656"
+    }
+  },
+  "crew2": {
+    "kickoff_invoked": false,
+    "kickoffs": 0
+  },
+  "required_outputs_sha256": {
+    "crew1/clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "crew1/eda_report.html": "494a7685603029dfa50b8a95bf4ac4cbbeb81acac03257f07c77b166e867f805",
+    "crew1/insights.md": "6816a705171175c5d0b6515f3cd6b1794ee5ac9dc0287b0303a6e52a2c272a6a",
+    "crew1/dataset_contract.json": "f2cd9d7bd1b6dbeb98a4d429e75350b18dbcda67842bd0dbab837a72c33bc4db"
+  },
+  "crew1_outputs_unchanged_by_the_flow": true,
+  "error": null,
+  "timing": {
+    "started_at": "2026-10-20T17:41:30+00:00",
+    "total_seconds": 22.8,
+    "crew1_kickoff": 19.6,
+    "prepare_handoff": 0.1,
+    "contract_gate": 0.1
+  },
+  "n_jobs": 1
+}
