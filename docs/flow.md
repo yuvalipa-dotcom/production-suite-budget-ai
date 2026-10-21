@@ -33,8 +33,8 @@ the approved Crew 1 handoff (`artifacts/crew1/p3-live-005/`) and the pinned P4 r
 | Outcome label leaked as an input column | `... --scenario label_leakage` | `STOPPED_CONTRACT` (3) |
 
 Every run needs a new, empty `--out` folder. A normal run takes about 5 minutes with `--n-jobs 5` (the 9
-pre-registered grouped-CV runs are not shortened); a stopped run takes under a minute, because Crew 2 never
-starts. `FAILED_RUNTIME` (1) means a runtime error, never a completed model run.
+pre-registered grouped-CV runs are not shortened); a stopped run takes about a minute (Crew 1 runs for real; Python and CrewAI start-up is
+about half of it), because Crew 2 never starts. `FAILED_RUNTIME` (1) means a runtime error, never a completed model run.
 
 ## The Flow (`orchestrator/flow.py`)
 

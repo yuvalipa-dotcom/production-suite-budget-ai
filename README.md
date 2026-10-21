@@ -31,7 +31,8 @@ only original code, synthetic data and documentation.
 
 ### 5-minute quickstart (Windows, Python 3.13)
 
-See the verified results without running anything (the app has its own small environment):
+See the verified results without running anything (the app has its own small environment; the first install
+takes a few minutes):
 
 ```
 git clone https://github.com/yuvalipa-dotcom/production-suite-budget-ai.git
@@ -41,11 +42,13 @@ py -3.13 -m venv .venv-app
 .venv-app\Scripts\streamlit run app\streamlit_app.py
 ```
 
+Until the P5 pull request is merged into `main`, clone the branch instead: add `-b p5-flow` to the clone command.
+
 The browser opens at http://localhost:8501 on the committed canonical run `p5e-run-001` (VERIFIED badge: every
 file matches its recorded sha256). Tabs: Overview, Model results, Artifacts, Contract gate demos, Run the full
 Flow, How it works. Nothing runs until you click a button. Stop the app with Ctrl+C.
 
-To run the Flow and the tests yourself, create the ML environment as well (a larger download):
+To run the Flow and the tests yourself, create the ML environment as well (a larger download: about 5–15 minutes):
 
 ```
 py -3.13 -m venv .venv
@@ -58,9 +61,9 @@ py -3.13 -m venv .venv
 
 | Command | Expected | Time (reference machine) |
 |---|---|---|
-| Flow, normal run | `PASS`, exit code 0, 8 required outputs in `out/flow_runs/run-001/` | about 4–8 minutes (the TRAIN-only model selection: 9 pre-registered grouped-CV runs) |
-| Flow, `--scenario money_x100` | `STOPPED_CONTRACT`, exit code 3; Crew 2 never starts | about 15–25 seconds |
-| `pytest` (all of `tests/`) | all pass; 2 skips are expected on Windows without symlink rights and without a local-only P3 audit record | about 35 minutes (it includes full Flow runs) |
+| Flow, normal run | `PASS`, exit code 0, 8 required outputs in `out/flow_runs/run-001/`, byte-identical to `flow_evidence/runs/p5e-run-001/` | about 4–8 minutes (the TRAIN-only model selection: 9 pre-registered grouped-CV runs); clean-clone rehearsal: 374 s |
+| Flow, `--scenario money_x100` | `STOPPED_CONTRACT`, exit code 3, violation `UNIT_SCALE_ANOMALY`; Crew 2 never starts | about 1 minute (Crew 1 runs for real first; about half of it is Python and CrewAI start-up); clean-clone rehearsal: 71–76 s |
+| `pytest` (all of `tests/`) | all pass; 2 skips are expected on Windows without symlink rights and without a local-only P3 audit record | about 35–40 minutes (it includes full Flow runs); clean-clone rehearsal: 553 passed, 2 skipped in 37 minutes |
 
 Every Flow run needs a new, empty `--out` folder. The app's **Run the full Flow** and **Contract gate demos**
 buttons start the same commands (they use `.venv\Scripts\python.exe`).

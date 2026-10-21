@@ -45,7 +45,7 @@ set PSBA_ML_PYTHON=C:\path\to\ml-env\Scripts\python.exe
   contract and gate report; CSV files as header and counts only (no rows); `model.joblib` as metadata only
   (never loaded).
 * **Contract gate demos**: the five committed breaks with their violation codes and proof that Crew 2 never ran;
-  a button runs one again (about 20 s).
+  a button runs one again (about 1 minute: Crew 1 runs for real first).
 * **Run the full Flow**: a full run (about 4–5 minutes with 5 parallel jobs) only after the confirmation box and
   a click; live stage progress and a redacted log tail.
 

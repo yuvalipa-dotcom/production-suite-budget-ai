@@ -188,3 +188,9 @@ branch (`p5-…` and above, lowercase, hyphen-separated), never a fixed branch o
 the same ref, history, working-tree, path and object checks, and it must descend from `CANDIDATE_BASELINE`, the
 published `main` after P4 (`ea7366f`, the PR #5 merge, held as an integer literal). Tests:
 `tests/test_publication_check_p5.py`.
+
+**Dry-run result** (P5-G, disposable clone with exactly the six published branches from `origin` plus `p5-flow`,
+`--candidate-branch p5-flow`): PASS. 69 commits and 367 blob/path pairs scanned, 0 secret and 0 content findings in
+history, working trees and commit messages; no forbidden path, submodule, LFS pointer or file over 5 MB; the only
+binary file is `flow_evidence/runs/p5e-run-001/crew2/model.joblib`. The private denylist was not applied in this
+run (empty placeholder); it must be run by the owner before publication.
