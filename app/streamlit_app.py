@@ -248,7 +248,8 @@ with tabs[3]:
     st.divider()
     st.subheader("Run a contract break now")
     scen = st.selectbox("Scenario", RUN.SCENARIOS, format_func=lambda s: SCENARIO_TEXT[s])
-    st.caption("About 20 seconds: Crew 1 runs for real (scripted LLM responses), then the gate stops the run.")
+    st.caption("Roughly 1 minute (observed: about 30–80 s): Crew 1 runs for real (scripted LLM responses), "
+               "then the gate stops the run before Crew 2.")
     if st.button("Run this contract break", disabled=RUN.ml_python() is None or bool(RUN.active_runs())):
         try:
             st.session_state["last_started"] = RUN.start_flow(scen, 1)
@@ -276,8 +277,9 @@ with tabs[3]:
 with tabs[4]:
     st.write("Runs the whole Flow locally: Crew 1 kickoff → contract gate → Crew 2 kickoff (TRAIN-only: the 9 "
              "pre-registered grouped-CV runs, selection, final fit) → verification of the 8 outputs.")
-    st.info("Expected runtime: about 4–5 minutes with 5 parallel jobs (Crew 1 ≈ 15 s, Crew 2 ≈ 4 min); slower "
-            "with fewer CPU cores. The grids are never shortened. TEST is never reopened.", icon=":material/timer:")
+    st.info("Expected runtime: roughly 4–8 minutes with 5 parallel jobs (observed: Crew 1 ≈ 20 s, Crew 2 ≈ 5 min); "
+            "slower with fewer CPU cores. The grids are never shortened. TEST is never reopened.",
+            icon=":material/timer:")
     n_jobs = st.slider("Parallel jobs", 1, max(1, os.cpu_count() or 1), min(5, os.cpu_count() or 1))
     ok = st.checkbox("I understand this starts a CPU-heavy local run of several minutes.")
     if st.button("Start the full Flow run", type="primary",

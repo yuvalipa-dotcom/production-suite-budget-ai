@@ -114,6 +114,14 @@ def test_a_contract_break_starts_only_on_click(started):
     assert started == [("contract_column_deletion", 1)]
 
 
+def test_runtime_notes_give_the_observed_approximate_ranges(started):
+    at = _app()
+    assert any(c.value.startswith("Roughly 1 minute (observed: about 30–80 s)") for c in at.caption)
+    assert any("roughly 4–8 minutes with 5 parallel jobs" in i.value for i in at.info)
+    text = " ".join([c.value for c in at.caption] + [i.value for i in at.info])
+    assert "About 20 seconds" not in text and "4–5 minutes" not in text
+
+
 def test_local_source_without_runs_renders(started, monkeypatch, tmp_path):
     monkeypatch.setattr(E, "LOCAL_RUNS_DIR", tmp_path / "none")
     at = _app()

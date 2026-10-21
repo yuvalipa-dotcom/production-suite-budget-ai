@@ -46,7 +46,7 @@ set PSBA_ML_PYTHON=C:\path\to\ml-env\Scripts\python.exe
   (never loaded).
 * **Contract gate demos**: the five committed breaks with their violation codes and proof that Crew 2 never ran;
   a button runs one again (about 1 minute: Crew 1 runs for real first).
-* **Run the full Flow**: a full run (about 4–5 minutes with 5 parallel jobs) only after the confirmation box and
+* **Run the full Flow**: a full run (roughly 4–8 minutes with 5 parallel jobs) only after the confirmation box and
   a click; live stage progress and a redacted log tail.
 
 Nothing runs when the app opens or renders. Runs started from the app are written to `out/flow_runs/` (ignored by

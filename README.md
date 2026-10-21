@@ -24,8 +24,10 @@ only original code, synthetic data and documentation.
   answers each model request from a fixed script, marked `[SCRIPTED RESPONSE - not LLM inference]`. No model
   inference, no network call, no API key. Every number, check, fit and artifact is computed by deterministic
   Python tools. (P3's approved handoff `artifacts/crew1/p3-live-005/` came from one owner-approved live run.)
-* **Instructor approval.** _[OWNER TO COMPLETE before publication: what the instructor approved (for example the
-  synthetic dataset and the scripted LLM transport), by whom and when.]_
+* **Instructor approval.** The instructor approved using the existing Production Suite as the business context for
+  this academic project, provided that the AI agents and machine-learning workflow were developed specifically for
+  the assignment. The instructor also accepted clearly labeled, documented synthetic data. The project focuses on
+  predicting production budget overruns.
 * **AI assistance.** The code and documentation were developed with AI coding assistance (Claude Code) under the
   owner's direction and review; see [AI assistance](#ai-assistance).
 
@@ -67,6 +69,11 @@ py -3.13 -m venv .venv
 
 Every Flow run needs a new, empty `--out` folder. The app's **Run the full Flow** and **Contract gate demos**
 buttons start the same commands (they use `.venv\Scripts\python.exe`).
+
+One test (`tests/test_publish_scan.py::test_git_baselines_are_public_origin_main_commits`) checks the recorded
+publication baselines against `origin/main`. In a clone from GitHub that is the published `main`. In a clone made
+from another local copy, `origin/main` is that copy's local `main`, which may be older; point it at the published
+baseline first: `git update-ref refs/remotes/origin/main ea7366f` (the published `main` after P4).
 
 ### Requirement → evidence
 

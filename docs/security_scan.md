@@ -194,3 +194,8 @@ published `main` after P4 (`ea7366f`, the PR #5 merge, held as an integer litera
 history, working trees and commit messages; no forbidden path, submodule, LFS pointer or file over 5 MB; the only
 binary file is `flow_evidence/runs/p5e-run-001/crew2/model.joblib`. The private denylist was not applied in this
 run (empty placeholder); it must be run by the owner before publication.
+
+**Private denylist** (P5-G closeout): the owner's private denylist, kept outside this repository and never committed,
+was applied (23 entries). `publish_scan` over all 70 local commits and the tracked working tree: 0 secret and
+0 content findings. The disposable-clone dry run with `--candidate-branch p5-flow` and the same denylist is the
+final pre-push gate.
