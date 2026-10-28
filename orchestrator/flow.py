@@ -1,6 +1,6 @@
 """The academic workflow as one CrewAI Flow (P5-E). ALL DATA IS SYNTHETIC.
 
-    python -m orchestrator.flow --out out/flow_runs/<run_id> [--scenario NAME] [--n-jobs N]
+    python -m orchestrator.flow --out out/flow_runs/<run_id> [--scenario NAME] [--n-jobs N] [--llm scripted|live]
 
     @start()                          run_crew1         Crew 1 kickoff -> <run>/crew1/ (its 4 required outputs)
     @listen(run_crew1)                prepare_handoff   isolated copy of THIS run's Crew 1 handoff -> <run>/handoff/,
@@ -14,16 +14,21 @@
     @listen(or_(finish_pass, stop_on_contract, record_failure))
                                       write_manifest    <run>/flow_manifest.json and <run>/flow_events.jsonl
 
-The CrewAI orchestration (Flow, both Crews, their Agents and Tasks) is real; the LLM responses are scripted
-(``crew_common.scripted``: no inference, no network); every number, check, fit and artifact is computed by
-deterministic Python. Statuses: PASS (exit 0), STOPPED_CONTRACT (exit 3, the run stopped on purpose: no model
-was trained), FAILED_RUNTIME (exit 1).
+The CrewAI orchestration (Flow, both Crews, their Agents and Tasks) is real. By default (``--llm scripted``)
+the LLM responses are scripted (``crew_common.scripted``: no inference, no network). With ``--llm live`` all
+six agents get their responses from the Anthropic API (``crew_common.live``: every provider call recorded with
+UTC timestamps, one request and token budget for the whole Flow, no fallback to scripted responses); it needs
+ANTHROPIC_API_KEY in the environment and is refused (exit 2, no call made) without it. In both modes every
+number, check, fit and artifact is computed by deterministic Python, and the contract gate is the same code.
+Statuses: PASS (exit 0), STOPPED_CONTRACT (exit 3, the run stopped on purpose: no model was trained),
+FAILED_RUNTIME (exit 1).
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import sys
 import time
@@ -37,6 +42,7 @@ import crew_common  # noqa: F401  (forces the telemetry settings before CrewAI i
 from budget_flow import contract as C
 from budget_flow import crew2_kickoff as K2
 from budget_flow import handoff as FH
+from crew_common import live as L
 from crew_common import scripted as S
 from crew_common.workspace import REPO, sha256_bytes
 
@@ -50,16 +56,34 @@ STATUSES = {"PASS": 0, "FAILED_RUNTIME": 1, "STOPPED_CONTRACT": 3}
 DISCLOSURE = ("The CrewAI Flow, both Crews, their Agents and Tasks run for real (crew.kickoff() inside Flow "
               "methods). The LLM responses are scripted (" + S.SOURCE + "): no model inference takes place. Every "
               "number, check, fit and artifact is computed by deterministic Python tools.")
+LIVE_DISCLOSURE = ("The CrewAI Flow, both Crews, their six Agents and Tasks run for real (crew.kickoff() inside Flow "
+                   "methods), and every agent response comes from live Anthropic inference (" + L.SOURCE + "; "
+                   "every provider call is listed in crew1/crew_kickoff.json and crew2/crew_kickoff.json under "
+                   "llm_transport.exchanges). Every number, check, fit and artifact is still computed by deterministic "
+                   "Python tools, and the contract gate is deterministic Python.")
+LLM_MODES = ("scripted", "live")
+_RUN = {"log": None, "budget": None}           # the progress printer and live budget of the run in progress
+
+
+class LiveConfigError(RuntimeError):
+    """A live run was requested without what it needs; no provider call was made."""
+
+
+def _say(msg: str) -> None:
+    if _RUN["log"]:
+        _RUN["log"](f"[flow {L.utc_now()}] {msg}")
 
 
 class FlowState(BaseModel):
     out: str = ""
     scenario: str = "none"
     n_jobs: int = 1
+    llm_mode: str = "scripted"
     status: str = "RUNNING"
     route: str = ""
     error: str | None = None
     timings: dict = Field(default_factory=dict)
+    utc: dict = Field(default_factory=dict)
     crew1: dict = Field(default_factory=dict)
     handoff: dict = Field(default_factory=dict)
     gate: dict = Field(default_factory=dict)
@@ -86,20 +110,27 @@ def _flow_class():
 
         def _fail(self, where: str, e: BaseException):
             self.state.error = f"{where}: {type(e).__name__}: {e}"[:800]
+            _say(f"{where} FAILED: {type(e).__name__}")
 
         @start()
         def run_crew1(self):
             from flow_crews.crew1_kickoff import run_crew1_kickoff
             t0, root = time.monotonic(), Path(self.state.out)
+            self.state.utc["crew1_started"] = L.utc_now()
+            _say(f"Crew 1 kickoff starting (LLM mode: {self.state.llm_mode})")
             try:
-                k = run_crew1_kickoff(root / "crew1")
+                k = run_crew1_kickoff(root / "crew1", log=_RUN["log"], llm_mode=self.state.llm_mode,
+                                      budget=_RUN["budget"])
                 self.state.crew1 = {
                     "kickoff": "crew1/crew_kickoff.json", "agents_executed": k["crewai_events"]["agents_executed"],
                     "crewai_events": k["crewai_events"]["event_counts"], "llm_requests": k["llm_transport"]["requests"],
                     "python_tool_calls": k["python_tool_calls"]["calls"], "gate": k["gate"],
                     "outputs_sha256": _hashes(root / "crew1", CREW1_REQUIRED)}
+                _say(f"Crew 1 completed tasks {k['crewai_events']['tasks_completed']}; its own handoff gate "
+                     f"{k['gate']['status']}")
             except Exception as e:                                # noqa: BLE001  (routed to FAILED_RUNTIME)
                 self._fail("crew1", e)
+            self.state.utc["crew1_finished"] = L.utc_now()
             self._timed("crew1_kickoff", t0)
             return "crew1 done"
 
@@ -157,6 +188,8 @@ def _flow_class():
             except Exception as e:                                # noqa: BLE001  (fail closed)
                 codes = ["GATE_EXCEPTION"]
                 violations = [{"code": "GATE_EXCEPTION", "column": None, "detail": f"{type(e).__name__}: {e}"[:300]}]
+            self.state.utc["gate_decided"] = L.utc_now()
+            _say(f"contract gate (deterministic Python) decision: {decision} {codes}")
             self.state.gate = {"contract": C.FLOW_CONTRACT_VERSION, "decision": decision, "violation_codes": codes,
                                "violations": violations[:50], "violation_count": len(violations),
                                "validated_files_sha256": _hashes(dst, (*HANDOFF, "flow_contract.json"))}
@@ -169,12 +202,19 @@ def _flow_class():
         @listen("PASS")
         def run_crew2(self):
             t0, root = time.monotonic(), Path(self.state.out)
+            if self.state.gate.get("decision") != "PASS" or self.state.route != "PASS":    # defence in depth
+                self._fail("crew2", RuntimeError("Crew 2 reached without a PASS gate decision; not started"))
+                self.state.crew2["boundary_violations"] = []
+                return "crew2 refused"
+            self.state.utc["crew2_started"] = L.utc_now()
+            _say("Crew 2 kickoff starting (the gate returned PASS)")
             self.state.crew2.update(kickoff_invoked=True, kickoffs=self.state.crew2["kickoffs"] + 1)
             dst = root / "handoff"
             try:
                 with G.crew2_boundary(REPO, root / "crew1") as boundary:
                     m = K2.run_crew2_kickoff(dst / "clean_data.csv", dst / "dataset_contract.json", root / "crew2",
-                                             flow_contract_json=dst / "flow_contract.json", n_jobs=self.state.n_jobs)
+                                             flow_contract_json=dst / "flow_contract.json", n_jobs=self.state.n_jobs,
+                                             log=_RUN["log"], llm_mode=self.state.llm_mode, budget=_RUN["budget"])
                 k = json.loads((root / "crew2" / "crew_kickoff.json").read_text(encoding="utf-8"))
                 self.state.crew2.update(
                     kickoff="crew2/crew_kickoff.json", agents_executed=k["crewai_events"]["agents_executed"],
@@ -186,6 +226,7 @@ def _flow_class():
                 self._fail("crew2", e)
                 boundary = locals().get("boundary") or {"violations": []}
             self.state.crew2["boundary_violations"] = boundary["violations"]
+            self.state.utc["crew2_finished"] = L.utc_now()
             self._timed("crew2_kickoff", t0)
             return "crew2 done"
 
@@ -199,6 +240,7 @@ def _flow_class():
             if not ok and not self.state.error:
                 self.state.error = "verify_outputs: the 8 required outputs or the boundary checks are incomplete"
             self.state.route = "COMPLETE" if ok else "FAILED_RUNTIME"
+            _say(f"output check: {len(self.state.outputs)} of 8 required outputs present -> {self.state.route}")
             return self.state.route
 
         @listen("COMPLETE")
@@ -247,7 +289,7 @@ class FlowEvidence:
         def make_handler(kind):
             # The bus may pass extra positional arguments (its runtime state); only (source, event) are used.
             def handler(source, event, *_):
-                rec = {"t": round(time.monotonic() - self.t0, 3), "event": kind}
+                rec = {"t": round(time.monotonic() - self.t0, 3), "utc": L.utc_now(), "event": kind}
                 if isinstance(getattr(event, "flow_name", None), str):
                     rec["flow"] = event.flow_name
                 if isinstance(getattr(event, "method_name", None), str):
@@ -262,25 +304,55 @@ class FlowEvidence:
         return scope, bus
 
 
-def run_flow(out: Path, scenario: str = "none", n_jobs: int = 1, log=None) -> dict:
+def _llm_block(llm_mode: str, out: Path, budget) -> dict:
+    """What the provider calls of this run add up to, from the two crews' own exchange records."""
+    if llm_mode != "live":
+        return {"mode": "scripted", "source": S.SOURCE, "provider_calls": 0}
+    exchanges, by_crew = [], {}
+    for crew in ("crew1", "crew2"):
+        p = out / crew / "crew_kickoff.json"
+        if p.is_file():
+            t = json.loads(p.read_text(encoding="utf-8"))["llm_transport"]
+            exchanges += t["exchanges"]
+            by_crew[crew] = {k: t[k] for k in ("requests", "successful_responses", "successful_responses_by_agent",
+                                               "non_200_responses", "refused_before_sending")}
+    usage = L.usage_totals(exchanges)
+    return {"mode": "live", "source": L.SOURCE, "provider": "Anthropic", "model_configured": K2.DEFAULT_MODEL,
+            "models_reported_by_provider": sorted({e["model"] for e in exchanges if e.get("model")}),
+            "provider_calls": len(exchanges), "by_crew": by_crew, "usage": usage,
+            "cost": L.estimate_cost(K2.DEFAULT_MODEL, usage), "budget": budget.summary(),
+            "llm_settings": K2.LLM_SETTINGS, "scripted_responses": 0,
+            "note": "provider calls of a crew that failed before writing its evidence are counted in budget.used only"}
+
+
+def run_flow(out: Path, scenario: str = "none", n_jobs: int = 1, log=None, llm_mode: str = "scripted",
+             budget: L.LiveBudget | None = None) -> dict:
     """Run the Flow once into ``out`` (new or empty). Returns the flow manifest."""
     out = Path(out).resolve()
     if scenario not in ("none", *SC.SCENARIOS):
         raise ValueError(f"unknown scenario {scenario!r}")
+    if llm_mode not in LLM_MODES:
+        raise ValueError(f"unknown llm_mode {llm_mode!r}")
+    if llm_mode == "live" and not os.environ.get("ANTHROPIC_API_KEY"):
+        raise LiveConfigError("a live run needs ANTHROPIC_API_KEY in the environment (no call was made)")
+    budget = (budget or L.LiveBudget.default()) if llm_mode == "live" else None
     if out.exists() and (not out.is_dir() or any(out.iterdir())):
         raise FileExistsError("the run folder must be new or empty")
     out.mkdir(parents=True, exist_ok=True)
     started, t0 = datetime.now(timezone.utc), time.monotonic()
     flow = _flow_class()(suppress_flow_events=False)
     flow.state.out, flow.state.scenario, flow.state.n_jobs = str(out), scenario, n_jobs
+    flow.state.llm_mode = llm_mode
     evidence = FlowEvidence()
     scope, bus = evidence.listening()
+    _RUN.update(log=log, budget=budget)
     try:
         flow.kickoff()
     except Exception as e:                                       # noqa: BLE001  (a Flow-level crash)
         flow.state.status, flow.state.error = "FAILED_RUNTIME", f"flow: {type(e).__name__}: {e}"[:800]
         flow.state.timings["traceback"] = traceback.format_exc()[-2000:]
     finally:
+        _RUN.update(log=None, budget=None)
         bus.flush()
         scope.__exit__(None, None, None)
     st = flow.state
@@ -296,7 +368,8 @@ def run_flow(out: Path, scenario: str = "none", n_jobs: int = 1, log=None) -> di
                            "STOPPED_CONTRACT": "the contract gate stopped the run on purpose; Crew 2 never ran and no "
                                                "model was trained",
                            "FAILED_RUNTIME": "the run failed at runtime; see error"}[st.status],
-        "scenario": st.scenario, "disclosure": DISCLOSURE,
+        "scenario": st.scenario, "disclosure": LIVE_DISCLOSURE if llm_mode == "live" else DISCLOSURE,
+        "llm": _llm_block(llm_mode, out, budget),
         "flow": {"class": "BudgetFlow (crewai.flow.flow.Flow)", "flow_id": getattr(st, "id", None),
                  "decorators": {"start": ["run_crew1"], "listen": ["prepare_handoff", "run_crew2 (route PASS)",
                                 "finish_pass (route COMPLETE)", "stop_on_contract (route STOPPED_CONTRACT)",
@@ -312,7 +385,7 @@ def run_flow(out: Path, scenario: str = "none", n_jobs: int = 1, log=None) -> di
         "crew1_outputs_unchanged_by_the_flow": st.crew1.get("outputs_sha256") == _hashes(out / "crew1", CREW1_REQUIRED),
         "error": st.error,
         "timing": {"started_at": started.isoformat(timespec="seconds"), "total_seconds": round(time.monotonic() - t0, 1),
-                   **st.timings},
+                   **st.timings, "utc": {**st.utc, "flow_finished": L.utc_now()}},
         "n_jobs": n_jobs,
     }
     (out / "flow_events.jsonl").write_text("".join(json.dumps(e, sort_keys=True) + "\n" for e in evidence.events),
@@ -331,12 +404,23 @@ def main(argv=None) -> int:
     ap.add_argument("--scenario", default="none", choices=("none", *SC.SCENARIOS),
                     help="a deliberate contract break applied to the Flow's handoff copy (default: none)")
     ap.add_argument("--n-jobs", type=int, default=1)
+    ap.add_argument("--llm", choices=LLM_MODES, default="scripted",
+                    help="scripted (default: no inference, no network) or live (Anthropic API; needs ANTHROPIC_API_KEY)")
     args = ap.parse_args(argv)
-    m = run_flow(args.out, args.scenario, args.n_jobs, log=lambda s: print(s, flush=True))
+    try:
+        m = run_flow(args.out, args.scenario, args.n_jobs, log=lambda s: print(s, flush=True), llm_mode=args.llm)
+    except LiveConfigError as e:
+        print(f"refused: {e}", file=sys.stderr)
+        return 2
     if m["status"] == "PASS":
         print(f"selected {m['crew2']['selected_model']['candidate']} {m['crew2']['selected_model']['params']}")
-    print(json.dumps({"status": m["status"], "gate": m["gate"].get("violation_codes"),
-                      "outputs": sorted(m["required_outputs_sha256"])}, indent=2))
+    summary = {"status": m["status"], "llm_mode": m["llm"]["mode"], "gate": m["gate"].get("decision"),
+               "gate_violation_codes": m["gate"].get("violation_codes"), "error": m["error"],
+               "outputs": sorted(m["required_outputs_sha256"])}
+    if m["llm"]["mode"] == "live":
+        summary |= {"provider_calls": m["llm"]["provider_calls"], "tokens": m["llm"]["usage"],
+                    "estimated_usd": m["llm"]["cost"].get("estimated_usd")}
+    print(json.dumps(summary, indent=2))
     return m["exit_code"]
 
 

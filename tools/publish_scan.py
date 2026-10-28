@@ -185,6 +185,32 @@ APPROVED_P5_FLOW_DIGESTS = {   # path: (git blob id, approved JSON location patt
     f"{P5_EVIDENCE}/{run}/{rel}": (f"{blob:040x}", P5_DIGEST_LOCATIONS[rel])
     for run, files in _P5_BLOBS.items() for rel, blob in files.items()
 }
+# Narrow, documented exemption (live-LLM follow-up, owner-approved 2026-10-28): the sha256 provenance digests in
+# the 11 JSON records of the documented live-LLM Flow run under flow_evidence/live/ (a byte-for-byte copy of the verified
+# run; docs/security_scan.md). The same conditions (a)-(f) as the P5 exemption apply; the approved locations are
+# the P5 ones plus the raw-export manifest digest in Crew 1's cleaning log and in the handoff's contract copy.
+LIVE_EVIDENCE = "flow_evidence/live"
+LIVE_DIGEST_LOCATIONS = {**P5_DIGEST_LOCATIONS, "crew1/cleaning_log.json": (("raw_manifest_sha256",),),
+                         "handoff/dataset_contract.json": (("raw_manifest_sha256",),)}
+_LIVE_BLOBS = {
+    "p5-live-001": {
+        "crew1/cleaning_log.json": 0x83fd16ac59287c027a6f182fc88edf0e64d7f4d8,
+        "crew1/crew_kickoff.json": 0x25cb26b34b26acdbd1ee2e9f1a429d2c5171b810,
+        "crew1/dataset_contract.json": 0xd5d9023285c831584c09b4e85b495f2e9fbb0447,
+        "crew1/gate_result.json": 0x5e895d16991a1e41814a5a1c911b0cea3ef9f7bd,
+        "crew2/crew_kickoff.json": 0x4aba0eef9f6f5536271fa03d0a96fa75b4018200,
+        "crew2/run_manifest.json": 0xec820b75d8f9b9f96722b2896e4cbc1bbb36df82,
+        "evidence.json": 0xd185109466af5cc9b35b2144c0cbab22552d9504,
+        "flow_manifest.json": 0x384f38cd552f359db39ab9c3f568125cf4fbddfc,
+        "handoff/dataset_contract.json": 0xd5d9023285c831584c09b4e85b495f2e9fbb0447,
+        "handoff/flow_contract.json": 0xd7435673346c00287b14498aa60a6260ef1e5b4b,
+        "handoff/gate_report.json": 0x0df2322a55d56ceeec5485033fc3b71e9c34bc86,
+    },
+}
+APPROVED_LIVE_FLOW_DIGESTS = {   # path: (git blob id, approved JSON location patterns)
+    f"{LIVE_EVIDENCE}/{run}/{rel}": (f"{blob:040x}", LIVE_DIGEST_LOCATIONS[rel])
+    for run, files in _LIVE_BLOBS.items() for rel, blob in files.items()
+}
 P5_PLAIN_KEY = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_./\-]*")
 
 GENERIC_PATTERNS = {
@@ -292,8 +318,9 @@ def _p5_location_ok(loc: tuple, patterns: tuple) -> bool:
 
 
 def _approved_p5_flow_digest(logical: str, data: bytes, finding: dict) -> bool:
-    """True only for an approved digest in an unchanged canonical Flow evidence file (see APPROVED_P5_FLOW_DIGESTS)."""
-    approved = APPROVED_P5_FLOW_DIGESTS.get(logical)
+    """True only for an approved digest in an unchanged canonical or live Flow evidence file (see
+    APPROVED_P5_FLOW_DIGESTS and APPROVED_LIVE_FLOW_DIGESTS)."""
+    approved = APPROVED_P5_FLOW_DIGESTS.get(logical) or APPROVED_LIVE_FLOW_DIGESTS.get(logical)
     if not approved or finding["rule"] != P5_DIGEST_TYPE or git_blob_id(data) != approved[0]:
         return False
     text = data.decode("utf-8")

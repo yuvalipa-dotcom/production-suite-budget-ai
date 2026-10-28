@@ -1,0 +1,825 @@
+{
+  "synthetic": true,
+  "orchestration": "real CrewAI crew.kickoff(): Crew, 3 Agents, 3 Tasks, sequential process",
+  "llm_mode": "live",
+  "llm_responses": "live Anthropic Messages API (api.anthropic.com), recorded by crew_common.live",
+  "disclosure": "The CrewAI orchestration is real and every agent response came from live Anthropic inference (claude-haiku-4-5-20251001); each provider call is recorded in llm_transport.exchanges (no header, no key). Every number, check, fit and artifact was computed by deterministic Python tools (computed_by: python).",
+  "agents": [
+    {
+      "key": "handoff_validator",
+      "role": "Handoff & Feature Validator",
+      "tools": [
+        "validate_handoff",
+        "write_features"
+      ]
+    },
+    {
+      "key": "train_only_modeler",
+      "role": "TRAIN-only Model Trainer",
+      "tools": [
+        "check_preregistration",
+        "list_runs",
+        "run_grouped_cv",
+        "apply_selection_rule",
+        "fit_final_models",
+        "verify_reproducibility"
+      ]
+    },
+    {
+      "key": "evaluation_author",
+      "role": "Evaluation & Ethics Author",
+      "tools": [
+        "write_model",
+        "write_evaluation_report",
+        "write_model_card",
+        "verify_artifacts"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "name": "validate_handoff_and_features",
+      "agent": "Handoff & Feature Validator"
+    },
+    {
+      "name": "train_select_and_fit",
+      "agent": "TRAIN-only Model Trainer"
+    },
+    {
+      "name": "write_and_verify_artifacts",
+      "agent": "Evaluation & Ethics Author"
+    }
+  ],
+  "task_outputs": [
+    {
+      "task": "validate_handoff_and_features",
+      "agent": "Handoff & Feature Validator",
+      "source": "llm",
+      "text": "## Handoff & Feature Validation Report\n\n**Contract Validation:**\n- Contract: flow-1\n- Violations: 0\n- Status: OK\n- Non-train labels: redacted before validation\n- Test vault: SealedVault\n\n**Row Counts per Split:**\n- Train: 1,084 rows (278 production_ids)\n- Test: 306 rows (80 production_ids)\n- Demo: 148 rows (39 production_ids)\n- **Total: 1,538 rows**\n\n**Features Table Written:**\n- File: features.csv\n- Rows: 1,538\n- Columns: handoff_row, production_id, split, cv_fold, plus 27 F27 features\n- Features: 27\n- Outcome columns present: No\n- Schema: features.schema.json\n- SHA256: a0ec48bd45254b64979e7eb8692185394a7ed59ca6ddf8771c827294b7c034e0\n- Bytes: 257,028\n\n**Clean Data Integrity:**\n- SHA256: 2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8\n- Monetary scale ratio range: [1.0, 1.0]\n\n\u2713 Crew 1 handoff validated successfully. Feature table ready for Crew 2."
+    },
+    {
+      "task": "train_select_and_fit",
+      "agent": "TRAIN-only Model Trainer",
+      "source": "llm",
+      "text": "## TRAIN-Only Protocol Execution Summary\n\n**Pre-Registration Verification:**\n- Status: \u2713 UNCHANGED\n- Seed: 42\n- Candidates: B0, LR, GB\n- Grid sizes: B0=1, LR=4, GB=8\n- Brier tie threshold: 0.005\n- Reference: p4_reference.v1\n\n**All 9 Pre-Registered Grouped-CV Runs Completed:**\n\n1. **F27.is_overrun.B0** (Primary)\n   - Brier: 0.2069 \u00b1 0.0142\n   - PR-AUC: 0.6579 \u00b1 0.0452\n   - ROC-AUC: 0.7071 \u00b1 0.0385\n   - Params: {} (no tuning)\n\n2. **F27.is_overrun.LR** (Primary)\n   - Brier: 0.1884 \u00b1 0.0147\n   - PR-AUC: 0.7570 \u00b1 0.0779\n   - ROC-AUC: 0.7891 \u00b1 0.0414\n   - Params: C=10.0 (all folds)\n\n3. **F27.is_overrun.GB** (Primary)\n   - Brier: 0.1992 \u00b1 0.0055\n   - PR-AUC: 0.7321 \u00b1 0.0517\n   - ROC-AUC: 0.7624 \u00b1 0.0152\n   - Params: learning_rate=0.05, max_depth=2\u20133, n_estimators=100\n\n4. **F27.is_material_overrun.B0** (Secondary)\n   - Brier: 0.1911 \u00b1 0.0179\n   - PR-AUC: 0.5730 \u00b1 0.0652\n   - ROC-AUC: 0.7076 \u00b1 0.0495\n\n5. **F27.is_material_overrun.LR** (Secondary)\n   - Brier: 0.1802 \u00b1 0.0164\n   - PR-AUC: 0.6562 \u00b1 0.1092\n   - ROC-AUC: 0.7625 \u00b1 0.0543\n\n6. **F27.is_material_overrun.GB** (Secondary)\n   - Brier: 0.1957 \u00b1 0.0185\n   - PR-AUC: 0.6245 \u00b1 0.0953\n   - ROC-AUC: 0.7192 \u00b1 0.0569\n\n7. **F29.is_overrun.B0** (Research)\n   - Brier: 0.2069 \u00b1 0.0142\n   - PR-AUC: 0.6579 \u00b1 0.0452\n   - ROC-AUC: 0.7071 \u00b1 0.0385\n\n8. **F29.is_overrun.LR** (Research)\n   - Brier: 0.1898 \u00b1 0.0149\n   - PR-AUC: 0.7534 \u00b1 0.0908\n   - ROC-AUC: 0.7863 \u00b1 0.0495\n\n9. **F29.is_overrun.GB** (Research)\n   - Brier: 0.2002 \u00b1 0.0073\n   - PR-AUC: 0.7246 \u00b1 0.0592\n   - ROC-AUC: 0.7597 \u00b1 0.0150\n\n**Selection Rule Applied (Code-Driven):**\n- Rule: \"Lowest mean grouped-CV Brier; tie within 0.005 \u2192 higher mean PR-AUC \u2192 simpler model (B0 < LR < GB)\"\n- Decision criterion: Lowest mean Brier among primary runs (F27.is_overrun.*)\n- Best mean Brier: 0.1884 (F27.is_overrun.LR)\n- Brier differences from best:\n  - B0: +0.0184\n  - LR: 0.0000 (SELECTED)\n  - GB: +0.0107\n- Tie set: [LR] (no tie; LR is sole winner)\n- **Selected Candidate: LR**\n\n**Final Models Refitted on All Train Data (1,084 rows):**\n\n**Primary Model (is_overrun):**\n- Candidate: LR (Logistic Regression)\n- Parameters: C=10.0\n- Model SHA256: bc7b312e127b01d12999998f4b680180dd5150a2bf199e35c582ac5dd3252d81\n- Audit violations: 0\n\n**Secondary Model (is_material_overrun):**\n- Candidate: LR (Logistic Regression)\n- Parameters: C=10.0\n- Model SHA256: 55a5c9e39c7e532f2583a07a72c65df0ccdc20314e09ca528ee557e98c47ee36\n- Audit violations: 0\n\n**Reproducibility Verification Against Approved P4 Cross-Validation:**\n- Mode: EXACT\n- Reference: p4_reference.v1\n- Source run: p4-offline-002\n- **Primary model SHA256 match: \u2713 TRUE**\n- **Secondary model SHA256 match: \u2713 TRUE**\n- **Parameters equal: \u2713 TRUE**\n- **Selection equal: \u2713 TRUE**\n- **Max absolute deviation (CV mean): 0.0**\n- **Max absolute deviation (fold score): 0.0**\n- **Max absolute deviation (prediction): 0.0**\n- **Tolerances: None (exact match required)**\n- **Overall verdict: \u2713 OK \u2013 REPRODUCIBILITY VERIFIED**\n\n---\n\n**FINAL ANSWER:**\n\nThe pre-registered TRAIN-only protocol executed successfully with exact reproducibility against the approved P4 cross-validation.\n\n**Selected Candidate:** LR (Logistic Regression)\n\n**Selection Rule Decision:** The code-driven selection rule applied the pre-registered criterion: lowest mean grouped-CV Brier score among primary runs (F27.is_overrun.*). F27.is_overrun.LR achieved the best mean Brier of 0.1884, decisively outperforming B0 (0.2069, +0.0184 difference) and GB (0.1992, +0.0107 difference). No tie occurred; LR was the sole winner.\n\n**Final Model Parameters:**\n- Primary (is_overrun): Logistic Regression with C=10.0\n- Secondary (is_material_overrun): Logistic Regression with C=10.0\n\n**Model Hashes:**\n- Primary: bc7b312e127b01d12999998f4b680180dd5150a2bf199e35c582ac5dd3252d81\n- Secondary: 55a5c9e39c7e532f2583a07a72c65df0ccdc20314e09ca528ee557e98c47ee36\n\n**Reproducibility Verdict:** \u2713 EXACT MATCH \u2013 All CV means, fold scores, predictions, parameters, selection, and model hashes are identical to the approved P4 reference (p4-offline-002). Maximum absolute deviation across all metrics: 0.0. No tolerances applied; exact verification mode confirmed all outputs."
+    },
+    {
+      "task": "write_and_verify_artifacts",
+      "agent": "Evaluation & Ethics Author",
+      "source": "llm",
+      "text": "---\n\n## **CREW 2 ARTIFACTS PRODUCED AND VERIFIED**\n\n### **Artifacts Written:**\n\n1. **model.joblib** \u2713\n   - Bytes: 33,798\n   - SHA256: 053cb987dfef0953823e79b94c01ee2009350589e92275475af8879e9b1c6bb2\n   - Contents: Two TRAIN-only final models (primary: is_overrun, secondary: is_material_overrun), both Logistic Regression with C=10.0, refitted on all 1,084 training rows\n\n2. **evaluation_report.md** \u2713\n   - Bytes: 5,679\n   - SHA256: 161c1c3f0d2e888c848588368731d7945b350fdaef184e18bc49e0f0d63a6f27\n   - Sections: A. Current TRAIN-only grouped cross-validation (this run); B. Historical P4 TEST evaluation (cited, not recomputed)\n\n3. **model_card.md** \u2713\n   - Bytes: 3,848\n   - SHA256: 39c21e11e84587729f56b133d8cb1d777479ed66487e0efce85463e3f64b8218\n   - Contents: Purpose, training data, evaluation, limitations, synthetic-data disclosure, and ethical considerations\n\n---\n\n### **Verification Results \u2013 All 13 Checks Passed:**\n\n| Check | Result |\n|-------|--------|\n| Four artifacts written (features.csv, model.joblib, evaluation_report.md, model_card.md) | \u2713 PASS |\n| Artifacts equal what the tools wrote | \u2713 PASS |\n| features.csv has correct header (handoff_row, production_id, split, cv_fold + 27 F27 features) | \u2713 PASS |\n| features.csv has 1,538 rows | \u2713 PASS |\n| No outcome column in features.csv | \u2713 PASS |\n| No production_id in evaluation_report.md or model_card.md | \u2713 PASS |\n| model.joblib under 200 KB | \u2713 PASS |\n| evaluation_report.md separates current TRAIN-only CV from historical TEST | \u2713 PASS |\n| evaluation_report.md states test was not reopened | \u2713 PASS |\n| model_card.md discloses synthetic data | \u2713 PASS |\n| model_card.md includes ethical considerations | \u2713 PASS |\n| Reproducibility verified against P4 reference | \u2713 PASS |\n| Test vault sealed and unopened | \u2713 PASS |\n\n---\n\n### **Final Status:**\n\n\u2705 **ALL CREW 2 ARTIFACTS COMPLETE AND VERIFIED**\n\n- **Primary Model:** Logistic Regression (C=10.0) for is_overrun\n- **Secondary Model:** Logistic Regression (C=10.0) for is_material_overrun\n- **Selection Criterion:** Lowest mean grouped-CV Brier (0.1884) among pre-registered primary candidates\n- **Training Data:** 1,084 rows (278 production_ids)\n- **Features:** 27 F27 features\n- **Reproducibility:** \u2713 EXACT MATCH to approved P4 reference (p4-offline-002)\n- **Test Vault:** Sealed and unopened\n- **Data:** Synthetic (disclosed in model_card.md)\n- **Ethical Considerations:** Documented in model_card.md"
+    }
+  ],
+  "crewai_events": {
+    "crewai_version": "1.15.28",
+    "event_counts": {
+      "crew_kickoff_started": 1,
+      "task_started": 3,
+      "agent_execution_started": 3,
+      "llm_call_started": 12,
+      "tool_usage_finished": 20,
+      "agent_execution_completed": 3,
+      "task_completed": 3,
+      "crew_kickoff_completed": 1
+    },
+    "agents_executed": [
+      "Handoff & Feature Validator",
+      "TRAIN-only Model Trainer",
+      "Evaluation & Ethics Author"
+    ],
+    "tasks_completed": [
+      "validate_handoff_and_features",
+      "train_select_and_fit",
+      "write_and_verify_artifacts"
+    ],
+    "tools_by_agent": {
+      "Handoff & Feature Validator": [
+        "validate_handoff",
+        "write_features"
+      ],
+      "TRAIN-only Model Trainer": [
+        "check_preregistration",
+        "list_runs",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "apply_selection_rule",
+        "fit_final_models",
+        "verify_reproducibility"
+      ],
+      "Evaluation & Ethics Author": [
+        "write_model",
+        "write_evaluation_report",
+        "write_model_card",
+        "verify_artifacts"
+      ]
+    },
+    "events": [
+      {
+        "event": "crew_kickoff_started",
+        "crew": "crew"
+      },
+      {
+        "event": "task_started",
+        "task": "validate_handoff_and_features",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "validate_handoff",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "write_features",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "task_completed",
+        "task": "validate_handoff_and_features",
+        "agent": "Handoff & Feature Validator"
+      },
+      {
+        "event": "task_started",
+        "task": "train_select_and_fit",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "check_preregistration",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "list_runs",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_grouped_cv",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "apply_selection_rule",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "fit_final_models",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "verify_reproducibility",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "task_completed",
+        "task": "train_select_and_fit",
+        "agent": "TRAIN-only Model Trainer"
+      },
+      {
+        "event": "task_started",
+        "task": "write_and_verify_artifacts",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "write_model",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "write_evaluation_report",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "write_model_card",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "verify_artifacts",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "task_completed",
+        "task": "write_and_verify_artifacts",
+        "agent": "Evaluation & Ethics Author"
+      },
+      {
+        "event": "crew_kickoff_completed",
+        "crew": "crew"
+      }
+    ]
+  },
+  "llm_transport": {
+    "source": "live Anthropic Messages API (api.anthropic.com), recorded by crew_common.live",
+    "requests": 12,
+    "successful_responses": 12,
+    "successful_responses_by_agent": {
+      "handoff_validator": 2,
+      "train_only_modeler": 7,
+      "evaluation_author": 3
+    },
+    "non_200_responses": 0,
+    "refused_before_sending": 0,
+    "usage": {
+      "input_tokens": 36975,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "output_tokens": 4004
+    },
+    "network_attempts_blocked": [],
+    "exchanges": [
+      {
+        "n": 1,
+        "crew": "crew2",
+        "agent": "handoff_validator",
+        "source": "live",
+        "started_utc": "2026-10-28T09:27:30.479+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "043d668b153331a9215065a5d3efa6b1d53b6bd2733d827a8f4cadd9e859e991",
+        "request_messages": 1,
+        "tools_offered": [
+          "validate_handoff",
+          "write_features"
+        ],
+        "finished_utc": "2026-10-28T09:27:42.833+00:00",
+        "seconds": 12.354,
+        "status": 200,
+        "provider_request_id": "req_011CgUPzsfMKkM3gskpELLC1",
+        "message_id": "msg_011CgUPzssko5x6DXGZkVz7k",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 911,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 68
+        },
+        "tool_calls": [
+          "validate_handoff",
+          "write_features"
+        ]
+      },
+      {
+        "n": 2,
+        "crew": "crew2",
+        "agent": "handoff_validator",
+        "source": "live",
+        "started_utc": "2026-10-28T09:27:43.024+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "fb4b35a367bfdd4f895cfcceb8cc09ea59a4caa8464c408ca291cb53b6ae0576",
+        "request_messages": 3,
+        "tools_offered": [
+          "validate_handoff",
+          "write_features"
+        ],
+        "finished_utc": "2026-10-28T09:27:47.267+00:00",
+        "seconds": 4.244,
+        "status": 200,
+        "provider_request_id": "req_011CgUQ1nYo1NJMPiF6VkH5a",
+        "message_id": "msg_011CgUQ1nkxTUzdgLwEsGAY2",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "end_turn",
+        "usage": {
+          "input_tokens": 1272,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 343
+        },
+        "tool_calls": []
+      },
+      {
+        "n": 3,
+        "crew": "crew2",
+        "agent": "train_only_modeler",
+        "source": "live",
+        "started_utc": "2026-10-28T09:27:47.314+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "26f126a26bf14d1defd8f8b9fd7469bb2cb29c88bba1dd2a74646973fa85452e",
+        "request_messages": 1,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "finished_utc": "2026-10-28T09:28:06.096+00:00",
+        "seconds": 18.782,
+        "status": 200,
+        "provider_request_id": "req_011CgUQ27TqUoU8XjNfaVufh",
+        "message_id": "msg_011CgUQ27fzd1RmQ997MCu5N",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 1747,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 66
+        },
+        "tool_calls": [
+          "check_preregistration"
+        ]
+      },
+      {
+        "n": 4,
+        "crew": "crew2",
+        "agent": "train_only_modeler",
+        "source": "live",
+        "started_utc": "2026-10-28T09:28:06.135+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "a9b857888b65d6bf6d3c5028d311585d2f16dba73df33cfa0cba83a968dedc68",
+        "request_messages": 3,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "finished_utc": "2026-10-28T09:28:08.448+00:00",
+        "seconds": 2.313,
+        "status": 200,
+        "provider_request_id": "req_011CgUQ3VL1htR8kqcvHVKRK",
+        "message_id": "msg_011CgUQ3VtFejhrE3Egguvwm",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 1857,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 78
+        },
+        "tool_calls": [
+          "list_runs"
+        ]
+      },
+      {
+        "n": 5,
+        "crew": "crew2",
+        "agent": "train_only_modeler",
+        "source": "live",
+        "started_utc": "2026-10-28T09:28:08.456+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "88f6bc76ae1458e6d6e6925ae2ce726725362a33f9c0119148f353d540665049",
+        "request_messages": 5,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "finished_utc": "2026-10-28T09:28:13.036+00:00",
+        "seconds": 4.579,
+        "status": 200,
+        "provider_request_id": "req_011CgUQ3fJYAYTAQ7XuUzgtX",
+        "message_id": "msg_011CgUQ3fUhzNz6EvsRXanAN",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 2100,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 478
+        },
+        "tool_calls": [
+          "run_grouped_cv",
+          "run_grouped_cv",
+          "run_grouped_cv",
+          "run_grouped_cv",
+          "run_grouped_cv",
+          "run_grouped_cv",
+          "run_grouped_cv",
+          "run_grouped_cv",
+          "run_grouped_cv"
+        ]
+      },
+      {
+        "n": 6,
+        "crew": "crew2",
+        "agent": "train_only_modeler",
+        "source": "live",
+        "started_utc": "2026-10-28T09:30:40.997+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "0393e377baa5db5b1e97404a5bea16c6bdd4e6a213ab9a68caf5651624572934",
+        "request_messages": 7,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "finished_utc": "2026-10-28T09:30:42.991+00:00",
+        "seconds": 1.994,
+        "status": 200,
+        "provider_request_id": "req_011CgUQEvCXogJG7LJTV5zUe",
+        "message_id": "msg_011CgUQEvg4WBfofTjADfr7S",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 4371,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 38
+        },
+        "tool_calls": [
+          "apply_selection_rule"
+        ]
+      },
+      {
+        "n": 7,
+        "crew": "crew2",
+        "agent": "train_only_modeler",
+        "source": "live",
+        "started_utc": "2026-10-28T09:30:43.010+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "4acc3318db67b5a6fc0bf8b995eb2e1323e8943427ebbdc94e3d61b12ef3ac96",
+        "request_messages": 9,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "finished_utc": "2026-10-28T09:30:44.924+00:00",
+        "seconds": 1.914,
+        "status": 200,
+        "provider_request_id": "req_011CgUQF454WL7aUiFSh4Sx1",
+        "message_id": "msg_011CgUQF4EyanYpV8JMMdcdc",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 4503,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 38
+        },
+        "tool_calls": [
+          "fit_final_models"
+        ]
+      },
+      {
+        "n": 8,
+        "crew": "crew2",
+        "agent": "train_only_modeler",
+        "source": "live",
+        "started_utc": "2026-10-28T09:30:48.483+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "312c5e6244e2e3e2543e9fb056bc14275ead367a7f5013d997c8cfd1a039b52c",
+        "request_messages": 11,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "finished_utc": "2026-10-28T09:30:50.155+00:00",
+        "seconds": 1.673,
+        "status": 200,
+        "provider_request_id": "req_011CgUQFTSVYNrJ5fTTnpS2k",
+        "message_id": "msg_011CgUQFTcAdtfg31E9576n6",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 4718,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 37
+        },
+        "tool_calls": [
+          "verify_reproducibility"
+        ]
+      },
+      {
+        "n": 9,
+        "crew": "crew2",
+        "agent": "train_only_modeler",
+        "source": "live",
+        "started_utc": "2026-10-28T09:30:50.371+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "ac4a17f23bdd73ca144036469ca2a0eee5e5532a1013de222cc2a1b8e8821f11",
+        "request_messages": 13,
+        "tools_offered": [
+          "apply_selection_rule",
+          "check_preregistration",
+          "fit_final_models",
+          "list_runs",
+          "run_grouped_cv",
+          "verify_reproducibility"
+        ],
+        "finished_utc": "2026-10-28T09:31:07.396+00:00",
+        "seconds": 17.025,
+        "status": 200,
+        "provider_request_id": "req_011CgUQFbXASTAN6ZdnCn7bv",
+        "message_id": "msg_011CgUQFbgacbGNEY2ZL8XV9",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "end_turn",
+        "usage": {
+          "input_tokens": 4867,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 1843
+        },
+        "tool_calls": []
+      },
+      {
+        "n": 10,
+        "crew": "crew2",
+        "agent": "evaluation_author",
+        "source": "live",
+        "started_utc": "2026-10-28T09:31:07.447+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "0223723bb80f291ecde6908f2594fa4f73c3344d5cb14f2c02cdcfd54c36643a",
+        "request_messages": 1,
+        "tools_offered": [
+          "verify_artifacts",
+          "write_evaluation_report",
+          "write_model",
+          "write_model_card"
+        ],
+        "finished_utc": "2026-10-28T09:31:20.440+00:00",
+        "seconds": 12.993,
+        "status": 200,
+        "provider_request_id": "req_011CgUQGs9YduqYEH1me8Lb5",
+        "message_id": "msg_011CgUQGsLTSxc32UjLBsk9s",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 3228,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 98
+        },
+        "tool_calls": [
+          "write_model",
+          "write_evaluation_report",
+          "write_model_card"
+        ]
+      },
+      {
+        "n": 11,
+        "crew": "crew2",
+        "agent": "evaluation_author",
+        "source": "live",
+        "started_utc": "2026-10-28T09:31:20.484+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "36b7ca5fc4ca15313404b37a12ad7356c4ed34457f157c79bbe6643bde00bec1",
+        "request_messages": 3,
+        "tools_offered": [
+          "verify_artifacts",
+          "write_evaluation_report",
+          "write_model",
+          "write_model_card"
+        ],
+        "finished_utc": "2026-10-28T09:31:22.512+00:00",
+        "seconds": 2.028,
+        "status": 200,
+        "provider_request_id": "req_011CgUQHpKQuExTer9xTcmRi",
+        "message_id": "msg_011CgUQHpW5JTRizCtzgcdvg",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 3598,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 49
+        },
+        "tool_calls": [
+          "verify_artifacts"
+        ]
+      },
+      {
+        "n": 12,
+        "crew": "crew2",
+        "agent": "evaluation_author",
+        "source": "live",
+        "started_utc": "2026-10-28T09:31:22.553+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "6a66cd3f4b16b5c9ba3f2695101130a746b06af6cba38b9c01ec9d2d49f1a086",
+        "request_messages": 5,
+        "tools_offered": [
+          "verify_artifacts",
+          "write_evaluation_report",
+          "write_model",
+          "write_model_card"
+        ],
+        "finished_utc": "2026-10-28T09:31:31.322+00:00",
+        "seconds": 8.769,
+        "status": 200,
+        "provider_request_id": "req_011CgUQHy8UrzVVCDRnLFgu1",
+        "message_id": "msg_011CgUQHyL954RiqxJiE8oef",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "end_turn",
+        "usage": {
+          "input_tokens": 3803,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 868
+        },
+        "tool_calls": []
+      }
+    ]
+  },
+  "python_tool_calls": {
+    "computed_by": "python",
+    "calls": 20,
+    "failed": 0,
+    "by_agent": {
+      "handoff_validator": [
+        "validate_handoff",
+        "write_features"
+      ],
+      "train_only_modeler": [
+        "check_preregistration",
+        "list_runs",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "run_grouped_cv",
+        "apply_selection_rule",
+        "fit_final_models",
+        "verify_reproducibility"
+      ],
+      "evaluation_author": [
+        "write_model",
+        "write_evaluation_report",
+        "write_model_card",
+        "verify_artifacts"
+      ]
+    }
+  },
+  "token_usage_reported_by_crewai": {
+    "total_tokens": 40979,
+    "prompt_tokens": 36975,
+    "cached_prompt_tokens": 0,
+    "completion_tokens": 4004,
+    "reasoning_tokens": 0,
+    "cache_creation_tokens": 0,
+    "successful_requests": 12
+  },
+  "model_id_configured": "anthropic/claude-haiku-4-5-20251001",
+  "llm_settings": {
+    "temperature": 0.0,
+    "max_tokens": 8192,
+    "timeout": 180.0,
+    "max_retries": 2
+  },
+  "agent_limits": {
+    "handoff_validator": {
+      "max_iter": 6,
+      "max_execution_time": 600
+    },
+    "train_only_modeler": {
+      "max_iter": 20,
+      "max_execution_time": 7200
+    },
+    "evaluation_author": {
+      "max_iter": 8,
+      "max_execution_time": 600
+    }
+  },
+  "agent_max_retry_limit": 0,
+  "max_rpm": 20,
+  "timing": {
+    "kickoff_started_utc": "2026-10-28T09:27:30.442+00:00",
+    "kickoff_finished_utc": "2026-10-28T09:31:31.355+00:00"
+  }
+}

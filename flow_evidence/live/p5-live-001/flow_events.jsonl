@@ -1,0 +1,16 @@
+{"event": "flow_started", "flow": "BudgetFlow", "t": 0.018, "utc": "2026-10-28T09:22:52.479+00:00"}
+{"event": "method_started", "flow": "BudgetFlow", "method": "run_crew1", "t": 0.019, "utc": "2026-10-28T09:22:52.480+00:00"}
+{"event": "method_started", "flow": "BudgetFlow", "method": "prepare_handoff", "t": 275.94, "utc": "2026-10-28T09:27:28.396+00:00"}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "run_crew1", "result": "crew1 done", "t": 275.94, "utc": "2026-10-28T09:27:28.396+00:00"}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "prepare_handoff", "result": "handoff ready", "t": 275.987, "utc": "2026-10-28T09:27:28.443+00:00"}
+{"event": "method_started", "flow": "BudgetFlow", "method": "contract_gate", "t": 275.987, "utc": "2026-10-28T09:27:28.443+00:00"}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "contract_gate", "result": "PASS", "t": 276.073, "utc": "2026-10-28T09:27:28.529+00:00"}
+{"event": "method_started", "flow": "BudgetFlow", "method": "run_crew2", "t": 276.073, "utc": "2026-10-28T09:27:28.529+00:00"}
+{"event": "method_started", "flow": "BudgetFlow", "method": "verify_outputs", "t": 518.995, "utc": "2026-10-28T09:31:31.448+00:00"}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "run_crew2", "result": "crew2 done", "t": 518.995, "utc": "2026-10-28T09:31:31.448+00:00"}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "verify_outputs", "result": "COMPLETE", "t": 519.033, "utc": "2026-10-28T09:31:31.485+00:00"}
+{"event": "method_started", "flow": "BudgetFlow", "method": "finish_pass", "t": 519.033, "utc": "2026-10-28T09:31:31.485+00:00"}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "finish_pass", "result": "PASS", "t": 519.035, "utc": "2026-10-28T09:31:31.487+00:00"}
+{"event": "method_started", "flow": "BudgetFlow", "method": "write_manifest", "t": 519.035, "utc": "2026-10-28T09:31:31.487+00:00"}
+{"event": "method_finished", "flow": "BudgetFlow", "method": "write_manifest", "result": "PASS", "t": 519.036, "utc": "2026-10-28T09:31:31.488+00:00"}
+{"event": "flow_finished", "flow": "BudgetFlow", "t": 519.037, "utc": "2026-10-28T09:31:31.490+00:00"}

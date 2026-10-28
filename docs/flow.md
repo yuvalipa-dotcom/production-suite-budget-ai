@@ -6,6 +6,9 @@
 > place, no request leaves the process, and no API key is needed. Every scripted text starts with
 > `[SCRIPTED RESPONSE - not LLM inference]`. Every number, check, fit and artifact is computed by
 > deterministic Python tools.
+>
+> This is the default mode (`--llm scripted`). The same Flow also runs with **live** Anthropic responses for all
+> six agents (`--llm live`, needs `ANTHROPIC_API_KEY`): see [`live_run.md`](live_run.md).
 
 ## Install (fresh clone)
 
@@ -31,6 +34,7 @@ the approved Crew 1 handoff (`artifacts/crew1/p3-live-005/`) and the pinned P4 r
 | Required snapshot row deleted from `clean_data.csv` | `... --scenario row_deletion` | `STOPPED_CONTRACT` (3) |
 | Required column definition deleted from `dataset_contract.json` | `... --scenario contract_column_deletion` | `STOPPED_CONTRACT` (3) |
 | Outcome label leaked as an input column | `... --scenario label_leakage` | `STOPPED_CONTRACT` (3) |
+| The normal run with live LLM responses ([`live_run.md`](live_run.md)) | `... -m orchestrator.flow --llm live --out out/flow_runs/live-001 --n-jobs 5` | `PASS` (0); refused (2) without `ANTHROPIC_API_KEY` |
 
 Every run needs a new, empty `--out` folder. A normal run takes about 5 minutes with `--n-jobs 5` (the 9
 pre-registered grouped-CV runs are not shortened); a stopped run takes about a minute (Crew 1 runs for real; Python and CrewAI start-up is
