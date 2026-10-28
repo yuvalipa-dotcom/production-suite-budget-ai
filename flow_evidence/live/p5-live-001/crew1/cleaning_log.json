@@ -1,0 +1,658 @@
+{
+  "clean_rows": {
+    "budget_revisions": 552,
+    "category_plans": 2956,
+    "commitments": 3740,
+    "manual_costs": 1218,
+    "payments": 5269,
+    "productions": 400,
+    "snapshot_schedule": 1600
+  },
+  "excluded_payments": [
+    "SYN-0007-P03",
+    "SYN-0053-P09",
+    "SYN-0057-P07",
+    "SYN-0136-P12",
+    "SYN-0207-P12",
+    "SYN-0231-P16",
+    "SYN-0251-P05",
+    "SYN-0292-P06",
+    "SYN-0319-P15",
+    "SYN-0332-P05",
+    "SYN-0346-P07",
+    "SYN-0355-P19",
+    "SYN-0357-P10",
+    "SYN-0369-P05",
+    "SYN-0381-P13"
+  ],
+  "exclusion_counts": {
+    "commitment_category_missing": 50,
+    "manual_cost_undated": 12
+  },
+  "ineligible_snapshots": [
+    {
+      "production_id": "SYN-0011",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0011",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0011",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0022",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0022",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0023",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0023",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0023",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0025",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0025",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0025",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0032",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0097",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0108",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0108",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0108",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0110",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0110",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0125",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0125",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0125",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0133",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0133",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0133",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0153",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0153",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0154",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0154",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0154",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0182",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0186",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0188",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0188",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0242",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0242",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0242",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0250",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0250",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0282",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0282",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0283",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0283",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0283",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0301",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0315",
+      "reason": "manual_cost_undated",
+      "stage": "S0"
+    },
+    {
+      "production_id": "SYN-0315",
+      "reason": "manual_cost_undated",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0315",
+      "reason": "manual_cost_undated",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0315",
+      "reason": "manual_cost_undated",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0325",
+      "reason": "manual_cost_undated",
+      "stage": "S0"
+    },
+    {
+      "production_id": "SYN-0325",
+      "reason": "manual_cost_undated",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0325",
+      "reason": "manual_cost_undated",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0325",
+      "reason": "manual_cost_undated",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0341",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0341",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0341",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0348",
+      "reason": "commitment_category_missing",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0348",
+      "reason": "commitment_category_missing",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0348",
+      "reason": "commitment_category_missing",
+      "stage": "S3"
+    },
+    {
+      "production_id": "SYN-0367",
+      "reason": "manual_cost_undated",
+      "stage": "S0"
+    },
+    {
+      "production_id": "SYN-0367",
+      "reason": "manual_cost_undated",
+      "stage": "S1"
+    },
+    {
+      "production_id": "SYN-0367",
+      "reason": "manual_cost_undated",
+      "stage": "S2"
+    },
+    {
+      "production_id": "SYN-0367",
+      "reason": "manual_cost_undated",
+      "stage": "S3"
+    }
+  ],
+  "issues": [
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0011-C01",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0022-C08",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0023-C05",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0025-C01",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0032-C11",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0097-C05",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0108-C06",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0110-C05",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0125-C05",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0133-C02",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0153-C08",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0154-C07",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0157-C02",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0182-C05",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0186-C09",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0188-C10",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0242-C05",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0250-C07",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0282-C14",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0283-C06",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0301-C08",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0341-C05",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0348-C08",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:category"
+      ],
+      "record_id": "SYN-0357-C10",
+      "table": "commitments"
+    },
+    {
+      "problems": [
+        "missing:created_date"
+      ],
+      "record_id": "SYN-0315-M01",
+      "table": "manual_costs"
+    },
+    {
+      "problems": [
+        "missing:created_date"
+      ],
+      "record_id": "SYN-0325-M01",
+      "table": "manual_costs"
+    },
+    {
+      "problems": [
+        "missing:created_date"
+      ],
+      "record_id": "SYN-0367-M01",
+      "table": "manual_costs"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0007-P03",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0053-P09",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0057-P07",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0136-P12",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0207-P12",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0231-P16",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0251-P05",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0292-P06",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0319-P15",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0332-P05",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0346-P07",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0355-P19",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0357-P10",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0369-P05",
+      "table": "payments"
+    },
+    {
+      "problems": [
+        "out_of_range:amount_gross"
+      ],
+      "record_id": "SYN-0381-P13",
+      "table": "payments"
+    }
+  ],
+  "policy": "C (docs/raw_cleaning_policy.md)",
+  "raw_manifest_sha256": "82724a3dcac035ae83795299a9850380c6993dcc2ea837b7e95aa9a11942cef7",
+  "raw_rows": {
+    "budget_revisions": 552,
+    "category_plans": 2956,
+    "commitments": 3762,
+    "manual_costs": 1234,
+    "payments": 5353,
+    "productions": 400,
+    "snapshot_schedule": 1600
+  },
+  "snapshots": {
+    "eligible": 1538,
+    "ineligible": 62,
+    "scheduled": 1600
+  },
+  "synthetic": true,
+  "target_unreliable_productions": []
+}

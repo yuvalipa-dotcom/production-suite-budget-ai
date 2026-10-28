@@ -180,6 +180,39 @@ There is no value or pattern allow-list, no other file type, and no other run. T
 
 **Note on re-export.** Re-exporting any canonical run changes its blob ids and voids the exemption for that file by design; a new export needs a new owner-approved review.
 
+## Live-LLM exemption: the provenance digests of the documented live Flow run (owner-approved 2026-10-28)
+
+`flow_evidence/live/p5-live-001/` is a byte-for-byte copy of the documented live-LLM Flow run (24 files: the 23
+files of the run folder and `evidence.json`). detect-secrets flags 97 lines in 11 of its JSON records, all of type
+`Hex High Entropy String`. Each is a sha256 provenance digest: of a file in the publish set, of a pinned P4 model
+(4), or of a recorded provider request body (32, `request_sha256`; the body itself is not recorded). No finding
+is a key: the run's provider identifiers (`msg_…`, `req_…`) and every other value are not flagged, and the content
+scan (generic patterns and the owner's private denylist, 23 entries) finds nothing.
+
+`tools/publish_scan.py` spares these digests only under the same six conditions as the P5-F exemption (exact path,
+unchanged file by git blob id, exact finding type, a whole line that is one key with a lowercase hex-64 value, every
+JSON location of the value approved, exact occurrence count). The approved locations (`LIVE_DIGEST_LOCATIONS`) are
+the P5-F ones plus `raw_manifest_sha256` in `crew1/cleaning_log.json` and `handoff/dataset_contract.json`.
+
+**Proof.** `tests/test_publish_scan_live.py`: the whole live run scans clean; each of the 11 files is flagged without
+the exemption (97 findings) and is byte-identical to its approved blob; every spared value is a file digest, a P4
+model digest or a request digest; a changed digest, any other edit and the same bytes at any other path are
+detected; a planted token and an extra hex value are still detected; another finding type or line is not spared.
+`tests/test_flow_live.py` checks that the committed run passes all ten verifier checks and that `evidence.json`
+matches every file.
+
+**Note.** The copy is never re-exported or edited: a change to any of the 11 files voids its exemption by design.
+
+**Dry-run result** (2026-10-28, owner-approved exemption; disposable clone from GitHub with exactly the six fixed
+publication branches plus the candidate `p5-live-llm`, holding the candidate content as one local commit; remote
+removed; `--candidate-branch p5-live-llm`; the owner's private denylist, 23 entries): **PASS**. Final run, with the
+academic evidence report included: 73 commits and 413 blob/path pairs scanned: 0 secret and 0 content findings in history, in all seven working trees and in 563
+commit-message lines; no unexpected ref, forbidden path, submodule, LFS pointer or file over 5 MB; the only binary
+files are the two `model.joblib` files. The candidate descends from `CANDIDATE_BASELINE`. (A first attempt flagged
+2 content findings in every working tree: the checker had been run from inside the clone, so Python wrote
+`tools/__pycache__/*.pyc` there, which embeds a local path. Rerun with `python -B` after removing the cache: clean.
+Run the checker from outside the clone or with `-B`.) The clone was deleted afterwards.
+
 ## P5-G: the publication candidate is a parameter
 
 The dry-run checker's fixed branch list is unchanged (the W-3, P2, P3 and P4 branches). A later candidate is named

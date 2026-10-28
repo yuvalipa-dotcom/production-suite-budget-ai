@@ -4,9 +4,12 @@
 
 The CrewAI orchestration is real: CrewAI builds the agents and tasks, runs the tasks in order, sends each
 agent's requests to its LLM, executes the tool calls the responses ask for, and passes task context on.
-The model responses are NOT LLM inference: ``crew_common.scripted.ScriptedTransport`` answers every
-provider request in-process from a fixed script, every scripted text is marked, and no request leaves the
-process. Every number, check, fit and artifact is computed by deterministic Python tools.
+By default the model responses are NOT LLM inference: ``crew_common.scripted.ScriptedTransport`` answers
+every provider request in-process from a fixed script, every scripted text is marked, and no request leaves
+the process. With ``llm_mode="live"`` every response comes from the Anthropic API instead
+(``crew_common.live.RecordingTransport``: each provider call recorded, ``max_rpm`` 20 as in Crew 1, a shared
+request and token budget), with no fallback to scripted responses. In both modes every number, check, fit
+and artifact is computed by deterministic Python tools.
 
 Agents (``budget_flow/config/crew2_agents.yaml``) and their tools:
 
@@ -40,6 +43,7 @@ from pydantic import BaseModel, Field
 
 import crew_common  # noqa: F401  (forces the telemetry settings before CrewAI is imported)
 from crew_common import kickoff as K
+from crew_common import live as L
 from crew_common import scripted as S
 from crew_common import tools as CT
 from crew_common import workspace as W
@@ -69,6 +73,7 @@ AGENT_LIMITS = {
     "evaluation_author": {"max_iter": 8, "max_execution_time": 600},
 }
 AGENT_MAX_RETRY_LIMIT = 0
+LIVE_MAX_RPM = 20                                         # live runs only: the Crew 1 (P3) request-rate limit
 READ_NAMES = {"in.clean_data": "in/clean_data.csv", "in.dataset_contract": "in/dataset_contract.json",
               "in.flow_contract": "in/flow_contract.json"}
 OUTPUT_NAMES = {"out.features": "out/features.csv", "out.features_schema": "out/features.schema.json",
@@ -308,7 +313,8 @@ def load_config() -> tuple[dict, dict]:
             yaml.safe_load((CONFIG / "crew2_tasks.yaml").read_text(encoding="utf-8")))
 
 
-def build_crew(ctx: Crew2FlowContext, recorder: Recorder, state: CT.RunState, model: str = DEFAULT_MODEL):
+def build_crew(ctx: Crew2FlowContext, recorder: Recorder, state: CT.RunState, model: str = DEFAULT_MODEL,
+               max_rpm: int | None = None):
     """Three agents, each with only its own tools and its own LLM; three sequential tasks; the Crew 1/P4 safety
     settings (no memory, knowledge, embeddings, delegation, code execution, reasoning, planning or cache)."""
     import warnings
@@ -327,7 +333,7 @@ def build_crew(ctx: Crew2FlowContext, recorder: Recorder, state: CT.RunState, mo
             tools=tools[key], llm=make_llm(model), allow_delegation=False, memory=False, knowledge_sources=None,
             embedder=None, allow_code_execution=False, reasoning=False, planning=False, multimodal=False,
             inject_date=False, cache=False, max_retry_limit=AGENT_MAX_RETRY_LIMIT, respect_context_window=True,
-            step_callback=recorder.step, verbose=False, max_rpm=None, **AGENT_LIMITS[key])
+            step_callback=recorder.step, verbose=False, max_rpm=max_rpm, **AGENT_LIMITS[key])
     tasks = {}
     for name, cfg in tasks_cfg.items():
         tasks[name] = Task(name=name, description=cfg["description"].strip(),
@@ -335,7 +341,7 @@ def build_crew(ctx: Crew2FlowContext, recorder: Recorder, state: CT.RunState, mo
                            context=[tasks[c] for c in cfg.get("context", [])] or None)
     crew = Crew(agents=list(agents.values()), tasks=list(tasks.values()), process=Process.sequential,
                 memory=False, cache=False, planning=False, tracing=False, share_crew=False,
-                knowledge_sources=None, embedder=None, max_rpm=None, verbose=False,
+                knowledge_sources=None, embedder=None, max_rpm=max_rpm, verbose=False,
                 output_log_file=None, stream=False, task_callback=recorder.task)
     crew._task_output_handler.storage = KickoffTaskOutputsSQLiteStorage(db_path=str(ctx.ws.root / "tmp" / "kickoff.db"))
     return crew
@@ -367,8 +373,12 @@ def _python_tool_calls(recorder: Recorder) -> dict:
 
 
 def run_crew2_kickoff(clean_csv: Path, contract_json: Path, out_dir: Path, flow_contract_json: Path | None = None,
-                      n_jobs: int = 1, log=None) -> dict:
+                      n_jobs: int = 1, log=None, llm_mode: str = "scripted", budget: L.LiveBudget | None = None) -> dict:
     """Kick off the Flow's Crew 2 on Crew 1's delivered files; write the artifacts and the evidence to ``out_dir``."""
+    if llm_mode not in ("scripted", "live"):
+        raise ValueError(f"unknown llm_mode {llm_mode!r}")
+    live = llm_mode == "live"
+    source = L.SOURCE if live else S.SOURCE
     out = T._check_out_dir(out_dir)
     for p in (clean_csv, contract_json, *((flow_contract_json,) if flow_contract_json else ())):
         FH._read(Path(p))                                  # the path policy: never the raw export, never a link
@@ -379,14 +389,17 @@ def run_crew2_kickoff(clean_csv: Path, contract_json: Path, out_dir: Path, flow_
     ws = W.stage("crew2_flow_ws_", inputs, READ_NAMES, OUTPUT_NAMES)
     try:
         recorder = Recorder(ws.root)
-        recorder.add("run_started", orchestration="CrewAI crew.kickoff()", llm_responses=S.SOURCE)
+        recorder.add("run_started", orchestration="CrewAI crew.kickoff()", llm_responses=source)
         ctx = Crew2FlowContext(ws, n_jobs=n_jobs, has_flow_contract=bool(flow_contract_json))
         state = CT.RunState(FATAL)
-        crew = build_crew(ctx, recorder, state)
-        transport = S.ScriptedTransport(PLANS, AGENT_BY_TOOLS, ctx)
+        crew = build_crew(ctx, recorder, state, max_rpm=LIVE_MAX_RPM if live else None)
+        transport = (L.RecordingTransport(AGENT_BY_TOOLS, budget or L.LiveBudget.default(), "crew2", ctx, log) if live
+                     else S.ScriptedTransport(PLANS, AGENT_BY_TOOLS, ctx))
         evidence = K.KickoffEvidence()
+        kickoff_started = L.utc_now()
         with transport.installed(), evidence.listening(), _in_workspace(ws.root):
             result = crew.kickoff()
+        kickoff_finished = L.utc_now()
         kickoff_seconds = round(time.monotonic() - t0, 1)
         recorder.add("run_finished", fatal=state.fatal)
         if state.fatal:
@@ -395,28 +408,40 @@ def run_crew2_kickoff(clean_csv: Path, contract_json: Path, out_dir: Path, flow_
             raise Crew2RunFailed("the evaluation author did not verify the artifacts")
         if transport.network_blocked:
             raise Crew2RunFailed(f"network access was attempted: {transport.network_blocked[:3]}")
+        silent = [a for a in TOOLSETS if live and not transport.summary()["successful_responses_by_agent"].get(a)]
+        if silent:
+            raise Crew2RunFailed(f"agents without a live provider response: {silent}")
         out.mkdir(parents=True, exist_ok=True)
         for name, fname in OUTPUT_FILES.items():
             (out / fname).write_bytes(ws.read_output(name))
         kickoff = {
             "synthetic": True,
             "orchestration": "real CrewAI crew.kickoff(): Crew, 3 Agents, 3 Tasks, sequential process",
-            "llm_responses": S.SOURCE,
-            "disclosure": "The CrewAI orchestration is real. The model responses are scripted (not LLM inference); "
-                          f"every scripted text starts with '{S.SCRIPTED_MARK}'. Every number, check, fit and "
-                          "artifact was computed by deterministic Python tools (computed_by: python).",
+            "llm_mode": llm_mode,
+            "llm_responses": source,
+            "disclosure": (("The CrewAI orchestration is real and every agent response came from live Anthropic "
+                            f"inference ({DEFAULT_MODEL}); each provider call is recorded in llm_transport.exchanges "
+                            "(no header, no key). ") if live else
+                           ("The CrewAI orchestration is real. The model responses are scripted (not LLM inference); "
+                            f"every scripted text starts with '{S.SCRIPTED_MARK}'. "))
+                          + "Every number, check, fit and artifact was computed by deterministic Python tools "
+                            "(computed_by: python).",
             "agents": [{"key": k, "role": a.role, "tools": [t.name for t in a.tools]}
                        for k, a in zip(TOOLSETS, crew.agents)],
             "tasks": [{"name": t.name, "agent": t.agent.role} for t in crew.tasks],
-            "task_outputs": [{"task": o.name, "agent": o.agent, "source": "scripted", "text": recorder.redact(o.raw)}
+            "task_outputs": [{"task": o.name, "agent": o.agent, "source": "llm" if live else "scripted",
+                              "text": recorder.redact(o.raw)}
                              for o in result.tasks_output],
             "crewai_events": evidence.summary() | {"events": evidence.events},
             "llm_transport": transport.summary() | {"exchanges": transport.exchanges},
             "python_tool_calls": _python_tool_calls(recorder),
             "token_usage_reported_by_crewai": (crew.usage_metrics.model_dump()
                                                if hasattr(crew.usage_metrics, "model_dump") else None),
-            "model_id_configured": f"anthropic/{DEFAULT_MODEL} (never called: answered by the scripted transport)",
+            "model_id_configured": f"anthropic/{DEFAULT_MODEL}" + ("" if live else
+                                   " (never called: answered by the scripted transport)"),
             "llm_settings": LLM_SETTINGS, "agent_limits": AGENT_LIMITS, "agent_max_retry_limit": AGENT_MAX_RETRY_LIMIT,
+            "max_rpm": LIVE_MAX_RPM if live else None,
+            "timing": {"kickoff_started_utc": kickoff_started, "kickoff_finished_utc": kickoff_finished},
         }
         files = {fname: ctx.written[name] for name, fname in OUTPUT_FILES.items()}
         manifest = O.make_manifest(ctx.session, ctx.metrics, ctx.ref, ctx.repro, ctx.handoff, ctx.input_sha(), files,
@@ -425,7 +450,7 @@ def run_crew2_kickoff(clean_csv: Path, contract_json: Path, out_dir: Path, flow_
                                     "n_jobs": n_jobs})
         manifest |= {"step": "Flow Crew 2 kickoff (P5-D)", "orchestration": {
             "kickoff": "crew_kickoff.json", "trace": "trace.jsonl", "agents_executed":
-                kickoff["crewai_events"]["agents_executed"], "llm_responses": S.SOURCE}}
+                kickoff["crewai_events"]["agents_executed"], "llm_responses": source}}
         (out / "trace.jsonl").write_text(recorder.jsonl(), encoding="utf-8", newline="\n")
         (out / "crew_kickoff.json").write_text(json.dumps(kickoff, indent=2, default=str) + "\n", encoding="utf-8",
                                                newline="\n")

@@ -1,0 +1,1143 @@
+{
+  "synthetic": true,
+  "orchestration": "real CrewAI crew.kickoff() of the approved P3 Crew 1 (crew1.crew.build_crew, unchanged)",
+  "llm_mode": "live",
+  "llm_responses": "live Anthropic Messages API (api.anthropic.com), recorded by crew_common.live",
+  "disclosure": "The CrewAI orchestration is real and every agent response came from live Anthropic inference (claude-haiku-4-5-20251001); each provider call is recorded in llm_transport.exchanges (no header, no key). Every data value, statistic, chart, contract and gate result was computed by Crew 1's deterministic Python tools.",
+  "agents": [
+    {
+      "role": "Data Ingestion & Cleaning Engineer",
+      "tools": [
+        "load_raw_table",
+        "detect_defects",
+        "apply_policy_c",
+        "eligibility_summary"
+      ]
+    },
+    {
+      "role": "Exploratory Data Analyst",
+      "tools": [
+        "list_analyses",
+        "run_analysis",
+        "render_chart",
+        "assemble_eda_report"
+      ]
+    },
+    {
+      "role": "Data Contract & Insights Author",
+      "tools": [
+        "build_dataset_contract",
+        "run_handoff_gate",
+        "write_insights"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "name": "ingest_and_clean",
+      "agent": "Data Ingestion & Cleaning Engineer"
+    },
+    {
+      "name": "explore_and_report",
+      "agent": "Exploratory Data Analyst"
+    },
+    {
+      "name": "contract_and_insights",
+      "agent": "Data Contract & Insights Author"
+    }
+  ],
+  "task_outputs": [
+    {
+      "task": "ingest_and_clean",
+      "agent": "Data Ingestion & Cleaning Engineer",
+      "source": "llm",
+      "text": "## Cleaning Narrative\n\nThe synthetic raw export was ingested across seven tables: raw.productions (400 rows), raw.budget_revisions (552 rows), raw.category_plans (2,956 rows), raw.commitments (3,762 rows), raw.manual_costs (1,234 rows), raw.payments (5,353 rows), and raw.snapshot_schedule (1,600 rows).\n\nDefect detection identified 42 records with problems across multiple categories. Exact duplicates were removed: 22 from commitments, 16 from manual_costs, and 69 from payments. Invalid payments with out-of-range amounts were excluded: 15 records. Data quality issues included 24 missing category values in commitments, 3 missing created_date values in manual_costs, and 15 out-of-range amount_gross values in payments.\n\nNormalisations were applied deterministically across all tables without imputation. Productions underwent code normalisation (11 records) and whitespace trimming (9 records). Budget_revisions had 13 dates reformatted. Category_plans required code normalisation (91 records) and whitespace trimming (58 records). Commitments underwent extensive cleaning: code normalisation (67 records), date reformatting (76 records), pre_vat recomputation from gross (32 records), and whitespace trimming (84 records). Manual_costs were normalised with code standardisation (26 records), date reformatting (23 records), pre_vat recomputation (10 records), and whitespace trimming (30 records). Payments required code normalisation (18 records), date reformatting (86 records), and whitespace trimming (18 records). Snapshot_schedule had 39 dates reformatted.\n\nPolicy C applied deterministically, writing clean_data.csv with 1,538 rows and 37 columns, and cleaning_log.json documenting all operations. Of 1,600 scheduled snapshots across four stages (S0\u2013S3), 1,538 snapshots remained eligible. Ineligible snapshots totalled 62: 50 excluded due to commitment_category_missing and 12 due to manual_cost_undated. By stage, ineligibility increased progressively: S0 had 3 ineligible snapshots, S1 had 14, S2 had 20, and S3 had 25. Invalid payments (15 records) were excluded from the handoff. Among 400 productions, 375 were fully eligible, 3 were fully ineligible, and 25 had at least one ineligible snapshot. No target_unreliable_productions were flagged. The cleaning process preserved all normalisable data while excluding only records that could not be reliably reconstructed under Policy C's deterministic rules."
+    },
+    {
+      "task": "explore_and_report",
+      "agent": "Exploratory Data Analyst",
+      "source": "llm",
+      "text": "## Final Answer\n\n**Exploratory Data Analysis Report: Eligible Synthetic Snapshots**\n\n### Analyses Run\n1. **descriptive_statistics** \u2013 Counts and numeric summaries by split group, stage, and event type\n2. **overrun_prevalence** \u2013 Row-level is_overrun and is_material_overrun prevalence with Wilson 95% intervals\n3. **signed_gap_distribution** \u2013 Distribution of signed budget gap (ILS) and gap as share of budget\n4. **budget_revision_effects** \u2013 Overrun prevalence and gap by number of budget revisions\n5. **feature_correlations** \u2013 Spearman and point-biserial correlations on train group\n6. **fee_breakdown** \u2013 Overrun prevalence and gap by fee mode and fee inclusion\n7. **frozen_split_prevalence_difference** \u2013 Production-level bootstrap intervals for frozen groups\n8. **policy_c_exclusions** \u2013 Policy C eligibility and exclusion counts by reason and stage\n\n### Charts Rendered\n1. **prevalence_by_stage** \u2013 Overrun prevalence by stage (Wilson 95% interval)\n2. **split_prevalence** \u2013 Overrun prevalence by frozen group (production-level bootstrap 95% interval)\n3. **gap_histogram** \u2013 Signed gap as a share of the as-of budget\n4. **fee_breakdown** \u2013 Overrun prevalence by fee terms\n\n### Key Statistics\n\n**Population:** 1,538 eligible snapshots from 397 productions (375 fully eligible, 22 partially eligible, 3 fully ineligible from 400 scheduled).\n\n**Overall Overrun Prevalence:** 47.3% (95% Wilson interval: 44.8%\u201349.8%)\n\n**Overrun Prevalence by Stage:**\n- S0: 51.6% (95% interval: 46.7%\u201356.5%)\n- S1: 49.7% (95% interval: 44.8%\u201354.7%)\n- S2: 44.7% (95% interval: 39.8%\u201349.8%)\n- S3: 42.9% (95% interval: 38.0%\u201348.0%)\n\n**Frozen Split Prevalence Difference:**\n- Train group: 44.5% (95% production-level bootstrap interval: 38.9%\u201350.2%), 1,084 snapshots, 278 productions\n- Test group: 59.2% (95% interval: 48.4%\u201369.5%), 306 snapshots, 80 productions\n- Demo group: 43.9% (95% interval: 29.7%\u201359.2%), 148 snapshots, 39 productions\n- Test minus train difference: 14.7 percentage points (95% bootstrap interval: 3.3\u201326.2 pp)\n\n---\n\n### Report Content\n\n**Overview**\n\nThis exploratory data analysis examines 1,538 eligible snapshots from 397 productions across four event stages (S0\u2013S3) and three frozen split groups (train, test, demo). The analysis applies the P2 contract definitions of the signed gap (verified final cost plus contractual fee when included, minus approved budget) and overrun status (gap exceeding 0.5 ILS). The dataset includes 375 fully eligible productions, 22 partially eligible productions, and 3 fully ineligible productions from the 400 scheduled. Eight approved analyses were run to characterize overrun prevalence, budget gap distribution, budget revision effects, feature correlations, fee terms, and frozen split differences.\n\n**Data Quality and Policy C Exclusions**\n\nPolicy C eligibility screening excluded 62 snapshots from the 1,600 scheduled: 50 due to missing commitment categories and 12 due to undated manual costs. Ineligibility increased progressively by stage, from 3 ineligible snapshots in S0 to 25 in S3. The cleaning process identified 42 records with problems across seven tables and removed exact duplicates and invalid payments. All normalisable data were preserved; only records that could not be reliably reconstructed under Policy C's deterministic rules were excluded. No target_unreliable_productions were flagged.\n\n**Overrun Prevalence**\n\nOverall overrun prevalence (is_overrun, gap exceeding 0.5 ILS) was 47.3% (95% Wilson interval: 44.8%\u201349.8%) across the 1,538 eligible snapshots. Overrun prevalence declined across stages: S0 at 51.6% (95% interval: 46.7%\u201356.5%), S1 at 49.7% (95% interval: 44.8%\u201354.7%), S2 at 44.7% (95% interval: 39.8%\u201349.8%), and S3 at 42.9% (95% interval: 38.0%\u201348.0%). Material overrun prevalence (gap exceeding 2% of budget) was 35.7% (95% interval: 33.3%\u201338.1%) overall. By event type, conference snapshots showed the highest overrun prevalence at 55.1% (95% interval: 50.1%\u201360.0%), while wedding snapshots showed the lowest at 39.3% (95% interval: 34.5%\u201344.2%).\n\n**Signed Budget Gap**\n\nThe signed gap distribution was right-skewed with a median of \u2212988.9 ILS (under budget) and a mean of \u22121,863.6 ILS. The 5th to 95th percentile range was \u221246,958.0 ILS to 41,310.1 ILS. By stage, median gaps shifted from positive in S0 (282.4 ILS) to increasingly negative in S1 (\u2212255.7 ILS), S2 (\u22122,535.0 ILS), and S3 (\u22123,441.9 ILS). The gap as a share of the as-of budget had a median of \u22120.5% and a 5th to 95th percentile range of \u221216.0% to 16.3%. The histogram shows concentration near zero with a long right tail, indicating most snapshots cluster near budget but some have substantial positive gaps.\n\n**Budget Revisions**\n\nOverrun prevalence was strongly associated with the number of budget revisions to date. Snapshots with zero revisions had an overrun prevalence of 51.7% (95% interval: 49.0%\u201354.4%) and a mean gap of 1,965.3 ILS. Snapshots with one revision had a prevalence of 25.0% (95% interval: 18.9%\u201332.3%) and a mean gap of \u221219,638.0 ILS. Snapshots with two or more revisions had a prevalence of 9.8% (95% interval: 4.6%\u201319.8%) and a mean gap of \u221239,325.5 ILS. This association suggests that revisions are associated with larger negative gaps and lower overrun rates.\n\n**Fee Mode and Fee Inclusion**\n\nOverrun prevalence differed by fee inclusion status. Snapshots with fees included in the budget had an overrun prevalence of 48.7% (95% interval: 45.3%\u201352.1%), while those without fees included had a prevalence of 45.8% (95% interval: 42.2%\u201349.4%). By fee mode, snapshots with amount-based fees had an overrun prevalence of 52.6% (95% interval: 48.4%\u201356.8%), while those with percent-based fees had a prevalence of 44.5% (95% interval: 41.4%\u201347.6%). Mean gaps were \u2212466.4 ILS for fees included and \u22123,430.3 ILS for fees not included, and \u22121,585.5 ILS for amount-based fees versus \u22122,013.2 ILS for percent-based fees.\n\n**Feature Correlations (Train Group)**\n\nOn the train group (1,084 snapshots), Spearman correlation with the signed gap showed the strongest associations with over_plan_pre_vat (0.266), budget_revisions_to_date (\u22120.246), and current_position_ils (0.124). Point-biserial correlation with is_overrun showed the strongest associations with over_plan_pre_vat (0.275), budget_revisions_to_date (\u22120.183), and manual_costs_pre_vat (0.176). All correlations were weak to moderate. Committed_ratio, guest_count, and lead_time_days showed weak correlations with both targets. No feature showed a strong linear or monotonic relationship with the gap or overrun status.\n\n**Frozen Split Prevalence Difference**\n\nThe frozen split showed a significant difference in overrun prevalence between test and train groups. Train group overrun prevalence was 44.5% (95% production-level bootstrap interval: 38.9%\u201350.2%) across 1,084 snapshots from 278 productions. Test group prevalence was 59.2% (95% interval: 48.4%\u201369.5%) across 306 snapshots from 80 productions. Demo group prevalence was 43.9% (95% interval: 29.7%\u201359.2%) across 148 snapshots from 39 productions. The test minus train difference was 14.7 percentage points (95% bootstrap interval: 3.3\u201326.2 pp), indicating the test group had higher overrun prevalence than the train group.\n\n**Limitations**\n\nThis analysis describes associations in the eligible snapshots only; ineligible snapshots (62 total) are not represented. The frozen split is a documented sampling outcome, not a result of analysis, and the test group's higher overrun prevalence is an observed difference, not a tuning outcome. Correlations are computed on the train group only and are weak to moderate; no feature shows a strong predictive relationship with the gap or overrun status. The analysis does not assess causation, real-world accuracy, or the reliability of the underlying cost and budget data. Budget revisions, fee terms, and event type show associations with overrun prevalence, but these are descriptive findings, not explanations of overrun drivers."
+    },
+    {
+      "task": "contract_and_insights",
+      "agent": "Data Contract & Insights Author",
+      "source": "llm",
+      "text": "---\n\n## Final Confirmation\n\n**Gate Status:** PASS (all 21 hard checks passed; 1 warning on prevalence imbalance is informational)\n\n**Dataset Contract:**\n- **Row count:** 1,538 eligible snapshots\n- **Exclusion counts:** \n  - commitment_category_missing: 50\n  - manual_cost_undated: 12\n- **Columns:** 37\n\n**write_insights Checks:** All empty\n- sections_missing_or_empty: []\n- frozen_split_note_problems: []\n- unverified_quantitative_claims: []\n- forbidden_claims: []\n- context_problems: []\n\n---\n\n## Complete insights.md Content\n\n```markdown\n# Insights for Crew 2: Eligible Synthetic Snapshots\n\n## Observations (descriptive, from eligible synthetic snapshots)\n\nThe dataset comprises 1,538 eligible snapshots from 397 productions across four event stages (S0\u2013S3) and three frozen split groups (train, test, demo). Of the 400 scheduled productions, 375 are fully eligible, 22 are partially eligible (with at least one ineligible snapshot), and 3 have no eligible snapshots.\n\n**Overrun Prevalence by Stage**\n\nOverall overrun prevalence (is_overrun, signed gap exceeding 0.5 ILS) was 47.3% (95% Wilson interval: 44.8%\u201349.8%). Overrun prevalence declined across stages: S0 at 51.6% (95% interval: 46.7%\u201356.5%), S1 at 49.7% (95% interval: 44.8%\u201354.7%), S2 at 44.7% (95% interval: 39.8%\u201349.8%), and S3 at 42.9% (95% interval: 38.0%\u201348.0%). Material overrun prevalence (is_material_overrun, gap exceeding 2% of budget) was 35.7% (95% interval: 33.3%\u201338.1%) overall.\n\n**Signed Budget Gap Distribution**\n\nThe signed gap distribution was right-skewed with a median of \u2212988.9 ILS (under budget) and a mean of \u22121,863.6 ILS. The 5th to 95th percentile range was \u221246,958.0 ILS to 41,310.1 ILS. By stage, median gaps shifted from positive in S0 (282.4 ILS) to increasingly negative in S1 (\u2212255.7 ILS), S2 (\u22122,535.0 ILS), and S3 (\u22123,441.9 ILS). The gap as a share of the as-of budget had a median of \u22120.5% and a 5th to 95th percentile range of \u221216.0% to 16.3%.\n\n**Overrun Prevalence by Event Type**\n\nBy event type, conference snapshots showed the highest overrun prevalence at 55.1% (95% interval: 50.1%\u201360.0%), while wedding snapshots showed the lowest at 39.3% (95% interval: 34.5%\u201344.2%).\n\n**Budget Revisions**\n\nOverrun prevalence was associated with the number of budget revisions to date. Snapshots with zero revisions had an overrun prevalence of 51.7% (95% interval: 49.0%\u201354.4%) and a mean gap of 1,965.3 ILS. Snapshots with one revision had a prevalence of 25.0% (95% interval: 18.9%\u201332.3%) and a mean gap of \u221219,638.0 ILS. Snapshots with two or more revisions had a prevalence of 9.8% (95% interval: 4.6%\u201319.8%) and a mean gap of \u221239,325.5 ILS.\n\n**Fee Mode and Fee Inclusion**\n\nOverrun prevalence differed by fee inclusion status. Snapshots with fees included in the budget had an overrun prevalence of 48.7% (95% interval: 45.3%\u201352.1%), while those without fees included had a prevalence of 45.8% (95% interval: 42.2%\u201349.4%). By fee mode, snapshots with amount-based fees had an overrun prevalence of 52.6% (95% interval: 48.4%\u201356.8%), while those with percent-based fees had a prevalence of 44.5% (95% interval: 41.4%\u201347.6%).\n\n**Feature Correlations (Train Group)**\n\nOn the train group (1,084 snapshots), Spearman correlation with the signed gap showed the strongest associations with over_plan_pre_vat (0.266), budget_revisions_to_date (\u22120.246), and current_position_ils (0.124). Point-biserial correlation with is_overrun showed the strongest associations with over_plan_pre_vat (0.275), budget_revisions_to_date (\u22120.183), and manual_costs_pre_vat (0.176). All correlations were weak to moderate.\n\n## Hypotheses for Crew 2 (not predictions)\n\n1. Does the association between budget revisions and lower overrun prevalence reflect a causal mechanism (e.g., revisions allow teams to adjust budgets downward), or is it a selection effect (e.g., productions with larger negative gaps are more likely to revise)?\n\n2. Why do conference events show higher overrun prevalence than wedding events? Are there differences in cost structure, planning horizon, or budget discipline by event type?\n\n3. Can the weak correlations between individual features and the signed gap be explained by interactions or non-linear relationships not captured in univariate analysis?\n\n4. Does the association between over_plan_pre_vat and overrun status reflect category-level budget pressure, or does it indicate that certain categories are systematically underestimated?\n\n5. Is the right-skewed gap distribution driven by a subset of productions with large positive gaps, or is it a property of the cost and budget processes across the population?\n\n6. How do the frozen split groups differ in production characteristics (e.g., event type, budget size, revision frequency) beyond their overrun prevalence?\n\n## Frozen split note\n\nThe frozen split is documented and was not tuned. The test group had higher overrun prevalence than the train group: test minus train difference was +14.7 pp, 95% bootstrap interval [+3.3, +26.2] pp. This difference was assessed as a sampling outcome independent of the outcome mechanism (frozen_split_prevalence_difference analysis in stats.json, a production-level bootstrap).\n\n## Data quality and Policy C exclusions\n\nPolicy C eligibility screening excluded 62 snapshots from the 1,600 scheduled: 50 due to commitment_category_missing and 12 due to manual_cost_undated. Ineligibility increased progressively by stage, from 3 ineligible snapshots in S0 to 25 in S3. The cleaning process identified defects across seven tables and removed exact duplicates and invalid payments. All normalisable data were preserved; only records that could not be reliably reconstructed under Policy C's deterministic rules were excluded. No target_unreliable_productions were flagged.\n\n## Limitations\n\nThis analysis describes associations in the eligible snapshots only; ineligible snapshots (62 total) are not represented. The data are synthetic and there is no real-world validation. The frozen split is a documented sampling outcome, not a result of analysis, and the test group's higher overrun prevalence is an observed difference, not a tuning outcome. Correlations are computed on the train group only and are weak to moderate; no feature shows a strong predictive relationship with the gap or overrun status. The analysis does not assess causation or the reliability of the underlying cost and budget data. Budget revisions, fee terms, and event type show associations with overrun prevalence, but these are descriptive findings, not explanations of overrun drivers.\n```"
+    }
+  ],
+  "crewai_events": {
+    "crewai_version": "1.15.28",
+    "event_counts": {
+      "crew_kickoff_started": 1,
+      "task_started": 3,
+      "agent_execution_started": 3,
+      "llm_call_started": 20,
+      "tool_usage_finished": 33,
+      "agent_execution_completed": 3,
+      "task_completed": 3,
+      "crew_kickoff_completed": 1
+    },
+    "agents_executed": [
+      "Data Ingestion & Cleaning Engineer",
+      "Exploratory Data Analyst",
+      "Data Contract & Insights Author"
+    ],
+    "tasks_completed": [
+      "ingest_and_clean",
+      "explore_and_report",
+      "contract_and_insights"
+    ],
+    "tools_by_agent": {
+      "Data Ingestion & Cleaning Engineer": [
+        "load_raw_table",
+        "load_raw_table",
+        "load_raw_table",
+        "load_raw_table",
+        "load_raw_table",
+        "load_raw_table",
+        "load_raw_table",
+        "detect_defects",
+        "apply_policy_c",
+        "eligibility_summary"
+      ],
+      "Exploratory Data Analyst": [
+        "list_analyses",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "run_analysis",
+        "render_chart",
+        "render_chart",
+        "render_chart",
+        "render_chart",
+        "assemble_eda_report",
+        "assemble_eda_report",
+        "assemble_eda_report",
+        "assemble_eda_report",
+        "assemble_eda_report"
+      ],
+      "Data Contract & Insights Author": [
+        "build_dataset_contract",
+        "run_handoff_gate",
+        "build_dataset_contract",
+        "run_handoff_gate",
+        "write_insights"
+      ]
+    },
+    "events": [
+      {
+        "event": "crew_kickoff_started",
+        "crew": "crew"
+      },
+      {
+        "event": "task_started",
+        "task": "ingest_and_clean",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "load_raw_table",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "detect_defects",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "apply_policy_c",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "eligibility_summary",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "task_completed",
+        "task": "ingest_and_clean",
+        "agent": "Data Ingestion & Cleaning Engineer"
+      },
+      {
+        "event": "task_started",
+        "task": "explore_and_report",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "list_analyses",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_analysis",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "render_chart",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "assemble_eda_report",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "assemble_eda_report",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "assemble_eda_report",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "assemble_eda_report",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "assemble_eda_report",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "task_completed",
+        "task": "explore_and_report",
+        "agent": "Exploratory Data Analyst"
+      },
+      {
+        "event": "task_started",
+        "task": "contract_and_insights",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "agent_execution_started",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "build_dataset_contract",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_handoff_gate",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "build_dataset_contract",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "run_handoff_gate",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "tool_usage_finished",
+        "tool": "write_insights",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "llm_call_started"
+      },
+      {
+        "event": "agent_execution_completed",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "task_completed",
+        "task": "contract_and_insights",
+        "agent": "Data Contract & Insights Author"
+      },
+      {
+        "event": "crew_kickoff_completed",
+        "crew": "crew"
+      }
+    ]
+  },
+  "llm_transport": {
+    "source": "live Anthropic Messages API (api.anthropic.com), recorded by crew_common.live",
+    "requests": 20,
+    "successful_responses": 20,
+    "successful_responses_by_agent": {
+      "ingestion_engineer": 5,
+      "exploratory_analyst": 9,
+      "contract_author": 6
+    },
+    "non_200_responses": 0,
+    "refused_before_sending": 0,
+    "usage": {
+      "input_tokens": 136407,
+      "cache_creation_input_tokens": 5161,
+      "cache_read_input_tokens": 25805,
+      "output_tokens": 19200
+    },
+    "network_attempts_blocked": [],
+    "exchanges": [
+      {
+        "n": 1,
+        "crew": "crew1",
+        "agent": "ingestion_engineer",
+        "source": "live",
+        "started_utc": "2026-10-28T09:22:54.293+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "acdd23c1dbcafc514ad08dd7eb9982cda5105fb867ceca49c16d45532af10fe6",
+        "request_messages": 1,
+        "tools_offered": [
+          "apply_policy_c",
+          "detect_defects",
+          "eligibility_summary",
+          "load_raw_table"
+        ],
+        "finished_utc": "2026-10-28T09:22:58.350+00:00",
+        "seconds": 4.057,
+        "status": 200,
+        "provider_request_id": "req_011CgUPeWtPbuGbZBio3Zdnb",
+        "message_id": "msg_011CgUPeXQPvpA8oJ5JMm6p2",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 1259,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 336
+        },
+        "tool_calls": [
+          "load_raw_table",
+          "load_raw_table",
+          "load_raw_table",
+          "load_raw_table",
+          "load_raw_table",
+          "load_raw_table",
+          "load_raw_table"
+        ]
+      },
+      {
+        "n": 2,
+        "crew": "crew1",
+        "agent": "ingestion_engineer",
+        "source": "live",
+        "started_utc": "2026-10-28T09:22:58.510+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "76c2745878b44e42c68cc7eda362cbcced241bcc2215ff08938c79ba0710c787",
+        "request_messages": 3,
+        "tools_offered": [
+          "apply_policy_c",
+          "detect_defects",
+          "eligibility_summary",
+          "load_raw_table"
+        ],
+        "finished_utc": "2026-10-28T09:23:00.361+00:00",
+        "seconds": 1.851,
+        "status": 200,
+        "provider_request_id": "req_011CgUPep5zDdNpTJbh4FQ9U",
+        "message_id": "msg_011CgUPepHdpfmWc72qauPgw",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 4181,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 49
+        },
+        "tool_calls": [
+          "detect_defects"
+        ]
+      },
+      {
+        "n": 3,
+        "crew": "crew1",
+        "agent": "ingestion_engineer",
+        "source": "live",
+        "started_utc": "2026-10-28T09:23:01.304+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "c2ef3fc38178d1259c910fea671c3a456de978eca08dad90b1c929a43924495d",
+        "request_messages": 5,
+        "tools_offered": [
+          "apply_policy_c",
+          "detect_defects",
+          "eligibility_summary",
+          "load_raw_table"
+        ],
+        "finished_utc": "2026-10-28T09:23:02.975+00:00",
+        "seconds": 1.671,
+        "status": 200,
+        "provider_request_id": "req_011CgUPf2356pHu83sjaVHVF",
+        "message_id": "msg_011CgUPf2DkLKqJyBNvCEZ63",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 4551,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 38
+        },
+        "tool_calls": [
+          "apply_policy_c"
+        ]
+      },
+      {
+        "n": 4,
+        "crew": "crew1",
+        "agent": "ingestion_engineer",
+        "source": "live",
+        "started_utc": "2026-10-28T09:23:03.810+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "c0c822a7d949f01116b960499d867bf76f421bade551acb7d4c965503e0e16bb",
+        "request_messages": 7,
+        "tools_offered": [
+          "apply_policy_c",
+          "detect_defects",
+          "eligibility_summary",
+          "load_raw_table"
+        ],
+        "finished_utc": "2026-10-28T09:23:05.498+00:00",
+        "seconds": 1.688,
+        "status": 200,
+        "provider_request_id": "req_011CgUPfCjWT39JCLh5qUJuD",
+        "message_id": "msg_011CgUPfCvfq3FCZ7nGCppgR",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 4748,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 37
+        },
+        "tool_calls": [
+          "eligibility_summary"
+        ]
+      },
+      {
+        "n": 5,
+        "crew": "crew1",
+        "agent": "ingestion_engineer",
+        "source": "live",
+        "started_utc": "2026-10-28T09:23:05.522+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "dd309075770ecbfae1afd87a9cf70e7e65b1e38ca7a104a96dbab8570d954220",
+        "request_messages": 9,
+        "tools_offered": [
+          "apply_policy_c",
+          "detect_defects",
+          "eligibility_summary",
+          "load_raw_table"
+        ],
+        "finished_utc": "2026-10-28T09:23:13.285+00:00",
+        "seconds": 7.763,
+        "status": 200,
+        "provider_request_id": "req_011CgUPfL729EHfbQeyF67qL",
+        "message_id": "msg_011CgUPfLKvMMPFQhAL5UcGr",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "end_turn",
+        "usage": {
+          "input_tokens": 4928,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 646
+        },
+        "tool_calls": []
+      },
+      {
+        "n": 6,
+        "crew": "crew1",
+        "agent": "exploratory_analyst",
+        "source": "live",
+        "started_utc": "2026-10-28T09:23:13.334+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "60ad83b0bca856c1156a123deac90d8a1f346d49cad2fb9e3cd9689f5784360c",
+        "request_messages": 1,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "finished_utc": "2026-10-28T09:23:55.528+00:00",
+        "seconds": 42.195,
+        "status": 200,
+        "provider_request_id": "req_011CgUPfv1DNNYRb1SxfC58W",
+        "message_id": "msg_011CgUPfvDNB3K2Q4pdhoeuM",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 2857,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 63
+        },
+        "tool_calls": [
+          "list_analyses"
+        ]
+      },
+      {
+        "n": 7,
+        "crew": "crew1",
+        "agent": "exploratory_analyst",
+        "source": "live",
+        "started_utc": "2026-10-28T09:23:55.537+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "e7d0069d0801c5f79c10eff62f84d5acd430da6ca2d2ee5697e5b7fc4301b000",
+        "request_messages": 3,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "finished_utc": "2026-10-28T09:24:00.672+00:00",
+        "seconds": 5.135,
+        "status": 200,
+        "provider_request_id": "req_011CgUPj24vy9AaLAB2fyDKs",
+        "message_id": "msg_011CgUPj2JJyNuCK8Bpa4Bp1",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 4264,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 396
+        },
+        "tool_calls": [
+          "run_analysis",
+          "run_analysis",
+          "run_analysis",
+          "run_analysis",
+          "run_analysis",
+          "run_analysis",
+          "run_analysis",
+          "run_analysis"
+        ]
+      },
+      {
+        "n": 8,
+        "crew": "crew1",
+        "agent": "exploratory_analyst",
+        "source": "live",
+        "started_utc": "2026-10-28T09:24:01.105+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "86726714d108a35d00f4b3cc386416802f9c91950897530230cd61a343cda0aa",
+        "request_messages": 5,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "finished_utc": "2026-10-28T09:24:04.545+00:00",
+        "seconds": 3.44,
+        "status": 200,
+        "provider_request_id": "req_011CgUPjRiE6nN82STpaSoVc",
+        "message_id": "msg_011CgUPjRteWTQF2PyDayLUH",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 9449,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 190
+        },
+        "tool_calls": [
+          "render_chart",
+          "render_chart",
+          "render_chart",
+          "render_chart"
+        ]
+      },
+      {
+        "n": 9,
+        "crew": "crew1",
+        "agent": "exploratory_analyst",
+        "source": "live",
+        "started_utc": "2026-10-28T09:24:05.719+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "cbfe743ecf125bed7abc69b7e1af0c48432ddcaf38ca402c257f839c24bc9d4d",
+        "request_messages": 7,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "finished_utc": "2026-10-28T09:24:27.378+00:00",
+        "seconds": 21.659,
+        "status": 200,
+        "provider_request_id": "req_011CgUPjmVMqWbmnDioXSBjm",
+        "message_id": "msg_011CgUPjmgGGBMwopE28mx8j",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 9889,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 1862
+        },
+        "tool_calls": [
+          "assemble_eda_report"
+        ]
+      },
+      {
+        "n": 10,
+        "crew": "crew1",
+        "agent": "exploratory_analyst",
+        "source": "live",
+        "started_utc": "2026-10-28T09:24:27.498+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "c93ec5213f4d8b396a82a2f0385f8638096187df1d11642c7938dcb27812dbd4",
+        "request_messages": 9,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "finished_utc": "2026-10-28T09:24:48.940+00:00",
+        "seconds": 21.443,
+        "status": 200,
+        "provider_request_id": "req_011CgUPmNckD3PBA2TYmvS1W",
+        "message_id": "msg_011CgUPmNqdkRGXRwPnrLc1Z",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 11851,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 2085
+        },
+        "tool_calls": [
+          "assemble_eda_report"
+        ]
+      },
+      {
+        "n": 11,
+        "crew": "crew1",
+        "agent": "exploratory_analyst",
+        "source": "live",
+        "started_utc": "2026-10-28T09:24:48.998+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "3126e0a6d3aa53d98e8ba1d7522514bc1360e3eb43c516909b2f0a66a3c82329",
+        "request_messages": 11,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "finished_utc": "2026-10-28T09:25:09.980+00:00",
+        "seconds": 20.983,
+        "status": 200,
+        "provider_request_id": "req_011CgUPnxcRj9rLtRtThUF3v",
+        "message_id": "msg_011CgUPnxoqGjDWHTQDTBsvu",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 13785,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 2066
+        },
+        "tool_calls": [
+          "assemble_eda_report"
+        ]
+      },
+      {
+        "n": 12,
+        "crew": "crew1",
+        "agent": "exploratory_analyst",
+        "source": "live",
+        "started_utc": "2026-10-28T09:25:10.042+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "82d50e1ae76af4f6ebf588539b612b6d57c5e6104ccc5d6331003dc494ef54b2",
+        "request_messages": 13,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "finished_utc": "2026-10-28T09:25:30.281+00:00",
+        "seconds": 20.24,
+        "status": 200,
+        "provider_request_id": "req_011CgUPpWd3JLjWELLtg2xjC",
+        "message_id": "msg_011CgUPpX84Hx2PDJGv2Jhd5",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 15719,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 2032
+        },
+        "tool_calls": [
+          "assemble_eda_report"
+        ]
+      },
+      {
+        "n": 13,
+        "crew": "crew1",
+        "agent": "exploratory_analyst",
+        "source": "live",
+        "started_utc": "2026-10-28T09:25:30.341+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "46a04eaacbe3ad9e42ce54044b7511d1144159f4e155f6f9bd716cb6e80327ae",
+        "request_messages": 15,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "finished_utc": "2026-10-28T09:25:49.631+00:00",
+        "seconds": 19.29,
+        "status": 200,
+        "provider_request_id": "req_011CgUPr1GkN5ZTEpcsyJdFv",
+        "message_id": "msg_011CgUPr1V9U4MWaRQrC3P2D",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 17644,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 1928
+        },
+        "tool_calls": [
+          "assemble_eda_report"
+        ]
+      },
+      {
+        "n": 14,
+        "crew": "crew1",
+        "agent": "exploratory_analyst",
+        "source": "live",
+        "started_utc": "2026-10-28T09:25:49.691+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "72aabddc7c257b7bb1ea21ca9dc2aa5bf3cbdec6b0f1871a31d6b7c731a3c780",
+        "request_messages": 17,
+        "tools_offered": [
+          "assemble_eda_report",
+          "list_analyses",
+          "render_chart",
+          "run_analysis"
+        ],
+        "finished_utc": "2026-10-28T09:26:13.083+00:00",
+        "seconds": 23.392,
+        "status": 200,
+        "provider_request_id": "req_011CgUPsS5H2TbBZ9agBCZKf",
+        "message_id": "msg_011CgUPsSFCRh5UjcqdNwcuX",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "end_turn",
+        "usage": {
+          "input_tokens": 19541,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 2396
+        },
+        "tool_calls": []
+      },
+      {
+        "n": 15,
+        "crew": "crew1",
+        "agent": "contract_author",
+        "source": "live",
+        "started_utc": "2026-10-28T09:26:13.138+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "49c1f0a8bc36dcfc17fe1f3a0bb2cd6e0e163115a9909b0d585192193f92c773",
+        "request_messages": 1,
+        "tools_offered": [
+          "build_dataset_contract",
+          "run_handoff_gate",
+          "write_insights"
+        ],
+        "finished_utc": "2026-10-28T09:26:40.771+00:00",
+        "seconds": 27.633,
+        "status": 200,
+        "provider_request_id": "req_011CgUPuAwkYH7UZKgEoCQyB",
+        "message_id": "msg_011CgUPuBDcRUPGz44TNs2st",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 3,
+          "cache_creation_input_tokens": 5161,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 1206
+        },
+        "tool_calls": [
+          "build_dataset_contract"
+        ]
+      },
+      {
+        "n": 16,
+        "crew": "crew1",
+        "agent": "contract_author",
+        "source": "live",
+        "started_utc": "2026-10-28T09:26:40.803+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "32ccce7e6c86febb5b77c2976a454a69e258cae8bff3d546ce34d0e54cb90448",
+        "request_messages": 3,
+        "tools_offered": [
+          "build_dataset_contract",
+          "run_handoff_gate",
+          "write_insights"
+        ],
+        "finished_utc": "2026-10-28T09:26:43.184+00:00",
+        "seconds": 2.38,
+        "status": 200,
+        "provider_request_id": "req_011CgUPwCd1ZfQeLK6KtwXFA",
+        "message_id": "msg_011CgUPwCs9jYiV5MgwxkNyB",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 1190,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 5161,
+          "output_tokens": 79
+        },
+        "tool_calls": [
+          "run_handoff_gate"
+        ]
+      },
+      {
+        "n": 17,
+        "crew": "crew1",
+        "agent": "contract_author",
+        "source": "live",
+        "started_utc": "2026-10-28T09:26:43.201+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "5f0cb677b72f2f279b0d77314b2a461d5d94bce19af618d9e836622019c95844",
+        "request_messages": 5,
+        "tools_offered": [
+          "build_dataset_contract",
+          "run_handoff_gate",
+          "write_insights"
+        ],
+        "finished_utc": "2026-10-28T09:26:45.566+00:00",
+        "seconds": 2.364,
+        "status": 200,
+        "provider_request_id": "req_011CgUPwNogWfjS322yQMQiW",
+        "message_id": "msg_011CgUPwNzqsedGGkkr9ve7o",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 1255,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 5161,
+          "output_tokens": 95
+        },
+        "tool_calls": [
+          "build_dataset_contract"
+        ]
+      },
+      {
+        "n": 18,
+        "crew": "crew1",
+        "agent": "contract_author",
+        "source": "live",
+        "started_utc": "2026-10-28T09:26:45.602+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "1651bae9dd9f17ece2f87fa90b34389acf68d0aca7b611f7185d65336782d8a8",
+        "request_messages": 7,
+        "tools_offered": [
+          "build_dataset_contract",
+          "run_handoff_gate",
+          "write_insights"
+        ],
+        "finished_utc": "2026-10-28T09:26:47.518+00:00",
+        "seconds": 1.916,
+        "status": 200,
+        "provider_request_id": "req_011CgUPwZ5ZZSdAvaMpq7aMA",
+        "message_id": "msg_011CgUPwZEzA2CxAFVAavNLq",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 2074,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 5161,
+          "output_tokens": 49
+        },
+        "tool_calls": [
+          "run_handoff_gate"
+        ]
+      },
+      {
+        "n": 19,
+        "crew": "crew1",
+        "agent": "contract_author",
+        "source": "live",
+        "started_utc": "2026-10-28T09:26:48.930+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "d74977f2b50eeb2107fb20170a57a232500d8175e5124d44c6165fce96f0aa5d",
+        "request_messages": 9,
+        "tools_offered": [
+          "build_dataset_contract",
+          "run_handoff_gate",
+          "write_insights"
+        ],
+        "finished_utc": "2026-10-28T09:27:10.331+00:00",
+        "seconds": 21.401,
+        "status": 200,
+        "provider_request_id": "req_011CgUPwoG6nrnhrCnX6igDJ",
+        "message_id": "msg_011CgUPwoTFqKi2d5oXwNvRc",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "tool_use",
+        "usage": {
+          "input_tokens": 2600,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 5161,
+          "output_tokens": 1773
+        },
+        "tool_calls": [
+          "write_insights"
+        ]
+      },
+      {
+        "n": 20,
+        "crew": "crew1",
+        "agent": "contract_author",
+        "source": "live",
+        "started_utc": "2026-10-28T09:27:10.371+00:00",
+        "model_requested": "claude-haiku-4-5-20251001",
+        "max_tokens_requested": 8192,
+        "request_sha256": "0ecc14bb140562f39f4fc5467bae799907e78f309168b7da1dcfdfe1137be5d4",
+        "request_messages": 11,
+        "tools_offered": [
+          "build_dataset_contract",
+          "run_handoff_gate",
+          "write_insights"
+        ],
+        "finished_utc": "2026-10-28T09:27:28.220+00:00",
+        "seconds": 17.849,
+        "status": 200,
+        "provider_request_id": "req_011CgUPyNyuY5vy3WEcVR6oJ",
+        "message_id": "msg_011CgUPyPTS6n51zmAZtEeZn",
+        "model": "claude-haiku-4-5-20251001",
+        "stop_reason": "end_turn",
+        "usage": {
+          "input_tokens": 4619,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 5161,
+          "output_tokens": 1874
+        },
+        "tool_calls": []
+      }
+    ]
+  },
+  "python_tool_calls": {
+    "computed_by": "python",
+    "calls": 33,
+    "failed": 2
+  },
+  "rate_limit_note": "the P3 limits (max_rpm 20 per agent and crew)",
+  "gate": {
+    "status": "PASS",
+    "checks": 22
+  },
+  "handoff_sha256": {
+    "clean_data.csv": "2b8353247ebd7c5e9c63acec4c8a0bbc773380e846bd8c59ba21b58b75aa77e8",
+    "dataset_contract.json": "d8774b8dd55b835822e1f0f1179734be536b647b2f0111ec14f2ee59bc5f719c"
+  },
+  "timing": {
+    "started_at": "2026-10-28T09:22:52+00:00",
+    "kickoff_seconds": 275.8,
+    "kickoff_started_utc": "2026-10-28T09:22:54.196+00:00",
+    "kickoff_finished_utc": "2026-10-28T09:27:28.345+00:00"
+  },
+  "analyses_requested": [
+    "descriptive_statistics",
+    "overrun_prevalence",
+    "signed_gap_distribution",
+    "budget_revision_effects",
+    "feature_correlations",
+    "fee_breakdown",
+    "frozen_split_prevalence_difference",
+    "policy_c_exclusions"
+  ],
+  "charts_rendered": [
+    "prevalence_by_stage",
+    "split_prevalence",
+    "gap_histogram",
+    "fee_breakdown"
+  ]
+}

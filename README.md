@@ -9,6 +9,10 @@ Product Workflow*. The business problem is **predicting budget overruns for even
 productions**: will a production exceed its client-approved budget, with what
 probability, and by how much (signed, in ILS)?
 
+> *Production Suite Budget AI combines the flexibility of multi-agent AI with the reliability of deterministic
+> contract validation — demonstrated through a genuine, verified end-to-end LLM execution*
+> ([academic evidence report](docs/academic_evidence_report.md)).
+
 This repository is separate from any commercial product codebase. It contains
 only original code, synthetic data and documentation.
 
@@ -19,11 +23,24 @@ only original code, synthetic data and documentation.
 * **Synthetic data.** Every record is produced by the seeded simulation in `generator/` (seed `42`). No real
   customer, vendor or event data exists in this repository. Results on this data are not evidence of real-world
   predictive accuracy.
-* **Scripted model responses.** In the P5 Flow the CrewAI Flow, both crews, their agents and tasks run for real
-  (`crew.kickoff()`), but **every LLM response is scripted**: an in-process transport (`crew_common/scripted.py`)
-  answers each model request from a fixed script, marked `[SCRIPTED RESPONSE - not LLM inference]`. No model
-  inference, no network call, no API key. Every number, check, fit and artifact is computed by deterministic
-  Python tools. (P3's approved handoff `artifacts/crew1/p3-live-005/` came from one owner-approved live run.)
+* **Two LLM modes: scripted (default) and live.** In the P5 Flow the CrewAI Flow, both crews, their six agents
+  and tasks always run for real (`crew.kickoff()`).
+  * **Scripted** (default; the committed runs under `flow_evidence/runs/` and the tests): every LLM response comes
+    from an in-process transport (`crew_common/scripted.py`) that answers from a fixed script, marked
+    `[SCRIPTED RESPONSE - not LLM inference]`. No model inference, no network call, no API key.
+  * **Live** (`--llm live`): every agent response comes from the Anthropic API (`claude-haiku-4-5-20251001`), and
+    each provider call is recorded with UTC timestamps, the provider's request id, message id and token usage
+    (no key, no header). **One documented live run of the complete Flow** is committed in
+    [`flow_evidence/live/p5-live-001/`](flow_evidence/live/p5-live-001/): all six agents answered by
+    `claude-haiku-4-5-20251001` (32 provider calls), gate `PASS`, Crew 2 after `PASS`, 8 outputs, verifier 10/10.
+    See [Run the Complete Flow with a Live LLM](#run-the-complete-flow-with-a-live-llm) and the
+    [academic evidence report](docs/academic_evidence_report.md).
+
+  In both modes every number, check, fit and artifact is computed by deterministic Python tools, and the contract
+  gate between the crews is the same deterministic code. Separately, P3's approved Crew 1 handoff
+  `artifacts/crew1/p3-live-005/` came from one owner-approved live run of **Crew 1 alone** (2026-10-19, before the
+  Flow existed: 3 agents, no Flow contract gate, no Crew 2); it is not a complete Flow run. The complete live Flow
+  run is `flow_evidence/live/p5-live-001/` (2026-10-28).
 * **Instructor approval.** The instructor approved using the existing Production Suite as the business context for
   this academic project, provided that the AI agents and machine-learning workflow were developed specifically for
   the assignment. The instructor also accepted clearly labeled, documented synthetic data. The project focuses on
@@ -43,8 +60,6 @@ py -3.13 -m venv .venv-app
 .venv-app\Scripts\python -m pip install -r requirements-app.txt
 .venv-app\Scripts\streamlit run app\streamlit_app.py
 ```
-
-Until the P5 pull request is merged into `main`, clone the branch instead: add `-b p5-flow` to the clone command.
 
 The browser opens at http://localhost:8501 on the committed canonical run `p5e-run-001` (VERIFIED badge: every
 file matches its recorded sha256). Tabs: Overview, Model results, Artifacts, Contract gate demos, Run the full
@@ -75,6 +90,86 @@ publication baselines against `origin/main`. In a clone from GitHub that is the 
 from another local copy, `origin/main` is that copy's local `main`, which may be older; point it at the published
 baseline first: `git update-ref refs/remotes/origin/main ea7366f` (the published `main` after P4).
 
+### Run the Complete Flow with a Live LLM
+
+**Committed live run.** `flow_evidence/live/p5-live-001/` is a byte-for-byte copy of the documented complete live run
+(2026-10-28; `evidence.json` lists every file's sha256). Check it without a key or network:
+`.venv\Scripts\python -m orchestrator.verify_live_run flow_evidence/live/p5-live-001` → `VERDICT: PASS (10/10 checks)`.
+
+| | `p5-live-001` |
+|---|---|
+| Provider calls | 32, all HTTP 200, model `claude-haiku-4-5-20251001`; 0 errors, 0 retries, 0 scripted responses |
+| Per agent | Crew 1: ingestion engineer 5, exploratory analyst 9, contract author 6 · Crew 2: handoff validator 2, TRAIN-only trainer 7, evaluation author 3 |
+| Tokens and cost | 204,348 input, 23,204 output; about USD 0.30 (estimate from the bundled price catalogue) |
+| Time | 8 min 40 s (Crew 1 276 s, gate 0.1 s, Crew 2 243 s) |
+| Gate and order | contract gate `PASS`, 0 violations at 09:27:28.526 UTC; Crew 2 started 09:27:28.529; its first provider call 09:27:30.479 |
+| Model | logistic regression `C = 10` by the pre-registered rule; P4 reproduction exact; TEST opened 0 times |
+
+`clean_data.csv`, `features.csv`, `model.joblib` and `model_card.md` are byte-identical to the scripted canonical run;
+the model-written EDA report and insights differ, and so does `dataset_contract.json` (the live model wrote no column
+descriptions after the code rejected its first attempt). Full record:
+[`docs/live_run.md`](docs/live_run.md#the-documented-live-run-flow_evidencelivep5-live-001); academic write-up:
+[`docs/academic_evidence_report.md`](docs/academic_evidence_report.md).
+
+**Reproduce it yourself.** The same Flow, with live Anthropic responses for all six agents (Crew 1: 3, Crew 2: 3). It needs an Anthropic API
+key; use a dedicated, temporary one ([key handling](docs/live_run.md#the-api-key)). One run costs about
+**USD 0.30** with `claude-haiku-4-5-20251001` (measured in `p5-live-001`; the number of model turns varies between
+runs; hard budget per run: 150 requests, 2M input and 150k output tokens, at most about USD 2.75) and takes about
+8–12 minutes.
+
+1. Fresh clone and environment (Windows shown; on macOS/Linux use `python3.13 -m venv .venv` and `.venv/bin/python`):
+
+   ```
+   git clone https://github.com/yuvalipa-dotcom/production-suite-budget-ai.git
+   cd production-suite-budget-ai
+   py -3.13 -m venv .venv
+   .venv\Scripts\python -m pip install -r requirements-ml.txt
+   ```
+
+2. Set the key for this terminal only (hidden input; never in a file, a commit or a recording):
+
+   ```
+   $k = Read-Host "Anthropic API key" -AsSecureString
+   $env:ANTHROPIC_API_KEY = [System.Net.NetworkCredential]::new("", $k).Password
+   Remove-Variable k
+   ```
+
+   macOS/Linux: `read -rs ANTHROPIC_API_KEY && export ANTHROPIC_API_KEY`.
+
+3. Run the complete Flow (one command):
+
+   ```
+   .venv\Scripts\python -m orchestrator.flow --llm live --out out/flow_runs/live-001 --n-jobs 5
+   ```
+
+   The console shows every provider call (`[LLM n] crew1/<agent>: HTTP 200 claude-haiku-4-5-… msg_… in=… out=…`),
+   `Crew 1 completed tasks`, `contract gate (deterministic Python) decision: PASS`, then
+   `Crew 2 kickoff starting (the gate returned PASS)` and Crew 2's calls, and ends with `"status": "PASS"`.
+   Without the key it exits `2` and makes no call. A provider error or an exhausted budget fails the run
+   (`FAILED_RUNTIME`); there is never a silent fallback to scripted responses.
+
+4. Verify the run from its files (standard library only, no network, no key), then clear the key:
+
+   ```
+   .venv\Scripts\python -m orchestrator.verify_live_run out/flow_runs/live-001
+   Remove-Item Env:ANTHROPIC_API_KEY
+   ```
+
+   Ten checks, all `PASS`: the Flow finished `PASS` in live mode; the deterministic gate returned `PASS` with 0
+   violations; every provider exchange is a recorded Anthropic call; **each of the six agents** received live
+   responses; no scripted response anywhere; by UTC time, **Crew 2 started only after the gate decided `PASS`**;
+   **all 8 required outputs** exist and match their sha256; totals are consistent; no key in the evidence.
+
+5. Inspect the evidence in `out/flow_runs/live-001/`: `flow_manifest.json` (status, routes, gate, `llm` totals and
+   estimated cost, `timing.utc`), `flow_events.jsonl`, `handoff/gate_report.json`, `crew1/crew_kickoff.json` and
+   `crew2/crew_kickoff.json` (`llm_transport.exchanges`: one record per provider call), and the eight outputs:
+   `crew1/clean_data.csv`, `crew1/eda_report.html`, `crew1/insights.md`, `crew1/dataset_contract.json`,
+   `crew2/features.csv`, `crew2/model.joblib`, `crew2/evaluation_report.md`, `crew2/model_card.md`.
+
+The tools, the gate and the model-selection rule are code, so a live run is expected to select the same model as
+the scripted run (logistic regression, `C = 10`); the narrative texts differ between runs. Details, controls,
+costs and a screen-recording procedure: [`docs/live_run.md`](docs/live_run.md).
+
 ### Requirement → evidence
 
 | Requirement | Where | Tests | PR |
@@ -86,13 +181,15 @@ baseline first: `git update-ref refs/remotes/origin/main ea7366f` (the published
 | File-only boundary: Crew 2 reads only the handoff folder | `budget_flow/`, `orchestrator/guard.py`, [`docs/flow.md`](docs/flow.md) | `tests/test_flow_handoff_boundary.py` | P5 |
 | TRAIN-only Crew 2; TEST never reopened (the P4 TEST result is cited, not recomputed) | `budget_flow/train.py`, `budget_flow/p4_reference.py` | `tests/test_flow_train.py` | P5 |
 | Real CrewAI kickoffs (agents, tasks, events) with the scripted transport | `crew_common/`, `flow_crews/`, `budget_flow/crew2_kickoff.py` | `tests/test_flow_kickoff.py`, `tests/test_crew_common.py` | P5 |
+| The complete Flow with live LLM responses for all six agents; recorded provider calls; evidence verifier | `crew_common/live.py`, `orchestrator/flow.py` (`--llm live`), `orchestrator/verify_live_run.py`, [`docs/live_run.md`](docs/live_run.md) | `tests/test_flow_live.py` (offline: the provider is replaced behind the recording transport) | live-LLM follow-up |
+| One documented live run of the complete Flow (6 agents, gate `PASS`, Crew 2 after `PASS`, 8 outputs) | `flow_evidence/live/p5-live-001/` | `tests/test_flow_live.py` (verifier 10/10 on the committed run), `tests/test_publish_scan_live.py` | live-LLM follow-up |
 | One CrewAI Flow: Crew 1 → contract gate → Crew 2, stopping before Crew 2 on a broken contract | `orchestrator/flow.py`, `orchestrator/scenarios.py`, `budget_flow/contract.py` | `tests/test_flow_contract.py`, `tests/test_flow_e2e.py` | P5 |
 | The 8 required outputs of a committed run, with hashes | `flow_evidence/runs/p5e-run-001/` (`crew1/`, `crew2/`, `flow_manifest.json`, `evidence.json`) | `tests/test_app_evidence.py`, `tests/test_flow_e2e.py` | P5 |
 | Five committed contract breaks (rename, money ×100, row deletion, contract column deletion, label leakage) | `flow_evidence/runs/p5e-break-*/` | `tests/test_flow_e2e.py` | P5 |
 | Streamlit demonstration | `app/`, [`docs/app.md`](docs/app.md) | `tests/test_app_evidence.py`, `app/tests/test_app_ui.py` | P5 |
 | Pre-publication security scan | `tools/`, [`docs/security_scan.md`](docs/security_scan.md) | `tests/test_publish_scan*.py`, `tests/test_publication_check*.py` | all |
 
-"P5" is the pull request that publishes the branch `p5-flow`.
+"P5" is pull request #6 (branch `p5-flow`), merged into `main`.
 
 ### The model file
 
@@ -105,19 +202,22 @@ its sha256. The Streamlit app never loads it; it shows its metadata only.
 | Phase | Content | Status |
 |---|---|---|
 | **P1** | Synthetic data generator, tests, documentation | done (branch `p1-synthetic-generator`) |
-| **P1-R / P1-R2** | Remediation: target audit, dataset v2, raw export, reconciliation, reports; Policy C cleaning and outcome-only contract | **branch `p1-remediation`** |
+| **P1-R / P1-R2** | Remediation: target audit, dataset v2, raw export, reconciliation, reports; Policy C cleaning and outcome-only contract | done (merged into `main`) |
 | **P2** | Dataset contract and deterministic quality gate | done |
 | **P3** | Crew 1: the data-analyst crew | done (PR #4) |
 | **P4** | Crew 2: predictive modelling, validation, single TEST evaluation | done (PR #5) |
-| **P5** | File-only crew boundary, TRAIN-only Crew 2, real CrewAI kickoffs, one CrewAI Flow with a contract gate, Streamlit demo | branch `p5-flow` |
+| **P5** | File-only crew boundary, TRAIN-only Crew 2, real CrewAI kickoffs, one CrewAI Flow with a contract gate, Streamlit demo | done (PR #6, merged into `main`) |
+| **Live LLM** | Instructor follow-up: the complete Flow with live Anthropic responses for all six agents (`--llm live`), provider-call record, evidence verifier done: live mode, offline tests and one documented live run (`flow_evidence/live/p5-live-001/`, verifier 10/10) |
 
 See [`docs/roadmap.md`](docs/roadmap.md).
 
 ## P5 the end-to-end Flow and the demo app
 
 One CrewAI Flow runs Crew 1 → contract gate → Crew 2 (TRAIN-only); a failed contract stops the run before Crew 2.
-The CrewAI orchestration and every Python computation are real; **the LLM responses are scripted** (no inference,
-no network). Run `.venv\Scripts\python -m orchestrator.flow --out out/flow_runs/run-001 --n-jobs 5`; see
+The CrewAI orchestration and every Python computation are real. By default **the LLM responses are scripted** (no
+inference, no network); with `--llm live` they come from the Anthropic API
+([live mode](#run-the-complete-flow-with-a-live-llm)). Run
+`.venv\Scripts\python -m orchestrator.flow --out out/flow_runs/run-001 --n-jobs 5`; see
 [`docs/flow.md`](docs/flow.md). The Streamlit app (own environment) shows the verified canonical run in
 [`flow_evidence/`](flow_evidence/) and starts runs only on request: `.venv-app\Scripts\streamlit run
 app\streamlit_app.py`; see [`docs/app.md`](docs/app.md).
@@ -139,7 +239,8 @@ The handoff is `clean_data.csv`, `dataset_contract.json`, `eda_report.html` and 
 
 Post-run validators re-check every output: a byte-identical recomputation, the P2 gate, and quantitative claims against the computed statistics with units.
 
-Install the pinned dependencies with `.venv\Scripts\python -m pip install -r requirements-crew.txt`. A live run (`python -m crew1.run --live --out artifacts/crew1/<run_id>`) needs `ANTHROPIC_API_KEY` in the environment; without `--live` or the key it exits `2` and makes no call. The offline tests need no key and block the network. See [`docs/crew1.md`](docs/crew1.md).
+Install the pinned dependencies with `.venv\Scripts\python -m pip install -r requirements-crew.txt`. A live run of Crew 1 alone (`python -m crew1.run --live --out artifacts/crew1/<run_id>`; this is how
+`p3-live-005` was produced, before the Flow existed) needs `ANTHROPIC_API_KEY` in the environment; without `--live` or the key it exits `2` and makes no call. The offline tests need no key and block the network. See [`docs/crew1.md`](docs/crew1.md).
 
 ## Quick start (Python 3.13)
 
@@ -192,6 +293,9 @@ is_overrun     = budget_gap_ils > 0.5   (any positive excess; 0.5 is rounding to
 | [`docs/feature_availability.md`](docs/feature_availability.md) | feature vs outcome-only vs metadata roles; machine-readable in [`contracts/column_roles.json`](contracts/column_roles.json) |
 | [`docs/security_scan.md`](docs/security_scan.md) | pre-publication scan summary |
 | [`docs/crew1.md`](docs/crew1.md) | Crew 1 (P3): agents, tools, deterministic boundary, isolation, validators |
+| [`docs/flow.md`](docs/flow.md) | P5: the CrewAI Flow, the contract gate, the deliberate contract breaks |
+| [`docs/live_run.md`](docs/live_run.md) | the complete Flow with a live LLM: controls, cost, key handling, verification, recording |
+| [`docs/academic_evidence_report.md`](docs/academic_evidence_report.md) | **academic evidence report**: the verified live run `p5-live-001`, gate chronology, artifacts, cost, rejection paths, limitations |
 
 ## Repository layout
 
@@ -207,7 +311,7 @@ docs/                documentation
 
 ## AI assistance
 
-The code in this repository was developed with AI coding assistance (Claude Code), under the owner's direction and review. Commits carry a `Co-Authored-By` trailer that records this. The P5 LLM responses are scripted, not generated by a model at run time (see [Disclosures](#disclosures)).
+The code in this repository was developed with AI coding assistance (Claude Code), under the owner's direction and review. Commits carry a `Co-Authored-By` trailer that records this. In the P5 Flow's default mode the LLM responses are scripted, not generated by a model at run time; in live mode (`--llm live`) they are generated by the Anthropic API at run time (see [Disclosures](#disclosures)).
 
 ## Licence
 
